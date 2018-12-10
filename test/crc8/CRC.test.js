@@ -1,5 +1,4 @@
 /* eslint-disable no-undef  */
-console.log(process.env.NODE_PATH)
 const assert = require('chai').assert
 const getCRC8 = require('@enocean-js/crc8')
 
