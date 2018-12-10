@@ -4,7 +4,7 @@
   "description": "open source java script implementation of the enocean protocol",
   "main": "packages/index.js",
   "scripts": {
-    "test": "standard && nyc --reporter=lcov mocha --recursive test"
+    "test": "export NODE_PATH=./packages/node_modules && standard && nyc --reporter=lcov mocha --recursive test"
   },
   "repository": {
     "type": "git",
