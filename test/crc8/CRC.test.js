@@ -1,6 +1,6 @@
 /* eslint-disable no-undef  */
+import getCRC8 from '@enocean-js/crc8'
 const assert = require('chai').assert
-const getCRC8 = require('@enocean-js/crc8')
 
 describe('CRC8 Calculation', function () {
   it('SHOULD turn any number of Bytes into a single Byte Checksum', function () {
