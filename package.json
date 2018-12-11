@@ -5,7 +5,7 @@
   "main": "packages/index.js",
   "module": "packages/main.js",
   "scripts": {
-    "test": "export NODE_PATH=./packages/node_modules && standard && nyc -r esm --reporter=lcov mocha -r esm --recursive test"
+    "test": "export NODE_PATH=./packages/node_modules && standard && nyc -r esm --reporter=lcov --reporter=text mocha -r esm --recursive test"
   },
   "repository": {
     "type": "git",
