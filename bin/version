@@ -9,6 +9,7 @@ const reset = '\x1b[0m'
 const dim = "\x1b[2m"
 process.argv.shift()
 process.argv.shift()
+console.log(process.argv)
 if(process.argv.lenght>0){
   var argv = process.argv.join(" ")
   console.log(`npm version ${argv}`)
