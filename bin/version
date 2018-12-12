@@ -2,6 +2,12 @@
 const main = require('../package.json')
 const fs = require('fs')
 const rootPath = 'packages/node_modules/@enocean-js'
+const green = '\x1b[32m'
+const red = "\x1b[31m"
+const blue = "\x1b[34m"
+const reset = '\x1b[0m'
+const dim = "\x1b[2m"
+console.log(`setting version to ${red}${main.version}${reset}`)
 
 var subModules = fs.readdirSync(rootPath)
 subModules.forEach(subModuleFolder => {
@@ -10,20 +16,25 @@ subModules.forEach(subModuleFolder => {
   if (stat.isDirectory()) {
     var subModulesPacketJSONPath = `${subModuleDirectory}/package.json`
     if (fs.existsSync(subModulesPacketJSONPath)) {
-      updateVersionInFile(subModulesPacketJSONPath)
-      //var subModulePackageJSON = JSON.parse(fs.readFileSync(subModulesPacketJSONPath, 'utf8'))
-      //subModulePackageJSON.version = main.version
-      //console.log(`setting version of ${subModuleFolder} to ${main.version}`)
-      //fs.writeFileSync(subModulesPacketJSONPath, JSON.stringify(subModulePackageJSON, null, 2))
+      updateVersionInFile(subModulesPacketJSONPath,subModuleFolder)
     }
   }
 })
 
-updateVersionInFile("resources/templates/package.json")
+updateVersionInFile("resources/templates/package.json","template")
 
-function updateVersionInFile(path){
+function updateVersionInFile(path,name = path){
   var packageJSON = JSON.parse(fs.readFileSync(path, 'utf8'))
   packageJSON.version = main.version
-  console.log(`setting version of ${path} to ${main.version}`)
+  console.log(`${green}✓ ${reset}${dim}${name}${reset}`)
+  if(packageJSON.hasOwnProperty("dependencies")){
+    for(dep in packageJSON.dependencies){
+      if(dep.includes("@enocean-js")){
+        packageJSON.dependencies[dep] = main.version
+        console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
+      }
+    }
+  }
   fs.writeFileSync(path, JSON.stringify(packageJSON, null, 2))
+
 }
