@@ -16,3 +16,7 @@ install dependencies at the global root directory. NOT inside your module folder
 alternatively you can add the dependencies with `npm i -S whatever` but immediately delete your node_modules folder.
 
 if `import` any other submodule, add it to the dependencies as well.
+
+every new package needs an initial publication
+
+    `npm publish --access public`
