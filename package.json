@@ -4,8 +4,10 @@
   "description": "open source java script implementation of the enocean protocol",
   "main": "packages/index.js",
   "module": "packages/main.js",
-  "nyc":{
-    "include":["packages/**/*.js"]
+  "nyc": {
+    "include": [
+      "packages/**/*.js"
+    ]
   },
   "scripts": {
     "test": "export NODE_PATH=./packages/node_modules && standard && nyc -r esm --reporter=lcov --reporter=text mocha -r esm --recursive test"
