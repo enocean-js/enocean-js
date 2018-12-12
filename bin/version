@@ -10,7 +10,7 @@ const reset = '\x1b[0m'
 const dim = "\x1b[2m"
 process.argv.shift()
 process.argv.shift()
-console.log(process.argv)
+console.log(process.argv.join(" "))
 
 console.log(`setting version to ${red}${main.version}${reset}`)
 
