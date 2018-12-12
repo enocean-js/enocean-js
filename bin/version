@@ -8,7 +8,8 @@ const red = "\x1b[31m"
 const blue = "\x1b[34m"
 const reset = '\x1b[0m'
 const dim = "\x1b[2m"
-
+process.argv.unshift()
+process.argv.unshift()
 console.log(process.argv)
 
 console.log(`setting version to ${red}${main.version}${reset}`)
