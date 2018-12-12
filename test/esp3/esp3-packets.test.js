@@ -20,7 +20,7 @@ describe('ERP3 Packets', () => {
   it('created from packet type number should have matching header.packetType and constructors', () => {
     for (var packetNr in packets) {
       var p = Packet.from(packetNr)
-      assert.equal(p.header.packetType, packetNr, `Wrong header.packetType at ${packetNr}`)
+      assert.equal(p.packetType, packetNr, `Wrong header.packetType at ${packetNr}`)
       assert.equal(p.constructor.name, packets[packetNr], 'Wrong Checksum for 00')
     }
   })
