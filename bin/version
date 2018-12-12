@@ -8,6 +8,9 @@ const red = "\x1b[31m"
 const blue = "\x1b[34m"
 const reset = '\x1b[0m'
 const dim = "\x1b[2m"
+
+console.log(process.argv)
+
 console.log(`setting version to ${red}${main.version}${reset}`)
 
 var subModules = fs.readdirSync(rootPath)
@@ -25,7 +28,7 @@ subModules.forEach(subModuleFolder => {
 updateVersionInFile("resources/templates/package.json","template")
 console.log("")
 console.log(`... commiting version update`)
-execSync(`git commit -a -m '${main.version}'`, {stdio: 'inherit' })
+execSync(`git commit -a -m '🎁 ${main.version}'`, {stdio: 'inherit' })
 
 function updateVersionInFile(path,name = path){
   var packageJSON = JSON.parse(fs.readFileSync(path, 'utf8'))
