@@ -9,11 +9,11 @@ subModules.forEach(subModuleFolder => {
   var stat = fs.statSync(subModuleDirectory)
   if (stat.isDirectory()) {
     var subModulesPacketJSONPath = `${subModuleDirectory}/package.json`
-    if(fs.existsSync(subModulesPacketJSONPath)){
-      var subModulePackageJSON = JSON.parse(fs.readFileSync(subModulesPacketJSONPath,'utf8'))
+    if (fs.existsSync(subModulesPacketJSONPath)) {
+      var subModulePackageJSON = JSON.parse(fs.readFileSync(subModulesPacketJSONPath, 'utf8'))
       subModulePackageJSON.version = main.version
       console.log(`setting version of ${subModuleFolder} to ${main.version}`)
-      fs.writeFileSync(subModulesPacketJSONPath,JSON.stringify(subModulePackageJSON,null,2))
+      fs.writeFileSync(subModulesPacketJSONPath, JSON.stringify(subModulePackageJSON, null, 2))
     }
   }
 })
