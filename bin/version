@@ -12,8 +12,7 @@ process.argv.shift()
 console.log(process.argv)
 if(process.argv.length>0){
   var argv = process.argv.join(" ")
-  console.log(`npm version ${argv}`)
-  //execSync(`npm version ${argv}`, {stdio: 'inherit' })
+  execSync(`npm version ${argv}`, {stdio: 'inherit' })
 }
 
 const main = require('../package.json')
