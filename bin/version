@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const main = require('../package.json')
 const fs = require('fs')
-const { execSync } = require('child_process')
+const { spawnSync } = require('child_process')
 const rootPath = 'packages/node_modules/@enocean-js'
 const green = '\x1b[32m'
 const red = "\x1b[31m"
@@ -23,7 +23,9 @@ subModules.forEach(subModuleFolder => {
 })
 
 updateVersionInFile("resources/templates/package.json","template")
-execSync(`git commit -a -m '${main.version}'`)
+console.log("")
+console.log(`... commiting version update`)
+spawnSync(`git commit -a -m '${main.version}'`)
 
 function updateVersionInFile(path,name = path){
   var packageJSON = JSON.parse(fs.readFileSync(path, 'utf8'))

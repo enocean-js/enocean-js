@@ -9,7 +9,7 @@ subModules.forEach(subModuleFolder => {
   if (stat.isDirectory()) {
     var subModulesPacketJSONPath = `${subModuleDirectory}/package.json`
     if (fs.existsSync(subModulesPacketJSONPath)) {
-      execSync('npm publish', { cwd: subModuleDirectory, shell: true })
+      execSync('npm publish', { cwd: subModuleDirectory, stdio: 'inherit' })
     }
   }
 })
