@@ -10,7 +10,7 @@ const dim = "\x1b[2m"
 process.argv.shift()
 process.argv.shift()
 console.log(process.argv)
-if(process.argv.lenght>0){
+if(process.argv.length>0){
   var argv = process.argv.join(" ")
   console.log(`npm version ${argv}`)
   //execSync(`npm version ${argv}`, {stdio: 'inherit' })
