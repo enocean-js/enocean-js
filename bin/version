@@ -10,10 +10,20 @@ subModules.forEach(subModuleFolder => {
   if (stat.isDirectory()) {
     var subModulesPacketJSONPath = `${subModuleDirectory}/package.json`
     if (fs.existsSync(subModulesPacketJSONPath)) {
-      var subModulePackageJSON = JSON.parse(fs.readFileSync(subModulesPacketJSONPath, 'utf8'))
-      subModulePackageJSON.version = main.version
-      console.log(`setting version of ${subModuleFolder} to ${main.version}`)
-      fs.writeFileSync(subModulesPacketJSONPath, JSON.stringify(subModulePackageJSON, null, 2))
+      updateVersionInFile(subModulesPacketJSONPath)
+      //var subModulePackageJSON = JSON.parse(fs.readFileSync(subModulesPacketJSONPath, 'utf8'))
+      //subModulePackageJSON.version = main.version
+      //console.log(`setting version of ${subModuleFolder} to ${main.version}`)
+      //fs.writeFileSync(subModulesPacketJSONPath, JSON.stringify(subModulePackageJSON, null, 2))
     }
   }
 })
+
+updateVersionInFile("resources/templates/package.json")
+
+function updateVersionInFile(path){
+  var packageJSON = JSON.parse(fs.readFileSync(path, 'utf8'))
+  packageJSON.version = main.version
+  console.log(`setting version of ${path} to ${main.version}`)
+  fs.writeFileSync(path, JSON.stringify(packageJSON, null, 2))
+}
