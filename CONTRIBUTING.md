@@ -20,3 +20,8 @@ if you `import` any other submodule, add it to the dependencies as well.
 every new package needs an initial publication so that it can be published to our scope.
 
     `npm publish --access public`
+
+## publishing a new version
+
+    bin/version patch
+    bin/publish
