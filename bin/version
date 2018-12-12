@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-const main = require('../package.json')
 const fs = require('fs')
 const { execSync } = require('child_process')
 const rootPath = 'packages/node_modules/@enocean-js'
@@ -10,8 +9,13 @@ const reset = '\x1b[0m'
 const dim = "\x1b[2m"
 process.argv.shift()
 process.argv.shift()
-console.log(process.argv.join(" "))
+if(process.argv.lenght>0){
+  var argv = process.argv.join(" ")
+  console.log(`npm version ${argv}`)
+  //execSync(`npm version ${argv}`, {stdio: 'inherit' })
+}
 
+const main = require('../package.json')
 console.log(`setting version to ${red}${main.version}${reset}`)
 
 var subModules = fs.readdirSync(rootPath)
