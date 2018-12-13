@@ -7,9 +7,9 @@ WE ARE NOT AFFILIATED WITH ENOCEAN IN ANY FORM. THIS IS NOT THE OFFICIAL SPECIFI
 
 ## Index
 
-Enocean Serial Protocol (ESP3)
-Enocean Equipment Profiles (EEP 2.6.4)
-Remote Management
-Security 
+* Enocean Serial Protocol (ESP3)
+* Enocean Equipment Profiles (EEP 2.6.4)
+* Remote Management
+* Security 
 
 
