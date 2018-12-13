@@ -2,6 +2,7 @@
 
 * [Packet Structure](#packet-structure)
 * [Packet Description](#packet-description)
+* [Packet Types](#packet-types)
 
 ## Packet structure
 ESP3 is a Point-to-Point protocol with a packet data structure.
