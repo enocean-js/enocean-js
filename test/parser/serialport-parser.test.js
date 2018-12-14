@@ -1,7 +1,7 @@
 /* eslint-disable no-undef  */
+import ESP3Parser from '@enocean-js/serialport-parser'
 const assert = require('chai').assert
-const Parser = require('@enocean-js/serialport-parser')
-esp3SimpleParser = new Parser()
+const esp3SimpleParser = new ESP3Parser()
 const sinon = require('sinon')
 
 const telegrams = [
@@ -21,7 +21,7 @@ describe('serialport enocean parser', function () {
         for (let key in telegrams) {
           let telegramm = Buffer.from(telegrams[key], 'hex')
           esp3SimpleParser.write(telegramm)
-          assert.deepEqual(spy.getCall(key).args[0], telegramm.toString('hex'))
+          assert.deepEqual(spy.getCall(key).args[0].toString(), telegramm.toString('hex'))
         }
         esp3SimpleParser.removeListener('data', spy)
       })
