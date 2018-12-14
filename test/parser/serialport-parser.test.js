@@ -46,7 +46,7 @@ describe('serialport enocean parser', function () {
       it('packets MUST be emitted, if messy bytes occur before the header was detected and there are at least 5 bytes to real sync byte', function () {
         const spy = sinon.spy()
         esp3SimpleParser.on('data', spy).on('error', err => err)
-        const messyBytes = [ // ESP3 can lose packets if 0x55 occurs in lesser than 5 bytes to real sync byte, therefore no 0x55 is defined on dangerous offsets.
+        const messyBytes = [
           '55a03d790001',
           '557017af60ff',
           '55a010001a03',
@@ -89,6 +89,25 @@ describe('serialport enocean parser', function () {
         esp3SimpleParser.write(byteStream)
         assert.equal(spy.callCount, 0, 'Broken packets are emitted.')
         esp3SimpleParser.removeListener('data', spy)
+      })
+      it('packet SHOULD be emitted, if it starts in the middle of another packets header', function () {
+        const spy = sinon.spy()
+        esp3SimpleParser.on('data', spy)
+        esp3SimpleParser.write(Buffer.from('55005500010005700838', 'hex')) // sync code in the middle of the header
+        esp3SimpleParser.write(Buffer.from('55000100015500010005700838', 'hex')) // CRC8H is the sync code of the next packet
+        assert.equal(spy.callCount, 2, '')
+        esp3SimpleParser.removeListener('data', spy)
+      })
+      it('an Error SHOULD be thrown if the packet exeeds 1000 Bytes', function () {
+        const spy = sinon.spy()
+        esp3SimpleParser.on('error', spy)
+        var buf = [0x55, 0xff, 0xff, 0xff, 0x01, 0x3d]
+        for (var i = 0; i < 1001; i++) {
+          buf.push(0)
+        }
+        esp3SimpleParser.write(Buffer.from(buf))
+        assert.equal(spy.callCount, 1, '')
+        esp3SimpleParser.removeListener('error', spy)
       })
     })
   })
