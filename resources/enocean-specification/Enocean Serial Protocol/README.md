@@ -47,7 +47,7 @@ Depending on the field [Packet Type](#packet-type) a different kind of packet is
 | 2 | 0x02 | RESPONSE | Response to any packet |
 | 3 | 0x03 | RADIO_SUB_TEL | Radio subtelegram |
 | 4 | 0x04 | EVENT Event | message |
-| 5 | 0x05 | COMMON_COMMAND | Common command |
+| 5 | 0x05 | [COMMON_COMMAND](Common_Command.md) | Common command |
 | 6 | 0x06 | SMART_ACK_COMMAND | Smart Ack command |
 | 7 | 0x07 | REMOTE_MAN_COMMAND | Remote management command |
 | 8 | 0x08 | --- | Reserved for EnOcean |
