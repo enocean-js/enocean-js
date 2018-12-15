@@ -5,8 +5,9 @@ const parser1 = new ESP3Parser({ maxBufferSize: 1200 })
 const parser2 = new ESP3AltParser({ maxBufferSize: 1200 })
 
 function runTest (parser) {
-  parser.on('data', data => { })
-  parser.on('error', data => { })
+  var cb = x => {}
+  parser.on('data', cb)
+  parser.on('error', cb)
 
   var t1 = new Date()
   for (var t = 0; t < 50000; t++) {
@@ -16,9 +17,14 @@ function runTest (parser) {
     }
     parser.write(Buffer.from(buf))
     parser.write(Buffer.from('5500010005700838', 'hex'))
+    if (t % 5000 === 0)process.stdout.write('.')
   }
-
+  parser.removeListener('data', cb)
+  parser.removeListener('error', cb)
   return ((new Date()) - t1) / 1000
 }
-console.log(runTest(parser1), 'Switch case')
-console.log(runTest(parser2), 'callback')
+
+process.stdout.write('Switch case')
+process.stdout.write(`finished in ${runTest(parser1)}\n`)
+process.stdout.write('Callback')
+process.stdout.write(`finished in ${runTest(parser2)}\n`)
