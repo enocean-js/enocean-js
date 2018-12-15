@@ -112,7 +112,7 @@ describe('serialport enocean parser', function () {
       it('under siege', function () {
         const spy = sinon.spy()
         const parser = new ESP3Parser({ maxBufferSize: 32 })
-        var ec = [0, 0, 0, 0]
+        var ec = [0, 0, 0, 0, 0]
         parser.on('data', spy)
         parser.on('error', err => ec[err.code]++)
         for (var t = 1; t <= 1000; t++) {
@@ -124,7 +124,7 @@ describe('serialport enocean parser', function () {
           parser.write(Buffer.from('55005500010005700838', 'hex'))
           // assert.equal(errorSpy.callCount, t, `${esp3SimpleParser.currentESP3Packet.toString()} ind state ${esp3SimpleParser.state}`)
         }
-        assert.isAbove(spy.callCount, 995, `1000`)
+        assert.isAbove(spy.callCount, 995, `${ec}`)
         parser.removeListener('error', spy)
         parser.removeListener('data', spy)
       })
