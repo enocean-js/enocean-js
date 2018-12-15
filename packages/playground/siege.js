@@ -1,8 +1,8 @@
 import { ESP3Parser, ESP3AltParser } from '@enocean-js/serialport-parser'
 // import { toCRC8 } from '@enocean-js/crc8'
 // import { makeESP3Packet } from '@enocean-js/esp3-packets'
-const parser1 = new ESP3Parser({ maxBufferSize: 120 })
-const parser2 = new ESP3AltParser({ maxBufferSize: 120 })
+const parser1 = new ESP3Parser({ maxBufferSize: 1200 })
+const parser2 = new ESP3AltParser({ maxBufferSize: 1200 })
 
 function runTest (parser) {
   parser.on('data', data => { })
