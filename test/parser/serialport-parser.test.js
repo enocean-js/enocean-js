@@ -72,7 +72,7 @@ describe('serialport enocean parser', function () {
 
         esp3SimpleParser.write(Buffer.from('55000a0701eba5', 'hex'))
         esp3SimpleParser.write(Buffer.from('c87f710fffdba5e40001ffffffff47000d', 'hex'))
-        assert.equal(spy.callCount, 1, '')
+        assert.equal(spy.called, true, '')
         esp3SimpleParser.removeListener('data', spy)
       })
       it('packet SHOULD NOT be emitted, if data or optional data is invalid', function () {
@@ -108,6 +108,25 @@ describe('serialport enocean parser', function () {
         esp3SimpleParser.write(Buffer.from(buf))
         assert.equal(spy.callCount, 1, '')
         esp3SimpleParser.removeListener('error', spy)
+      })
+      it('under siege', function () {
+        const spy = sinon.spy()
+        const parser = new ESP3Parser({ maxBufferSize: 32 })
+        var ec = [0, 0, 0, 0]
+        parser.on('data', spy)
+        parser.on('error', err => ec[err.code]++)
+        for (var t = 1; t <= 1000; t++) {
+          var buf = []
+          for (var i = 0; i < 500; i++) {
+            buf.push(Math.floor(Math.random() * 255))
+          }
+          parser.write(Buffer.from(buf))
+          parser.write(Buffer.from('55005500010005700838', 'hex'))
+          // assert.equal(errorSpy.callCount, t, `${esp3SimpleParser.currentESP3Packet.toString()} ind state ${esp3SimpleParser.state}`)
+        }
+        assert.isAbove(spy.callCount, 995, `1000`)
+        parser.removeListener('error', spy)
+        parser.removeListener('data', spy)
       })
     })
   })
