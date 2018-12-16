@@ -1,22 +1,19 @@
 /*eslint-disable*/
+import { SerialportSender } from '@enocean-js/serialport-sender'
 import { ESP3Parser } from '@enocean-js/serialport-parser'
-import { makeESP3Packet } from '@enocean-js/esp3-packets'
-import { makeCommandSender } from '@enocean-js/serialport-sender'
+import { CommonCommand } from '@enocean-js/esp3-packets'
 
 const SerialPort = require('serialport')
 
 const port = new SerialPort('/dev/ttyUSB1', { baudRate: 57600 })
-const parser = port.pipe(new ESP3Parser({ maxBufferSize: 200 }))
-const parser2 = port.pipe(new ESP3Parser({ maxBufferSize: 200 }))
 
-parser.on('data', data => {
-  console.log('1:', data.toString('hex'))
-})
+var sender = SerialportSender({port: port, parser: new ESP3Parser({ maxBufferSize: 200 })})
+var commander = CommonCommand.connect(sender)
+
 
 async function main () {
-  var sender = makeCommandSender({port: port, parser: parser2})
   // var res = await sender.send('CO_WR_IDBASE', 'ff800000')
-  var res = await sender.send('CO_RD_VERSION')
-  console.log(res)
+  // var res = await comander.send('CO_WR_RESET')
+  console.log(await commander.getVersion())
 }
 main()
