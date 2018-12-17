@@ -16,7 +16,7 @@ var commander = CommonCommand.connect(sender)
 parser.on("data",pretty.logESP3)
 async function main () {
   
-  console.log(await commander.setBaseId(0xffaaaa00))
+  //console.log(await commander.setBaseId(0xffaaaa00))
   console.log(await commander.getBaseId())
   // console.log(await commander.setRepeater(0))
   // console.log(await commander.getRepeater())
