@@ -1,0 +1,15 @@
+export const CO_RD_MEM = {
+  name: 'CO_RD_MEM',
+  commandCode: 0x13,
+  responsDefinition: {
+    0: [
+      {
+        name: 'data',
+        location: 'data',
+        retFunc: x => {
+          return x.slice(1, x.length)
+        }
+      }
+    ]
+  }
+}
