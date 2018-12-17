@@ -8,12 +8,12 @@ const SerialPort = require('serialport')
 
 const port = new SerialPort('/dev/ttyUSB1', { baudRate: 57600 })
 
+const parser=new ESP3Parser({ maxBufferSize: 2000 })
+port.pipe(parser)
 var sender = SerialportSender({port: port, parser: new ESP3Parser({ maxBufferSize: 2000 })})
 var commander = CommonCommand.connect(sender)
 
-
-// BLOCK_FILTERED_REPEATER,
-// APPLY_FILTERD_REPATER
+parser.on("data",data=>{console.log(data.toString())})
 async function main () {
   // var res = await sender.send('CO_WR_IDBASE', 'ff800000')
   // var res = await comander.send('CO_WR_RESET')
@@ -41,6 +41,8 @@ async function main () {
   process.stdout.write("\n")
   var ex = await commander.readMemory(4,addr.address+63,4)
   console.log(ex.data.toString("hex"))
+  console.log(await commander.writeMemory(4,addr.address+63,"ff830000"))
+  console.log(await commander.getBaseId())
 }
 main()
 function col(num){

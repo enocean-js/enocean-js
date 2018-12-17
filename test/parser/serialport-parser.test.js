@@ -21,7 +21,7 @@ describe('serialport enocean parser', function () {
         for (let key in telegrams) {
           let telegramm = Buffer.from(telegrams[key], 'hex')
           esp3SimpleParser.write(telegramm)
-          assert.deepEqual(spy.getCall(key).args[0].toString(), telegramm.toString('hex'))
+          assert.deepEqual(spy.getCall(key).args[0].toString('hex'), telegramm.toString('hex'))
         }
         esp3SimpleParser.removeListener('data', spy)
       })
