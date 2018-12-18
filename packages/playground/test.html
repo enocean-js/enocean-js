@@ -15,29 +15,50 @@
     </div>
     <button id="slp_btn">sleep for 10s</button>
     <button id="getId_btn">getId</button>
+
+    <button id="light_on_btn">ON</button>
+    <button id="light_off_btn">OFF</button>
+
     <div id="logger">
     </div>
     <script type="module">
       import { CommonCommand } from '/node_modules/@enocean-js/common-command/src/CommonCommand.js'
-      import { ESP3Packet } from '/node_modules/@enocean-js/esp3-packets/src/index.js'
+      import { ESP3Packet, RadioERP1 } from '/node_modules/@enocean-js/esp3-packets/src/index.js'
       import { pretty } from '/node_modules/@enocean-js/pretty-printer/src/pretty-printer.js'
       import { WebsocketSender } from '/node_modules/@enocean-js/websocket-sender/src/websocket-sender.js'
       var socket = io('http://localhost:3000');
       var sender = WebsocketSender(socket)
       var commander = CommonCommand.connect(sender)
+      var erp = RadioERP1.connect(sender)
       socket.on("data",data=>{
         var packet= ESP3Packet.from(data)
         logger.innerHTML += pretty.logESP3(packet)
         logger.scrollTop = logger.scrollHeight;
       })
       window.addEventListener("load",async ()=>{
+        var base = await commander.getBaseId()
+        elem_baseid.innerHTML= base.baseId
+        elem_rwc.innerHTML= base.remainingWriteCycles
+        const A0_DOWN = 0x10
+        const A1_DOWN = 0x30
+        const RELEASE = 0x00
+        const id = parseInt(base.baseId,16)+1
+
         getId_btn.addEventListener("click",async ()=>{
-          var baseId = await commander.getBaseId()
-          elem_baseid.innerHTML= baseId.baseId
-          elem_rwc.innerHTML= baseId.remainingWriteCycles
+          var base = await commander.getBaseId()
+          elem_baseid.innerHTML= base.baseId
+          elem_rwc.innerHTML= base.remainingWriteCycles
         })
         slp_btn.addEventListener("click",async ()=>{
           await commander.sleep(10000)
+        })
+        light_on_btn.addEventListener("click",async ()=>{
+          await erp.send(0xf6,A0_DOWN,id,0x20)
+          await erp.send(0xf6,RELEASE,id,0x20)
+        })
+        light_off_btn.addEventListener("click",async ()=>{
+          await erp.send(0xf6,A1_DOWN,id,0x20)
+          await erp.send(0xf6,RELEASE,id,0x20)
         })
       })
     </script>
