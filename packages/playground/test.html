@@ -14,6 +14,7 @@
       <div>remaining write cycles: <span id="elem_rwc"></span></div>
     </div>
     <button id="slp_btn">sleep for 10s</button>
+    <button id="getId_btn">getId</button>
     <div id="logger">
     </div>
     <script type="module">
@@ -30,9 +31,11 @@
         logger.scrollTop = logger.scrollHeight;
       })
       window.addEventListener("load",async ()=>{
-        var baseId = await commander.getBaseId()
-        elem_baseid.innerHTML= baseId.baseId
-        elem_rwc.innerHTML= baseId.remainingWriteCycles
+        getId_btn.addEventListener("click",async ()=>{
+          var baseId = await commander.getBaseId()
+          elem_baseid.innerHTML= baseId.baseId
+          elem_rwc.innerHTML= baseId.remainingWriteCycles
+        })
         slp_btn.addEventListener("click",async ()=>{
           await commander.sleep(10000)
         })

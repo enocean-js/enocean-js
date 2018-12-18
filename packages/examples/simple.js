@@ -13,7 +13,7 @@ port.pipe(parser)
 var sender = SerialportSender({port: port, parser: new ESP3Parser({ maxBufferSize: 2000 })})
 var commander = CommonCommand.connect(sender)
 
-//parser.on("data",pretty.logESP3)
+parser.on("data",pretty.logESP3)
 async function main () {
   function col (num) {
     return `\x1b[38;5;${num}m`
