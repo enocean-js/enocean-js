@@ -4,7 +4,6 @@ the Common Command interface lets you manage your TCM310 (enocean USB Sticks, en
 
 ## example
 
-!!OUTDATED SYNTAX!!
 
     var sender = makeCommandSender({port: port, parser: parser2})
     var res = await sender.send('CO_RD_IDBASE')
