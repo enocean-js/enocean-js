@@ -2,7 +2,7 @@
 
 # enocean-js
 
-[![GitHub](https://img.shields.io/github/license/node-enocean/enocean-js.svg)](https://github.com/enocean-js/enocean-js/blob/master/LICENSE.md)
+[![GitHub](https://img.shields.io/github/license/enocean-js/enocean-js.svg)](https://github.com/enocean-js/enocean-js/blob/master/LICENSE.md)
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/enocean-js/enocean-js.svg)](https://greenkeeper.io/)
 
