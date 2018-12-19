@@ -2,6 +2,6 @@ path_classifiers:
   test:
     - "**/*.test.js"
   library:
-    - exclude: "packages/node_modules/@enocean-js/**"
+    - exclude: "packages/node_modules/@enocean-js/"
 queries:
-  - exclude: "resources/**"
+  - exclude: "resources/"
