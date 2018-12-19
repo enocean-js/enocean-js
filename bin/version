@@ -3,16 +3,16 @@ const fs = require('fs')
 const { execSync } = require('child_process')
 const rootPath = 'packages/node_modules/@enocean-js'
 const green = '\x1b[32m'
-const red = "\x1b[31m"
-const blue = "\x1b[34m"
+const red = '\x1b[31m'
+const blue = '\x1b[34m'
 const reset = '\x1b[0m'
-const dim = "\x1b[2m"
+const dim = '\x1b[2m'
 process.argv.shift()
 process.argv.shift()
 console.log(process.argv)
-if(process.argv.length>0){
-  var argv = process.argv.join(" ")
-  execSync(`npm version ${argv}`, {stdio: 'inherit' })
+if (process.argv.length > 0) {
+  var argv = process.argv.join(' ')
+  execSync(`npm version ${argv}`, { stdio: 'inherit' })
 }
 
 const main = require('../package.json')
@@ -25,28 +25,27 @@ subModules.forEach(subModuleFolder => {
   if (stat.isDirectory()) {
     var subModulesPacketJSONPath = `${subModuleDirectory}/package.json`
     if (fs.existsSync(subModulesPacketJSONPath)) {
-      updateVersionInFile(subModulesPacketJSONPath,subModuleFolder)
+      updateVersionInFile(subModulesPacketJSONPath, subModuleFolder)
     }
   }
 })
 
-updateVersionInFile("resources/templates/package.json","template")
-console.log("")
+updateVersionInFile('resources/templates/package.json', 'template')
+console.log('')
 console.log(`... commiting version update`)
-execSync(`git commit -a -m '🎁 ${main.version}'`, {stdio: 'inherit' })
+execSync(`git commit -a -m '🎁 ${main.version}'`, { stdio: 'inherit' })
 
-function updateVersionInFile(path,name = path){
+function updateVersionInFile (path, name = path) {
   var packageJSON = JSON.parse(fs.readFileSync(path, 'utf8'))
   packageJSON.version = main.version
   console.log(`${green}✓ ${reset}${dim}${name}${reset}`)
-  if(packageJSON.hasOwnProperty("dependencies")){
-    for(dep in packageJSON.dependencies){
-      if(dep.includes("@enocean-js")){
+  if (packageJSON.hasOwnProperty('dependencies')) {
+    for (var dep in packageJSON.dependencies) {
+      if (dep.includes('@enocean-js')) {
         packageJSON.dependencies[dep] = main.version
         console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
       }
     }
   }
   fs.writeFileSync(path, JSON.stringify(packageJSON, null, 2))
-
 }
