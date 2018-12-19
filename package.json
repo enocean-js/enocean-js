@@ -1,6 +1,6 @@
 {
   "name": "enocean-js",
-  "version": "0.0.1-alpha.9",
+  "version": "0.0.1-alpha.10",
   "description": "open source java script implementation of the enocean protocol",
   "main": "packages/index.js",
   "module": "packages/main.js",
