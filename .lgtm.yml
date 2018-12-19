@@ -8,5 +8,6 @@ path_classifiers:
 queries:
   - exclude: "resources/"
   - include: "packages/node_modules/@enocean-js/"
-  tags:
-    - "main"
+  - include:
+    tags:
+      - "main"
