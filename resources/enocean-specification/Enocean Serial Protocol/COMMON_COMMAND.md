@@ -1,6 +1,6 @@
 # Common Command
 
-the Common Command interface lets you manage your TCM310 (your enocean USB Stick etc) 
+the Common Command interface lets you manage your TCM310 (enocean USB Sticks, enocean Pi etc)
 
 ## example
 
@@ -53,12 +53,11 @@ Function: Read the device SW version / HW version, chip-ID, etc.
 
 ### returns
 
-    { 
+    {
       returnCode: 'RET_OK',
       appVersion: '2.0.0.0',
       apiVersion: '2.5.0.0',
       chipId: '0x01994f49',
       chipVersion: '0x454f0103',
-      appDescription: 'GATEWAYCTRL' 
+      appDescription: 'GATEWAYCTRL'
     }
-

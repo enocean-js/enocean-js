@@ -1,5 +1,7 @@
 /* eslint-disable no-undef  */
-import { toCRC8, getCRC8 } from '@enocean-js/crc8'
+const EO = require('../../')
+const toCRC8 = EO.toCRC8
+const getCRC8 = EO.getCRC8
 const assert = require('chai').assert
 
 describe('CRC8 Calculation', () => {

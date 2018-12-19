@@ -1,6 +1,7 @@
 /* eslint-disable no-undef  */
-import ESP3Parser from '@enocean-js/serialport-parser'
+const EO = require('../../')
 const assert = require('chai').assert
+ESP3Parser = EO.ESP3Parser
 const esp3SimpleParser = new ESP3Parser()
 const sinon = require('sinon')
 

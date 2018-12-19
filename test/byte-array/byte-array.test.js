@@ -1,5 +1,6 @@
 /* eslint-disable no-undef  */
-import ByteArray from '@enocean-js/byte-array'
+const EO = require('../../')
+const ByteArray = EO.ByteArray
 const assert = require('chai').assert
 
 describe('ByteArray', () => {
