@@ -1,6 +1,5 @@
 /* eslint-disable no-undef  */
-const EO = require('../../')
-const ByteArray = EO.ByteArray
+const ByteArray = require('../../').ByteArray
 const assert = require('chai').assert
 
 describe('ByteArray', () => {
@@ -40,13 +39,19 @@ describe('ByteArray', () => {
     var a = ByteArray.from('00112233')
     a.set('aa', 2)
     assert.equal(a.toString('hex'), '0011aa33', '...')
+    a.set('', 2)
+    assert.equal(a.toString('hex'), '0011aa33', '...')
   })
   it('SHOULD turn numbers larger than 255 into a sequence of numbers smaller or equal to 255', () => {
     var a = ByteArray.from(0x11223344)
     assert.equal(a.toString('hex'), '11223344', '...')
   })
-  it('SHOULD return ascii encoded strings by default', () => {
-    var a = ByteArray.from(0x48414c4c4f)
-    assert.equal(a.toString('ascii'), 'HALLO', '...')
+  it('SHOULD return an array with one element when constructd with a single number', () => {
+    var a = ByteArray.from(0)
+    assert.equal(a.toString('hex'), '00', '...')
   })
+  // it('SHOULD return ascii encoded strings by default', () => {
+  //   var a = ByteArray.from(0x48414c4c4f)
+  //   assert.equal(a.toString('ascii'), 'HALLO', '...')
+  // })
 })
