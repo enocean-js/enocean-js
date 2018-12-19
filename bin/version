@@ -33,7 +33,7 @@ subModules.forEach(subModuleFolder => {
 updateVersionInFile('resources/templates/package.json', 'template')
 console.log('')
 console.log(`... commiting version update`)
-execSync(`git commit -a -S -m --allow-empty'🎁 ${main.version}'`, { stdio: 'inherit' })
+execSync(`git commit -a -S --allow-empty -m '🎁 ${main.version}'`, { stdio: 'inherit' })
 
 function updateVersionInFile (path, name = path) {
   var packageJSON = JSON.parse(fs.readFileSync(path, 'utf8'))
