@@ -9,7 +9,6 @@ const reset = '\x1b[0m'
 const dim = '\x1b[2m'
 process.argv.shift()
 process.argv.shift()
-console.log(process.argv)
 if (process.argv.length > 0) {
   var argv = process.argv.join(' ')
   execSync(`npm version ${argv}`, { stdio: 'inherit' })
