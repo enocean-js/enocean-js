@@ -9,7 +9,6 @@ const reset = '\x1b[0m'
 const dim = '\x1b[2m'
 process.argv.shift()
 process.argv.shift()
-console.log(process.argv)
 if (process.argv.length > 0) {
   var argv = process.argv.join(' ')
   execSync(`npm version ${argv}`, { stdio: 'inherit' })
@@ -33,7 +32,7 @@ subModules.forEach(subModuleFolder => {
 updateVersionInFile('resources/templates/package.json', 'template')
 console.log('')
 console.log(`... commiting version update`)
-execSync(`git commit -a -m '🎁 ${main.version}'`, { stdio: 'inherit' })
+execSync(`git commit -a -S --allow-empty -m '🎁 ${main.version}'`, { stdio: 'inherit' })
 
 function updateVersionInFile (path, name = path) {
   var packageJSON = JSON.parse(fs.readFileSync(path, 'utf8'))
@@ -43,6 +42,18 @@ function updateVersionInFile (path, name = path) {
     for (var dep in packageJSON.dependencies) {
       if (dep.includes('@enocean-js')) {
         packageJSON.dependencies[dep] = main.version
+        console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
+      }
+    }
+    for (var dep in packageJSON.dependencies) {
+      if (!dep.includes('@enocean-js')) {
+        if(main.dependencies.hasOwnProperty(dep)){
+          packageJSON.dependencies[dep] = main.dependencies[dep]
+        }else if (main.devDependencies.hasOwnProperty(dep)){
+          packageJSON.dependencies[dep] = main.devDependencies[dep]
+        }else{
+          console.log(` ${red}✘ ${dim}${red}dependency not found in main json ${reset}${dim}${dep}${reset}`)
+        }
         console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
       }
     }
