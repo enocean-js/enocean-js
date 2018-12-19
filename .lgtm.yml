@@ -7,4 +7,3 @@ path_classifiers:
     - include: "packages/node_modules/@enocean-js/"
 queries:
   - exclude: "resources/"
-  - include: "packages/node_modules/@enocean-js/"
