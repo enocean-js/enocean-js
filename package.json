@@ -10,7 +10,7 @@
     ]
   },
   "scripts": {
-    "test": "export NODE_PATH=./packages/node_modules && standard && nyc -r esm --reporter=lcov --reporter=text mocha -r esm --recursive test"
+    "test": "standard && nyc --reporter=lcov --reporter=text mocha --recursive test"
   },
   "repository": {
     "type": "git",
