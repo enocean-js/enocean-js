@@ -48,7 +48,13 @@ function updateVersionInFile (path, name = path) {
     }
     for (var dep in packageJSON.dependencies) {
       if (!dep.includes('@enocean-js')) {
-        packageJSON.dependencies[dep] = main.dependencies[dep] 
+        if(main.dependencies.hasOwnProperty(dep)){
+          packageJSON.dependencies[dep] = main.dependencies[dep]
+        }else if (main.devDependencies.hasOwnProperty(dep)){
+          packageJSON.dependencies[dep] = main.dependencies[dep]
+        }else{
+          console.log(` ${red}✘ ${dim}${red}dependency not found in main json ${reset}${dim}${dep}${reset}`)
+        }
         console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
       }
     }
