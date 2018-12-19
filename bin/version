@@ -51,7 +51,7 @@ function updateVersionInFile (path, name = path) {
         if(main.dependencies.hasOwnProperty(dep)){
           packageJSON.dependencies[dep] = main.dependencies[dep]
         }else if (main.devDependencies.hasOwnProperty(dep)){
-          packageJSON.dependencies[dep] = main.dependencies[dep]
+          packageJSON.dependencies[dep] = main.devDependencies[dep]
         }else{
           console.log(` ${red}✘ ${dim}${red}dependency not found in main json ${reset}${dim}${dep}${reset}`)
         }
