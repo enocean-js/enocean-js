@@ -46,6 +46,12 @@ function updateVersionInFile (path, name = path) {
         console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
       }
     }
+    for (var dep in packageJSON.dependencies) {
+      if (!dep.includes('@enocean-js')) {
+        packageJSON.dependencies[dep] = main.dependencies[dep] 
+        console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
+      }
+    }
   }
   fs.writeFileSync(path, JSON.stringify(packageJSON, null, 2))
 }
