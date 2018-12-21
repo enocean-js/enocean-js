@@ -5,7 +5,7 @@
     <title></title>
     <script src="http://localhost:3000/socket.io/socket.io.js"></script>
     <style>
-     #logger{padding:10px;background:#333;color:#ddd;width:550px;height:200px;overflow:scroll;}
+     #logger{padding:10px;width:550px;height:200px;overflow:scroll;}
     </style>
   </head>
   <body>
@@ -24,17 +24,16 @@
     <div id="logger">
     </div>
     <script type="module">
-      import { CommonCommand } from '/node_modules/@enocean-js/common-command/src/CommonCommand.js'
-      import { ESP3Packet, RadioERP1 } from '/node_modules/@enocean-js/esp3-packets/src/index.js'
-      import { pretty } from '/node_modules/@enocean-js/pretty-printer/src/pretty-printer.js'
-      import { WebsocketSender } from '/node_modules/@enocean-js/websocket-sender/src/websocket-sender.js'
+      import { WebsocketSender, CommonCommand,ESP3Packet, RadioERP1 ,pretty } from '/main.js'
       var socket = io('http://localhost:3000');
       var sender = WebsocketSender(socket)
       var commander = CommonCommand.connect(sender)
       var erp = RadioERP1.connect(sender)
+
       socket.on("data",data=>{
         var packet= ESP3Packet.from(data)
-        logger.innerHTML += pretty.logESP3(packet)
+        pretty.logESP3(packet)
+        logger.innerHTML+=pretty.toString(packet)
         logger.scrollTop = logger.scrollHeight;
       })
       window.addEventListener("load",async ()=>{
