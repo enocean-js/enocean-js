@@ -24,7 +24,7 @@
     <div id="logger">
     </div>
     <script type="module">
-      import { WebsocketSender, CommonCommand,ESP3Packet, RadioERP1 ,pretty } from '/main.js'
+      import { WebsocketSender, CommonCommand, ESP3Packet, RadioERP1 ,pretty } from '../enocean.js'
       var socket = io('http://localhost:3000');
       var sender = WebsocketSender(socket)
       var commander = CommonCommand.connect(sender)
