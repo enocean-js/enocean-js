@@ -13,3 +13,4 @@ subModules.forEach(subModuleFolder => {
     }
   }
 })
+execSync('npm publish', { cwd: "./", stdio: 'inherit' })
