@@ -1,6 +1,6 @@
 {
   "name": "enocean-js",
-  "version": "0.0.1-beta.5",
+  "version": "0.0.1-beta.6",
   "description": "open source java script implementation of the enocean protocol",
   "main": "packages/index.js",
   "module": "packages/main.js",
@@ -49,7 +49,6 @@
     "@enocean-js/esp3-packets": "0.0.1-beta.5",
     "@enocean-js/pretty-printer": "0.0.1-beta.5",
     "@enocean-js/serialport-parser": "0.0.1-beta.5",
-    "@enocean-js/serialport-sender": "0.0.1-beta.5",
     "@enocean-js/serialport-sender": "0.0.1-beta.5"
   }
 }
