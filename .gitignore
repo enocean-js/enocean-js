@@ -35,6 +35,7 @@ build/Release
 # Dependency directories
 node_modules/*
 !packages/node_modules/@enocean-js
+packages/node_modules/@enocean-js/**/node_modules
 
 jspm_packages/
 
