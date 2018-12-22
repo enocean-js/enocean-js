@@ -18,13 +18,25 @@
 
 ![npm](https://img.shields.io/npm/dt/enocean-js.svg)
 
-there is nothing realy usable published yet. If you want to run the examples etc. do:
+starting with **enocean-js@0.0.1-beta.8** there is now an installable package. you can start using and testing it!
 
-    git clone git@github.com:enocean-js/enocean-js.git
-    cd enocean-js
-    npm i
-    node -r esm path/to/example
+## install
 
-if you want to write your own examples and play around with stuff, do it in the packages/playground folder everything should be requireable/importable
+    npm i -S enocean-js
+    
+## simple examle
 
-if you require any external package, npm install it at the repositorys root level.
+    nmp i -S enocean-js serialport
+
+and then...
+
+    const SerialPort = require('serialport')
+    const Enocean = require('enocean-js')
+    const pretty = Enocean.pretty
+    const ESP3Parser = Enocean.ESP3Parser
+
+    const port = new SerialPort('/dev/ttyUSB0', { baudRate: 57600 })
+    const parser = new ESP3Parser({ maxBufferSize: 2000 })
+    port.pipe(parser)
+
+    parser.on('data', pretty.logESP3)
