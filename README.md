@@ -36,7 +36,7 @@ and then...
     const ESP3Parser = Enocean.ESP3Parser
 
     const port = new SerialPort('/dev/ttyUSB0', { baudRate: 57600 })
-    const parser = new ESP3Parser({ maxBufferSize: 2000 })
+    const parser = new ESP3Parser()
     port.pipe(parser)
 
     parser.on('data', pretty.logESP3)
