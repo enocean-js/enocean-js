@@ -1,4 +1,21 @@
 // Set options as a parameter, environment variable, or rc file.
 /*eslint-disable */
-require = require('esm')(module)
-module.exports = require('./main.js')
+var exp = {}
+requireAll("@enocean-js/byte-array")
+requireAll("@enocean-js/crc8")
+requireAll("@enocean-js/esp3-packets")
+requireAll("@enocean-js/pretty-printer")
+requireAll("@enocean-js/serialport-parser")
+requireAll("@enocean-js/serialport-sender")
+requireAll("@enocean-js/serialport-sender")
+
+function requireAll(st){
+  var tmp = {}
+  var e = require(st)
+  for(var item in e){
+    tmp[item] = e[item]
+  }
+  exp = {...tmp,...exp}
+}
+
+module.exports = exp
