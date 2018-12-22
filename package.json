@@ -44,11 +44,11 @@
   },
   "dependencies": {
     "esm": "^3.0.84",
-    "@enocean-js/byte-array": "0.0.1-beta.8",
-    "@enocean-js/crc8": "0.0.1-beta.8",
-    "@enocean-js/esp3-packets": "0.0.1-beta.8",
-    "@enocean-js/pretty-printer": "0.0.1-beta.8",
-    "@enocean-js/serialport-parser": "0.0.1-beta.8",
-    "@enocean-js/serialport-sender": "0.0.1-beta.8"
+    "@enocean-js/byte-array": "0.0.1-beta.9",
+    "@enocean-js/crc8": "0.0.1-beta.9",
+    "@enocean-js/esp3-packets": "0.0.1-beta.9",
+    "@enocean-js/pretty-printer": "0.0.1-beta.9",
+    "@enocean-js/serialport-parser": "0.0.1-beta.9",
+    "@enocean-js/serialport-sender": "0.0.1-beta.9"
   }
 }
