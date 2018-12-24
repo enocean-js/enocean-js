@@ -25,7 +25,7 @@
     </div>
     <script type="module">
       import { WebsocketSender, CommonCommand,ESP3Packet, RadioERP1 ,pretty } from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.1-alpha.11/packages/enocean.js'
-      var socket = io('http://localhost:4242/');
+      var socket = io('http://192.168.178.43:4242/');
       var sender = WebsocketSender(socket)
       var commander = CommonCommand.connect(sender)
       var erp = RadioERP1.connect(sender)
