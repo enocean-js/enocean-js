@@ -3,6 +3,7 @@
   "version": "0.0.1-beta.9",
   "description": "open source java script implementation of the enocean protocol",
   "main": "packages/index.js",
+  "jsdelivr": "packages/enocean.js",
   "module": "packages/main.js",
   "nyc": {
     "include": [
@@ -10,7 +11,10 @@
     ]
   },
   "scripts": {
-    "test": "standard && nyc --reporter=lcov --reporter=text mocha --recursive test"
+    "test": "standard && nyc --reporter=lcov --reporter=text-summary mocha --recursive test",
+    "test_only": "mocha --recursive test",
+    "coverage": "nyc --reporter=lcov mocha --recursive test && xdg-open ./coverage/lcov-report/index.html",
+    "fix": "standard --fix"
   },
   "repository": {
     "type": "git",
