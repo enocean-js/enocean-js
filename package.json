@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "esm": "^3.0.84",
-    "@enocean-js/byte-array": "0.0.1-beta.11",
+    "@enocean-js/byte-array": "0.0.1-beta.12",
     "@enocean-js/crc8": "0.0.1-beta.11",
     "@enocean-js/esp3-packets": "0.0.1-beta.11",
     "@enocean-js/pretty-printer": "0.0.1-beta.11",
