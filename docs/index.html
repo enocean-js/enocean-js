@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title></title>
     <script type="module">
-      import { CommonCommand, ESP3Packet, RadioERP1, pretty } from '../packages/enocean.js'
+      import { CommonCommand, ESP3Packet, RadioERP1, pretty } from 'https://cdn.jsdelivr.net/npm/enocean-js@latest/packages/enocean.js'
       var currentTelegram = RadioERP1.from({payload:0,rorg:0xd5})
       currentTelegram.T21=0
       currentTelegram.NU=0
