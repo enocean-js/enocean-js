@@ -1,0 +1,13 @@
+.git/*
+.nyc_output/*
+.coverage/*
+.docs/*
+node_modules/*
+!packages/node_modules/@enocean-js
+packages/node_modules/@enocean-js/**/node_modules
+examples/*
+packages/examples/*
+packages/node-red-contrib-enocean/*
+packages/playground/*
+test/*
+test_html/*
