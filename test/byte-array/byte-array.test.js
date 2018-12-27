@@ -31,6 +31,36 @@ describe('ByteArray', () => {
   it('SHOULD throw when string contains a char that is a hex digit', () => {
     assert.throws(() => { ByteArray.from('xx') }, '0-9 a b c d e f')
   })
+  it('SHOULD have a setValue and getValue Method', () => {
+    var ba = ByteArray.from('aaffaaff')
+    for (var i = 0; i < 100; i++) {
+      var r1 = Math.floor(Math.random() * 31)
+      var r2 = Math.floor(Math.random() * (32 - r1))
+      var v = Math.floor(Math.random() * (2 ** r2))
+      ba.setValue(v, r1, r2)
+      assert.equal(ba.getValue(r1, r2), v)
+    }
+  })
+  it('SHOULD allow to get single bits', () => {
+    var ba = ByteArray.from('01')
+    assert.equal(ba.getSingleBit(7), 1)
+    assert.equal(ba.getSingleBit(6), 0)
+    ba = ByteArray.from('010100')
+    assert.equal(ba.getSingleBit(15), 1)
+    assert.equal(ba.getSingleBit(7), 1)
+    assert.equal(ba.getSingleBit(6), 0)
+    assert.equal(ba.getSingleBit(5), 0)
+    assert.equal(ba.getSingleBit(4), 0)
+  })
+  it('SHOULD be able to turn the array to various stringss', () => {
+    var ba = ByteArray.from('010101')
+    assert.equal(ba.toString('hex'), '010101')
+    assert.equal(ba.toString(16), '010101')
+    assert.equal(ba.toString(10), '001001001')
+    assert.equal(ba.toString('dec'), '001001001')
+    assert.equal(ba.toString(2), '000000010000000100000001')
+    assert.equal(ba.toString('bin'), '000000010000000100000001')
+  })
   it('SHOULD allow for mixed creation of Arrays', () => {
     var a = ByteArray.from('55', [1, 2, 3], 4, [5, 6, ['ff', 7]])
     assert.equal(a.toString('hex'), '55010203040506ff07', '...')
@@ -41,6 +71,8 @@ describe('ByteArray', () => {
     assert.equal(a.toString('hex'), '0011aa33', '...')
     a.set('', 2)
     assert.equal(a.toString('hex'), '0011aa33', '...')
+    a.set('aa')
+    assert.equal(a.toString('hex'), 'aa11aa33', '...')
   })
   it('SHOULD turn numbers larger than 255 into a sequence of numbers smaller or equal to 255', () => {
     var a = ByteArray.from(0x11223344)
