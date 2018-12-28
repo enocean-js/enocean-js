@@ -22,7 +22,7 @@ describe('RadioERP1 packets', () => {
     assert.equal(radio.decode('f6-02-03').RA.value, 0x30)
   })
   it('SHOULD be manipulable with interface methods', () => {
-    var radio = RadioERP1.from({ payload: '00000000'})
+    var radio = RadioERP1.from({ payload: '00000000' })
     radio.RORG = 0xa5
     radio.payload = 0xaabbccdd
     assert.equal(radio.payload.toString(), 'aabbccdd')
@@ -43,13 +43,13 @@ describe('RadioERP1 packets', () => {
     assert.equal(radio.RSSI, 0xff)
     radio.securityLeve = 1
     assert.equal(radio.securityLevel, 0)
-    var radio = RadioERP1.from({ payload: '00'})
+    radio = RadioERP1.from({ payload: '00' })
     assert.equal(radio.RORG, 0xf6, '1BS')
-    var radio = RadioERP1.from({ payload: '0000000000'})
+    radio = RadioERP1.from({ payload: '0000000000' })
     assert.equal(radio.RORG, 0xd2, 'VLD')
   })
   it('SHOULD allow to create learn telegrams (4BS)', () => {
-    var radio = RadioERP1.from({ eep: 'a5-02-0a'})
+    var radio = RadioERP1.from({ eep: 'a5-02-0a' })
     var decoded = radio.decode()
     assert.equal(decoded.eep.func, 0x02)
     assert.equal(decoded.eep.type, 0x0a)
@@ -58,27 +58,27 @@ describe('RadioERP1 packets', () => {
     assert.equal(decoded.teachInType, '4BS')
   })
   it('SHOULD allow to create learn telegrams (1BS)', () => {
-    var radio = RadioERP1.from({ eep: 'd5-00-01', senderId: 'aabbccdd'})
+    var radio = RadioERP1.from({ eep: 'd5-00-01', senderId: 'aabbccdd' })
     var decoded = radio.decode()
     assert.equal(decoded.senderId, 'aabbccdd')
     assert.equal(decoded.eep.toString(), 'd5-00-01')
     assert.equal(decoded.teachInType, '1BS')
   })
   it('SHOULD type: 1BS', () => {
-    radio = RadioERP1.from({ type: '1BS', eep: 'd5-00-01'})
+    radio = RadioERP1.from({ type: '1BS', eep: 'd5-00-01' })
     decoded = radio.teachInInfo
     assert.equal(decoded.senderId, '00000000')
     assert.equal(decoded.teachInType, '1BS')
   })
   it('SHOULD allow to create learn telegrams (RPS)', () => {
-    var radio = RadioERP1.from({ eep: 'f6-02-01', senderId: 'aabbccdd'})
+    var radio = RadioERP1.from({ eep: 'f6-02-01', senderId: 'aabbccdd' })
     var decoded = radio.teachInInfo
     assert.equal(decoded.senderId, 'aabbccdd')
     assert.equal(decoded.eep.toString(), 'f6-02-01')
     assert.equal(decoded.teachInType, 'RPS')
   })
   it('SHOULD Type: RPS', () => {
-    radio = RadioERP1.from({ type: 'RPS', eep: 'f6-02-03'})
+    radio = RadioERP1.from({ type: 'RPS', eep: 'f6-02-03' })
     decoded = radio.teachInInfo
     assert.equal(decoded.senderId, '00000000')
     assert.equal(decoded.eep.toString(), 'f6-02-01')
