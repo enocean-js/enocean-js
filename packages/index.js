@@ -4,6 +4,8 @@ var exp = {}
 requireAll("@enocean-js/byte-array")
 requireAll("@enocean-js/crc8")
 requireAll("@enocean-js/esp3-packets")
+requireAll("@enocean-js/esp3-packet")
+requireAll("@enocean-js/radio-erp1")
 requireAll("@enocean-js/pretty-printer")
 requireAll("@enocean-js/serialport-parser")
 requireAll("@enocean-js/serialport-sender")

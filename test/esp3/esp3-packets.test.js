@@ -2,9 +2,10 @@
 const ESP3Packet = require('../../').ESP3Packet
 const assert = require('chai').assert
 describe('ESP3Packet', () => {
-  it('SHOULD be creatable with direct call', () => {
-    var packet = ESP3Packet([])
+  it('SHOULD be creatable with new', () => {
+    var packet = new ESP3Packet()
     assert.equal(packet.length, 0, `empty constructor results in non empty array`)
+    assert.equal(packet.constructor.name, 'ESP3Packet', `empty constructor results in non empty array`)
   })
   it('SHOULD be creatable with a .from() function', () => {
     var packet = ESP3Packet.from([])

@@ -9,6 +9,9 @@ const parser = new ESP3Parser()
 port.pipe(parser)
 
 var known = {}
+var ba = Enocean.ByteArray.from("0000")
+console.log(ba.getValue(1.2,"abc"))
+console.log(ba)
 
 parser.on('data', data => {
   if (data.packetType === 1) {
