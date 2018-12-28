@@ -35,5 +35,9 @@ describe('Response packets', () => {
     assert.equal(res.test2[0], 9)
     assert.equal(res.test3, 123)
     assert.equal(res.getRawPacket(), '5500050102db00ffa0870009e4')
+
+    res = Response.from(packet)
+    assert.equal(res.returnCode, 0)
+    assert.equal(res.returnMsg, 'RET_OK')
   })
 })
