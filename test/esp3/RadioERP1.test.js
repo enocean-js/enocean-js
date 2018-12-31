@@ -1,13 +1,13 @@
 /* eslint-disable no-undef  */
 // const ESP3Packet = require('../../').ESP3Packet
 const RadioERP1 = require('../../').RadioERP1
-const ByteArray = require('../../').ByteArray
+// const ByteArray = require('../../').ByteArray
+
 // const Response = require('../../').Response
 const assert = require('chai').assert
 describe('RadioERP1 packets', () => {
   it('SHOULD be creatable from ESP3Packets', () => {
     var radio = RadioERP1.from({ data: 'f630aabbccdd30', optionalData: '03ffffffffff00', packetType: 1 })
-    // console.log(radio)
     assert.equal(radio.packetType, 1)
     assert.equal(radio.RORG, 0xf6, 'RORG')
     assert.equal(radio.payload[0], 0x30)
@@ -133,23 +133,23 @@ describe('RadioERP1 packets', () => {
       assert.equal(decoded.WIN.description, 'down')
       radio = RadioERP1.from({ payload: 192, status: 0x20 })
       decoded = radio.decode('f6-10-00')
-      assert.equal(decoded.WIN.description, 'side')
+      assert.equal(decoded.WIN.description, 'left/right')
     })
     it('values with scale/unit point to other fields', () => {
-      radio = RadioERP1.from({ payload: [0, 0, 1, 0x09] })
+      radio = RadioERP1.from({ payload: [0, 0, 0, 0x08] })
+      radio.encode({ DT: 0, DIV: 1, MR: 0.1 }, { eep: 'a5-12-01' })
       decoded = radio.decode('a5-12-01')
       assert.equal(decoded.MR.value, 0.1, 'scale 1/10')
       assert.equal(decoded.MR.unit, 'kWh', 'unit kWh')
 
       radio = RadioERP1.from({ payload: [0, 0, 1, 0x08] })
-      radio.payload = radio.payload.setSingleBit(29, 1)
+      radio.encode({ DT: 2, DIV: 0, MR: 1 }, { eep: 'a5-12-01' })
       decoded = radio.decode('a5-12-01')
       assert.equal(decoded.MR.value, 1, 'scale 1/1')
       assert.equal(decoded.MR.unit, 'W', 'unit W')
 
-      var val = ByteArray.from([0, 0, 0])
-      val.setValue(34567, 0, 24)
-      radio = RadioERP1.from({ payload: [val, 0x0a] })
+      radio = RadioERP1.from({ payload: [0, 0, 0, 0x08] })
+      radio.encode({ DIV: 2, MR: 345.67 }, { eep: 'a5-12-01' })
       decoded = radio.decode('a5-12-01')
       assert.equal(decoded.MR.value, 345.67, 'scale 1/100')
     })
@@ -161,7 +161,7 @@ describe('RadioERP1 packets', () => {
       decoded = radio.decode('a5-09-0b')
       assert.equal(decoded.Ract.value.toFixed(1), 51.2)
     })
-    it('RPS with diffrent status codes', () => {
+    it('RPS with different status codes', () => {
       radio = RadioERP1.from({ payload: 0, status: 0x30 })
       decoded = radio.decode('f6-02-01')
       assert.equal(decoded.hasOwnProperty('SA'), true)
@@ -178,14 +178,11 @@ describe('RadioERP1 packets', () => {
     })
     it('a5-12-10', () => {
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.payload = radio.payload.setSingleBit(29, 1)
-      radio.payload = radio.payload.setValue(2, 30, 2)
-      radio.payload = radio.payload.setValue(5000, 0, 24)
+      radio.encode({ DT: 1, DIV: 2, MR: 50.5 }, { eep: 'a5-12-10' })
       decoded = radio.decode('a5-12-10')
-      assert.equal(decoded.MR.value, 50)
+      assert.equal(decoded.MR.value, 50.5)
       assert.equal(decoded.MR.unit, 'mA')
-      radio.payload = radio.payload.setSingleBit(29, 0)
-      radio.payload = radio.payload.setValue(0, 30, 2)
+      radio.encode({ DT: 0, DIV: 0, MR: 5000 }, { eep: 'a5-12-10' })
       decoded = radio.decode('a5-12-10')
       assert.equal(decoded.MR.unit, 'A.h')
       assert.equal(decoded.MR.value, 5000)
@@ -206,10 +203,25 @@ describe('RadioERP1 packets', () => {
     })
     it('a5-20-10', () => {
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.payload = radio.payload.setValue(90, 16, 8)
+      radio.payload = radio.encode({ CVAR: 90 }, { eep: 'a5-20-10', direction: 2 })
       decoded = radio.decode('a5-20-10', 2)
-      console.log(decoded)
-      assert.equal(decoded['CVAR'].value, 90)
+      assert.equal(decoded.CVAR.value, 90)
+    })
+    it('a5-38-08', () => {
+      radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+      radio.payload = radio.encode({ COM: 1, TIM: 100 }, { eep: 'a5-38-08', data: 1 })
+      decoded = radio.decode('a5-38-08')
+      assert.equal(decoded.TIM.value.toFixed(0), 100)
+
+      radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+      radio.payload = radio.encode({ COM: 2, EDIM: 50 }, { eep: 'a5-38-08' })
+      decoded = radio.decode('a5-38-08')
+      assert.equal(decoded.EDIM.value.toFixed(0), 50)
+    })
+  })
+  describe('EEP encoding', () => {
+    it('d2', () => {
+      // console.log(setValueFieldName(50, 'a5-38-08', 'EDIM', ByteArray.from([0, 0, 0, 0]), 2))
     })
   })
 })
