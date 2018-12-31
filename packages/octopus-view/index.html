@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      sensor-list-item {--rssi-fill-color: orange}
+      body{background:#ddd;padding:0;margin:0}
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script type="module">
+      import {render,html,svg} from 'https://unpkg.com/lit-html?module'
+      import { LitElement, property} from 'https://unpkg.com/@polymer/lit-element?module'
+      import { WebsocketSender, CommonCommand,ESP3Packet, RadioERP1 ,pretty } from 'https://cdn.jsdelivr.net/npm/enocean-js@latest/packages/enocean.js'
+      import  './elements/sensor-list-item.js'
+      import  './elements/rssi-indicator.js'
+      import  './elements/sensor-list.js'
+      import  './elements/server-connector.js'
+      // var socket = io('http://192.168.178.43:4242/',{autoConnect:false});
+      // socket.connect(()=>{console.log("connected")})
+      // var sender = WebsocketSender(socket)
+      // var commander = CommonCommand.connect(sender)
+      // var erp = RadioERP1.connect(sender)
+      // var rssi=[]
+      //
+      // socket.on("data",data=>{
+      //   var packet= RadioERP1.from(ESP3Packet.from(data))
+      //   rssi.push(packet.RSSI)
+      //   sl.addItem(packet)
+      //   out_min.innerHTML=rssi.reduce(min)
+      //   out_max.innerHTML=rssi.reduce(max)
+      //   out_avg.innerHTML=rssi.reduce(sum)/rssi.length
+      //   //document.getElementById("indicator").setAttribute("value",parseInt(packet.RSSI))
+      //   pretty.logESP3(packet.esp3Packet)
+      // })
+document.getElementById("sc").addEventListener("data",console.log)
+      function min(a,b){
+        if(b<a) return b
+        return a
+      }
+      function max(a,b){
+        if(b>a) return b
+        return a
+      }
+      function sum(a,b){
+        return a+b
+      }
+    </script>
+  </head>
+
+  <body>
+    <server-connector id="sc"></server-connector>
+    <sensor-list-item rssi="55" senderId="ff808000" rorg="0xa5"></sensor-list-item>
+    <sensor-list-item rssi="55" senderId="ff808000" rorg="0xd2" friendlyId="light actuator room 2"></sensor-list-item>
+    <sensor-list-item rssi="55" senderId="ff808000" rorg="0xf6" eep="f6-02-01" friendlyId="switch 3"></sensor-list-item>
+    MIN<div id ="out_min"></div>
+    MAX<div id ="out_max"></div>
+    AVG<div id ="out_avg"></div>
+    <sensor-list id="sl"></sensor-list>
+  </body>
+</html>

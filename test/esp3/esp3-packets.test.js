@@ -1,5 +1,6 @@
 /* eslint-disable no-undef  */
 const ESP3Packet = require('../../').ESP3Packet
+const pretty = require('../../').pretty
 const assert = require('chai').assert
 describe('ESP3Packet', () => {
   it('SHOULD be creatable with new', () => {
@@ -27,6 +28,7 @@ describe('ESP3Packet', () => {
       assert.equal(packet.dataLength, 1, `default dataLenght not 1`)
       assert.equal(packet.length, 8, `length not 8`)
       assert.equal(packet.toString(), '55000100016c0000', `does not autofix crc8 for new packets`)
+      pretty.logESP3(packet)
     })
     it('SHOULD return a readable JSON when stringified', () => {
       var packet = ESP3Packet.from({ data: [8], packetType: 5 })

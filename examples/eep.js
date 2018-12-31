@@ -15,17 +15,11 @@ console.log(ba)
 
 parser.on('data', data => {
   if (data.packetType === 1) {
-    var p = Enocean.RadioERP1.from(data)
-    if (p.senderId === '002a1d7e') console.log(p.decode('f6-01-01'))
-    if (p.teachIn) {
-      pretty.logESP3(data)
-      console.log("TI",p.teachInInfo)
-    }
-    if (known.hasOwnProperty(p.senderId) && !p.teachIn) {
-      console.log('hallo')
-      console.log(p.decode(known[p.senderId]))
-    }
-    // if (p.senderId === '0006d1a6') console.log(p.decode('a5-'))
+    
+    var p = Enocean.RadioERP1.from(data.toString())
+    console.log(p.toString())
+    if (p.senderId === '0182d459') console.log(p.decode('f6-10-00'))
+    
   }
 })
 

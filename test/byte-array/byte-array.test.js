@@ -28,8 +28,10 @@ describe('ByteArray', () => {
   it('SHOULD add a leading 0 when string does NOT contain an even number of chars', () => {
     assert.equal(ByteArray.from('1').toString('hex'), '01', 'not padded')
   })
-  it('SHOULD throw when string contains a char that is a hex digit', () => {
-    assert.throws(() => { ByteArray.from('xx') }, '0-9 a b c d e f')
+  it('SHOULD turn strings containing a chars that are not hex digits into an array of charcodes', () => {
+    var a = ByteArray.from('XX')
+    assert.equal(a[0], 88)
+    assert.equal(a[1], 88)
   })
   it('SHOULD have a setValue and getValue Method', () => {
     var ba = ByteArray.from('aaffaaff')

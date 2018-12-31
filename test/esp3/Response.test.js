@@ -1,10 +1,11 @@
 /* eslint-disable no-undef  */
-const ESP3Packet = require('../../').ESP3Packet
+// const ESP3Packet = require('../../').ESP3Packet
 const Response = require('../../').Response
+const EO = require('../../')
 const assert = require('chai').assert
 describe('Response packets', () => {
   it('...', () => {
-    var packet = ESP3Packet.from('5500050102db00ffa0870009e4')
+    var packet = Response.encode(EO.RET_OK, 'ffa08700', 9)
     var desc = {
       0: [
         {
@@ -29,14 +30,13 @@ describe('Response packets', () => {
         }
       ]
     }
-    var res = Response.from(packet, desc)
+    var res = packet.decode(desc)
     assert.equal(res.baseId, 'ffa08700')
     assert.equal(res.remainingWriteCycles, 9)
     assert.equal(res.test2[0], 9)
     assert.equal(res.test3, 123)
-    assert.equal(res.getRawPacket(), '5500050102db00ffa0870009e4')
 
-    res = Response.from(packet)
+    packet.decode()
     assert.equal(res.returnCode, 0)
     assert.equal(res.returnMsg, 'RET_OK')
   })

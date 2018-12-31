@@ -1,6 +1,7 @@
 /* eslint-disable no-undef  */
 // const ESP3Packet = require('../../').ESP3Packet
 const RadioERP1 = require('../../').RadioERP1
+const ByteArray = require('../../').ByteArray
 // const Response = require('../../').Response
 const assert = require('chai').assert
 describe('RadioERP1 packets', () => {
@@ -76,6 +77,12 @@ describe('RadioERP1 packets', () => {
     assert.equal(decoded.senderId, 'aabbccdd')
     assert.equal(decoded.eep.toString(), 'f6-02-01')
     assert.equal(decoded.teachInType, 'RPS')
+
+    radio = RadioERP1.from({ eep: 'f6-02-01', senderId: 'aabbccdd', RORG: 0xf6 })
+    decoded = radio.teachInInfo
+    assert.equal(decoded.senderId, 'aabbccdd')
+    assert.equal(decoded.eep.toString(), 'f6-02-01')
+    assert.equal(decoded.teachInType, 'RPS')
   })
   it('SHOULD Type: RPS', () => {
     radio = RadioERP1.from({ type: 'RPS', eep: 'f6-02-03' })
@@ -84,31 +91,125 @@ describe('RadioERP1 packets', () => {
     assert.equal(decoded.eep.toString(), 'f6-02-01')
     assert.equal(decoded.teachInType, 'RPS')
   })
-  // describe('the Object returned from connect', () => {
-  //   it('SHOULD have send method', () => {
-  //     // var packet = ESP3Packet.from({ data: 'f630aabbccdd20', optionalData: '03ffffffffff00', packetType: 1 })
-  //     const sender = {
-  //       send (data) {
-  //         var packet = ESP3Packet.from({ data: 0, packetType: 2 })
-  //         assert.equal(data, ESP3Packet.from({ data: 'f630aabbccdd20', optionalData: '03ffffffffff00', packetType: 1 }).toString())
-  //         return Response.from(packet)
-  //       }
-  //     }
-  //     var erp = RadioERP1.connect(sender)
-  //     var res = erp.send('f6', '30', 'aabbccdd', '20')
-  //     assert.equal(res.returnCode, 0)
-  //     assert.equal(res.returnMsg, 'RET_OK')
-  //   })
-  //   it('SHOULD have a status default = 0', () => {
-  //     // var packet = ESP3Packet.from({ data: 'f630aabbccdd20', optionalData: '03ffffffffff00', packetType: 1 })
-  //     const sender = {
-  //       send (data) {
-  //         var radio = RadioERP1.from(data)
-  //         assert.equal(radio.status, 0)
-  //       }
-  //     }
-  //     var erp = RadioERP1.connect(sender)
-  //     erp.send('f6', '30', 'aabbccdd')
-  //   })
-  // })
+  describe('EEP decoding', () => {
+    it('Value in single byte with reversed scale', () => {
+      radio = RadioERP1.from({ payload: '0000ff08' })
+      decoded = radio.decode('a5-02-01')
+      assert.equal(decoded.TMP.value, -40)
+    })
+    it('Value in spread across bytes 10bit', () => {
+      radio = RadioERP1.from({ payload: '00000008' })
+      decoded = radio.decode('a5-02-30')
+      assert.equal(decoded.TMP.value, 62.3)
+    })
+    it('multible values each in single byte', () => {
+      radio = RadioERP1.from({ payload: [0, 250, 250, 0x08] })
+      decoded = radio.decode('a5-04-02')
+      assert.equal(decoded.TMP.value, 60)
+      assert.equal(decoded.HUM.value, 100)
+    })
+    it('Enum values with range', () => {
+      radio = RadioERP1.from({ payload: [100, 0, 0, 0x08] })
+      decoded = radio.decode('a5-10-1f')
+      assert.equal(decoded.FAN.min, 0)
+      assert.equal(decoded.FAN.max, 144)
+    })
+    it('Enum with single value', () => {
+      radio = RadioERP1.from({ payload: [0x11] })
+      decoded = radio.decode('f6-05-01')
+      assert.equal(decoded.WAS.value, 0x11)
+      radio = RadioERP1.from({ payload: [0x21] })
+      decoded = radio.decode('f6-05-01')
+      assert.equal(decoded.WAS.value, null)
+    })
+    it('eep with complete ref to other eep', () => {
+      radio = RadioERP1.from({ payload: [250, 0, 0, 0x08] })
+      decoded = radio.decode('a5-10-1e')
+      assert.equal(decoded.SV.value, 5)
+    })
+    it('eep bitmask enum', () => {
+      radio = RadioERP1.from({ payload: 240, status: 0x20, RORG: 0xf6 })
+      decoded = radio.decode('f6-10-00')
+      assert.equal(decoded.WIN.description, 'down')
+      radio = RadioERP1.from({ payload: 192, status: 0x20 })
+      decoded = radio.decode('f6-10-00')
+      assert.equal(decoded.WIN.description, 'side')
+    })
+    it('values with scale/unit point to other fields', () => {
+      radio = RadioERP1.from({ payload: [0, 0, 1, 0x09] })
+      decoded = radio.decode('a5-12-01')
+      assert.equal(decoded.MR.value, 0.1, 'scale 1/10')
+      assert.equal(decoded.MR.unit, 'kWh', 'unit kWh')
+
+      radio = RadioERP1.from({ payload: [0, 0, 1, 0x08] })
+      radio.payload = radio.payload.setSingleBit(29, 1)
+      decoded = radio.decode('a5-12-01')
+      assert.equal(decoded.MR.value, 1, 'scale 1/1')
+      assert.equal(decoded.MR.unit, 'W', 'unit W')
+
+      var val = ByteArray.from([0, 0, 0])
+      val.setValue(34567, 0, 24)
+      radio = RadioERP1.from({ payload: [val, 0x0a] })
+      decoded = radio.decode('a5-12-01')
+      assert.equal(decoded.MR.value, 345.67, 'scale 1/100')
+    })
+    it('various EEPs', () => {
+      radio = RadioERP1.from({ payload: [0x02, 0x00, 0x0a, 0x0a] })
+      decoded = radio.decode('a5-09-05')
+      assert.equal(decoded.Conc.value, 512)
+      radio = RadioERP1.from({ payload: [0x0f, 0x02, 0x00, 0x0a] })
+      decoded = radio.decode('a5-09-0b')
+      assert.equal(decoded.Ract.value.toFixed(1), 51.2)
+    })
+    it('RPS with diffrent status codes', () => {
+      radio = RadioERP1.from({ payload: 0, status: 0x30 })
+      decoded = radio.decode('f6-02-01')
+      assert.equal(decoded.hasOwnProperty('SA'), true)
+      radio = RadioERP1.from({ payload: 0, status: 0x20 })
+      decoded = radio.decode('f6-02-01')
+      assert.equal(decoded.hasOwnProperty('SA'), false)
+    })
+    it('4BS with direction', () => {
+      radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+      decoded = radio.decode('a5-11-05', 1)
+      assert.equal(decoded.hasOwnProperty('WM'), false)
+      decoded = radio.decode('a5-11-05', 2)
+      assert.equal(decoded.hasOwnProperty('WM'), true)
+    })
+    it('a5-12-10', () => {
+      radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+      radio.payload = radio.payload.setSingleBit(29, 1)
+      radio.payload = radio.payload.setValue(2, 30, 2)
+      radio.payload = radio.payload.setValue(5000, 0, 24)
+      decoded = radio.decode('a5-12-10')
+      assert.equal(decoded.MR.value, 50)
+      assert.equal(decoded.MR.unit, 'mA')
+      radio.payload = radio.payload.setSingleBit(29, 0)
+      radio.payload = radio.payload.setValue(0, 30, 2)
+      decoded = radio.decode('a5-12-10')
+      assert.equal(decoded.MR.unit, 'A.h')
+      assert.equal(decoded.MR.value, 5000)
+    })
+    it('MSB-LSB splited fields', () => {
+      radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+      radio.payload = radio.payload.setValue(15, 4, 4)
+      radio.payload = radio.payload.setValue(255, 16, 8)
+      decoded = radio.decode('a5-13-06')
+      assert.equal(decoded['LOT(MSB)'].value, 180)
+      assert.equal(decoded['LAT(MSB)'].value, -90)
+
+      radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+      radio.payload = radio.payload.setValue(0, 29, 3)
+      radio.payload = radio.payload.setValue(250, 16, 8)
+      decoded = radio.decode('a5-13-10')
+      assert.equal(decoded['SRA (MSB)'].value, 2000)
+    })
+    it('a5-20-10', () => {
+      radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+      radio.payload = radio.payload.setValue(90, 16, 8)
+      decoded = radio.decode('a5-20-10', 2)
+      console.log(decoded)
+      assert.equal(decoded['CVAR'].value, 90)
+    })
+  })
 })
