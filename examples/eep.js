@@ -9,56 +9,18 @@ const parser = new ESP3Parser()
 port.pipe(parser)
 
 var known = {}
-var ba = Enocean.ByteArray.from("0000")
-console.log(ba.getValue(1.2,"abc"))
-console.log(ba)
 
 parser.on('data', data => {
   if (data.packetType === 1) {
-    
-    var p = Enocean.RadioERP1.from(data.toString())
-    console.log(p.toString())
-    if (p.senderId === '0182d459') console.log(p.decode('f6-10-00'))
-    
+    var telegram = Enocean.RadioERP1.from(data.toString())
+    if(telegram.teachIn){
+      var teachInInfo = telegram.teachInInfo
+      if(!known.hasOwnProperty(ti.senderId)){
+        known[telegram.senderId] = ti
+      }
+    }
+    if(known.hasOwnProperty(telgram.senderId) && !telegram.teachIn){
+      console.log(p.decode(known[telegram.senderId].eep.toString()))
+    }
   }
 })
-
-// class MyButton {
-//   constructor (id, parser) {
-//     parser.on('data', data => {
-//       if (data.packetType === 1) {
-//         var p = Enocean.RadioERP1.from(data)
-//         if (p.senderId === id) {
-//           switch (p.decode('f6-02-03').RA.value) {
-//             case 0x10:
-//               this.onA1down()
-//               break
-//             case 0x30:
-//               this.onA0down()
-//               break
-//             case 0x70:
-//               this.onB0down()
-//               break
-//             case 0x50:
-//               this.onB1down()
-//               break
-//             case 0x0:
-//               this.onup()
-//               break
-//           }
-//         }
-//       }
-//     })
-//     this.onA1down = () => {}
-//     this.onA0down = () => {}
-//     this.onB1down = () => {}
-//     this.onB0down = () => {}
-//     this.onup = () => {}
-//   }
-// }
-//
-// var button = new MyButton('002a1d7e', parser)
-// button.onA1down = function () { console.log('A1 was pressed') }
-
-// var data = Enocean.ByteArray.from([12, 33, 211, 17])
-// console.log(data.getValue(14, 10))
