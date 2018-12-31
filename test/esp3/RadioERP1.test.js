@@ -204,5 +204,12 @@ describe('RadioERP1 packets', () => {
       decoded = radio.decode('a5-13-10')
       assert.equal(decoded['SRA (MSB)'].value, 2000)
     })
+    it('a5-20-10', () => {
+      radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+      radio.payload = radio.payload.setValue(90, 16, 8)
+      decoded = radio.decode('a5-20-10', 2)
+      console.log(decoded)
+      assert.equal(decoded['CVAR'].value, 90)
+    })
   })
 })
