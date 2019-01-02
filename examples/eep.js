@@ -2,7 +2,6 @@
 const SerialPort = require('serialport')
 const Enocean = require('../')
 const ESP3Parser = Enocean.ESP3Parser
-//const decode = Enocean.decode
 const port = new SerialPort('/dev/ttyUSB0', { baudRate: 57600 })
 const parser = new ESP3Parser()
 port.pipe(parser)
