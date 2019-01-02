@@ -9,9 +9,6 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
     <script type="module">
-      import {render,html,svg} from 'https://unpkg.com/lit-html?module'
-      import { LitElement, property} from 'https://unpkg.com/@polymer/lit-element?module'
-      import { WebsocketSender, CommonCommand,ESP3Packet, RadioERP1 ,pretty } from 'https://cdn.jsdelivr.net/npm/enocean-js@latest/packages/enocean.js'
       import  './elements/sensor-list-item.js'
       import  './elements/rssi-indicator.js'
       import  './elements/sensor-list.js'
@@ -33,18 +30,7 @@
       //   //document.getElementById("indicator").setAttribute("value",parseInt(packet.RSSI))
       //   pretty.logESP3(packet.esp3Packet)
       // })
-document.getElementById("sc").addEventListener("data",console.log)
-      function min(a,b){
-        if(b<a) return b
-        return a
-      }
-      function max(a,b){
-        if(b>a) return b
-        return a
-      }
-      function sum(a,b){
-        return a+b
-      }
+      document.getElementById("sc").addEventListener("data",console.log)
     </script>
   </head>
 
