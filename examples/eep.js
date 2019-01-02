@@ -15,8 +15,8 @@ parser.on('data', data => {
     var telegram = Enocean.RadioERP1.from(data.toString())
     if(telegram.teachIn){
       var teachInInfo = telegram.teachInInfo
-      if(!known.hasOwnProperty(ti.senderId)){
-        known[telegram.senderId] = ti
+      if(!known.hasOwnProperty(teachInInfo.senderId)){
+        known[telegram.senderId] = teachInInfo
       }
     }
     if(known.hasOwnProperty(telgram.senderId) && !telegram.teachIn){
