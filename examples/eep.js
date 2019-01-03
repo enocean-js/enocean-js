@@ -2,23 +2,24 @@
 const SerialPort = require('serialport')
 const Enocean = require('../')
 const ESP3Parser = Enocean.ESP3Parser
+const ESP3Transformer = Enocean.ESP3Transformer
 const port = new SerialPort('/dev/ttyUSB0', { baudRate: 57600 })
 const parser = new ESP3Parser()
-port.pipe(parser)
+const transformer = new ESP3Transformer()
+port.pipe(parser).pipe(transformer)
 
 var known = {}
 
-parser.on('data', data => {
-  if (data.packetType === 1) {
-    var telegram = Enocean.RadioERP1.from(data.toString())
-    if(telegram.teachIn){
-      var teachInInfo = telegram.teachInInfo
+transformer.on('data', data => {
+  if (data.constructor.name === "RadioERP1") {
+    if(data.teachIn){
+      var teachInInfo = data.teachInInfo
       if(!known.hasOwnProperty(teachInInfo.senderId)){
-        known[telegram.senderId] = teachInInfo
+        known[data.senderId] = teachInInfo
       }
     }
-    if(known.hasOwnProperty(telgram.senderId) && !telegram.teachIn){
-      console.log(p.decode(known[telegram.senderId].eep.toString()))
+    if(known.hasOwnProperty(data.senderId)){
+      console.log(data.decode(known[data.senderId].eep.toString()))
     }
   }
 })
