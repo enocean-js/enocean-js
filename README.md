@@ -8,6 +8,7 @@
 
 [![](https://travis-ci.org/enocean-js/enocean-js.svg?branch=master)](https://travis-ci.org/enocean-js/enocean-js)
 ![Code Climate coverage](https://img.shields.io/codeclimate/coverage/enocean-js/enocean-js.svg)
+
 ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/enocean-js/enocean-js.svg)
 ![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/enocean-js/enocean-js.svg)
 
