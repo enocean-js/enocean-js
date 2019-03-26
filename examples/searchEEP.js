@@ -1,5 +1,4 @@
 const searchEEP = require('../').searchEEP
-
-console.log(searchEEP('ref', /.*/g))
+// searchEEP(field,value)
 // console.log(searchEEP('ref', /.*/g))
-// console.log(searchEEP('ref', /.*/g))
+console.log(searchEEP('number', /.*/g))

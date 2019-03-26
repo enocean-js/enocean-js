@@ -1,0 +1,32 @@
+<html>
+<head>
+  <link rel="icon" href="/favicon.ico?v=3" type="image/x-icon">
+</head>
+<body>
+
+  <a href="/system/info">System Info</a>
+  <input type="text" id="txt_eep" value="a5-02-01"/><button onclick="showProfile()">show</button>
+  <pre id="ta">
+
+  </pre>
+  <script>
+    async function showProfile(){
+      var res = await fetch("/profiles/"+txt_eep.value).then(data => data.json())
+      ta.innerHTML = JSON.stringify(res,null,2)
+    }
+
+    function watchStream(){
+      fetch("/stream").then(response => response.body.getReader()).then(reader=>read(reader))
+      async function read(reader){
+        var res = await reader.read()
+        document.write(
+          Array.from(res.value).map(item=>String.fromCharCode(item)).join("")
+        )
+        if(res.done===false){
+          read(reader)
+        }
+      }
+    }
+  </script>
+</body>
+</html>

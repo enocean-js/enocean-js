@@ -47,13 +47,17 @@
     "standard": "^12.0.1"
   },
   "dependencies": {
-    "esm": "^3.0.84",
     "@enocean-js/byte-array": "0.0.1-beta.12",
     "@enocean-js/crc8": "0.0.1-beta.12",
     "@enocean-js/eep-transcoder": "0.0.1-beta.12",
     "@enocean-js/esp3-packets": "0.0.1-beta.12",
     "@enocean-js/pretty-printer": "0.0.1-beta.12",
     "@enocean-js/serialport-parser": "0.0.1-beta.12",
-    "@enocean-js/serialport-sender": "0.0.1-beta.12"
+    "@enocean-js/serialport-sender": "0.0.1-beta.12",
+    "esm": "^3.0.84",
+    "koa": "^2.6.2",
+    "koa-better-router": "^2.1.1",
+    "koa-better-serve": "^2.0.7",
+    "koa-send": "^5.0.0"
   }
 }
