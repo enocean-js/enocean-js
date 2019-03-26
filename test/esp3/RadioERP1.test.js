@@ -229,7 +229,12 @@ describe('RadioERP1 packets', () => {
       radio.payload = radio.encode({ MT: 1, RMT: 1 }, { eep: 'd2-50-00', data: 1 })
       radio.baseId = 'ff00ff00'
       decoded = radio.decode('d2-50-00')
-      console.log(radio.toString())
+
+      radio = RadioERP1.from('55000c070196d240009005012001a03d790001ffffffff5600d5')
+      decoded = radio.decode('d2-32-02')
+      assert.equal(decoded.CH1.value, 0.9)
+      assert.equal(decoded.CH2.value, 0.5)
+      assert.equal(decoded.CH3.value, 1.8)
       // console.log(setValueFieldName(50, 'a5-38-08', 'EDIM', ByteArray.from([0, 0, 0, 0]), 2))
     })
   })
