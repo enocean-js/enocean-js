@@ -225,6 +225,11 @@ describe('RadioERP1 packets', () => {
   })
   describe('EEP encoding', () => {
     it('d2', () => {
+      radio = RadioERP1.from({ payload: [0], id: 'ff00ff00' })
+      radio.payload = radio.encode({ MT: 1, RMT: 1 }, { eep: 'd2-50-00', data: 1 })
+      radio.baseId = 'ff00ff00'
+      decoded = radio.decode('d2-50-00')
+      console.log(radio.toString())
       // console.log(setValueFieldName(50, 'a5-38-08', 'EDIM', ByteArray.from([0, 0, 0, 0]), 2))
     })
   })
