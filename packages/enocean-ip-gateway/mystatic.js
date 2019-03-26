@@ -1,9 +1,10 @@
+/*eslint-disable*/
 module.exports = function (root, pathname, options) {
-  if (typeof !== 'string') {
+  if (typeof root !== 'string') {
     throw new TypeError('koa-better-serve: expect `root` to be string')
   }
 
-  options = 
+  options =
   options = Object.assign({ root }, options)
   pathname = pathname || '/'
 

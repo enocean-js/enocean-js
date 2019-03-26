@@ -1,3 +1,4 @@
+/*eslint-disable*/
 var Koa = require('koa')
 var app = new Koa()
 const send = require('koa-send')

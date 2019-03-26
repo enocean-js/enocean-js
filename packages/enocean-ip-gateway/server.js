@@ -1,4 +1,5 @@
 // const SerialportSender = require('@enocean-js/serialport-sender').SerialportSender
+/*eslint-disable*/
 const ESP3Parser = require('@enocean-js/serialport-parser').ESP3Parser
 const Pretty = require('@enocean-js/pretty-printer').pretty
 const SerialPort = require('serialport')
@@ -38,7 +39,7 @@ app.get('/stream', function (req, res) {
     Pretty.logESP3(data)
     res.write(JSON.stringify(data) + '\r\n\r\n')
   })
-  req.on("close",x=>console.log("connection closed"))
+  req.on('close', x => console.log('connection closed'))
 })
 
 app.listen(3000, function () {

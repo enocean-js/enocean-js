@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var fc = 0
+// var fc = 0
 
 const fs = require('fs')
 const eepPath = 'packages/node_modules/@enocean-js/eep-transcoder/src/eep'
@@ -20,7 +20,7 @@ function fixField (field) {
   for (var child in field) {
     if (typeof field[child] === 'string') {
       if (!isNaN(field[child])) {
-        var nn
+        // var nn
         if (field[child].substr(0, 2) === '0b') {
           field[child] = parseInt(field[child].substr(2), 2)
         } else {

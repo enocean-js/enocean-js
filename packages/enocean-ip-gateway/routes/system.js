@@ -1,3 +1,4 @@
+/*eslint-disable*/
 let Router = require('koa-better-router')
 let router = Router({ prefix: '/system' }).loadMethods()
 

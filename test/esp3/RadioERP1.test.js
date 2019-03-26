@@ -49,6 +49,12 @@ describe('RadioERP1 packets', () => {
     radio = RadioERP1.from({ payload: '0000000000' })
     assert.equal(radio.RORG, 0xd2, 'VLD')
   })
+  it('SHOULD allow to create learn telegrams (UTE)', () => {
+    var radio = RadioERP1.from('55000d0701fdd480ff61000050d2050e0ed10001ffffffff360051')
+    var decoded = radio.decode()
+    assert.equal(decoded.eep.toString(), 'd2-50-00')
+    assert.equal(decoded.senderId, '050e0ed1')
+  })
   it('SHOULD allow to create learn telegrams (4BS)', () => {
     var radio = RadioERP1.from({ eep: 'a5-02-0a' })
     var decoded = radio.decode()
@@ -130,7 +136,7 @@ describe('RadioERP1 packets', () => {
     it('eep bitmask enum', () => {
       radio = RadioERP1.from({ payload: 240, status: 0x20, RORG: 0xf6 })
       decoded = radio.decode('f6-10-00')
-      assert.equal(decoded.WIN.description, 'down')
+      assert.equal(decoded.WIN.description, 'left/right')
       radio = RadioERP1.from({ payload: 192, status: 0x20 })
       decoded = radio.decode('f6-10-00')
       assert.equal(decoded.WIN.description, 'left/right')
