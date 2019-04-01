@@ -47,7 +47,7 @@
     "standard": "^12.0.1"
   },
   "dependencies": {
-    "@enocean-js/byte-array": "0.0.1-beta.13",
+    "@enocean-js/byte-array": "0.0.1-beta.14",
     "@enocean-js/crc8": "0.0.1-beta.13",
     "@enocean-js/eep-transcoder": "0.0.1-beta.13",
     "@enocean-js/esp3-packets": "0.0.1-beta.13",
