@@ -47,6 +47,7 @@
     "standard": "^12.0.1"
   },
   "dependencies": {
+    "@enocean-js/radio-erp1": "0.0.1-beta.14",
     "@enocean-js/byte-array": "0.0.1-beta.14",
     "@enocean-js/crc8": "0.0.1-beta.14",
     "@enocean-js/eep-transcoder": "0.0.1-beta.14",
