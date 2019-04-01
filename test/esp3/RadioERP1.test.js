@@ -227,7 +227,7 @@ describe('RadioERP1 packets', () => {
     it('d2', () => {
       radio = RadioERP1.from({ payload: [0], id: 'ff00ff00' })
       radio.payload = radio.encode({ MT: 1, RMT: 1 }, { eep: 'd2-50-00', data: 1 })
-      radio.baseId = 'ff00ff00'
+      radio.senderId = 'ff00ff00'
       decoded = radio.decode('d2-50-00')
 
       radio = RadioERP1.from('55000c070196d240009005012001a03d790001ffffffff5600d5')
