@@ -1,15 +1,22 @@
 {
-  "name": "@enocean-js/websocket-gateway",
+  "name": "@enocean-js/node-red-contrib-enocean",
   "version": "0.0.1",
-  "description": "websocket gateway for enocean-js",
-  "main": "src/serialport-parser.js",
+  "description": "an enocean node for node-red",
+  "main": "enocean-node.js",
   "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
   "license": "CC0-1.0",
   "repository": {
     "type" : "git",
     "url" : "https://github.com/enocean-js/enocean-js"
-  }
+  },
   "dependencies": {
-    "serialport": "^7.1.0"
-  }
+    "serialport": "^7.1.0",
+    "enocean-js":"*",
+    "@enocean-js/radio-erp1":"*"
+  },
+  "node-red" : {
+        "nodes": {
+            "enocean": "enocean-node.js"
+        }
+    }
 }
