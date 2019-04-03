@@ -54,7 +54,7 @@
     "@enocean-js/esp3-packets": "0.0.1-beta.14",
     "@enocean-js/pretty-printer": "0.0.1-beta.14",
     "@enocean-js/serialport-parser": "0.0.1-beta.14",
-    "@enocean-js/serialport-sender": "0.0.1-beta.14",
+    "@enocean-js/serialport-sender": "0.0.1-beta.15",
     "esm": "^3.2.4",
     "koa": "^2.6.2",
     "koa-better-router": "^2.1.1",
