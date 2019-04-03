@@ -218,7 +218,7 @@ describe('RadioERP1 packets', () => {
       assert.equal(decoded.TIM.value.toFixed(0), 100)
 
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.payload = radio.encode({ COM: 2, EDIM: 50 }, { eep: 'a5-38-08' })
+      radio.payload = radio.encode({ COM: 2, EDIM: 50 }, { eep: 'a5-38-08', data: 2 })
       decoded = radio.decode('a5-38-08')
       assert.equal(decoded.EDIM.value.toFixed(0), 50)
     })
