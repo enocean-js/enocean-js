@@ -1,6 +1,6 @@
 {
   "name": "enocean-js",
-  "version": "0.0.1-beta.15",
+  "version": "0.0.1-beta.16",
   "description": "open source java script implementation of the enocean protocol",
   "main": "packages/index.js",
   "jsdelivr": "packages/enocean.js",
