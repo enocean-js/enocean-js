@@ -14,6 +14,12 @@ var baseId=""
 
 port.pipe(parser).pipe(transformer)
 
+radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
+radio.payload = radio.encode({ COM: 1, TIM: 100 }, { eep: 'a5-38-08', data: 0 })
+console.log(radio.toString())
+
+decoded = radio.decode('d2-50-00')
+
 async function init(){
   var res = await Commander.getIdBase()
   baseId = parseInt(res.baseId.toString(), 16)
@@ -28,10 +34,11 @@ transformer.on('data', async data => {
       if(!known.hasOwnProperty(teachInInfo.senderId)){
         if(baseId==="") await init()
         known[data.senderId] = teachInInfo
+
+        radio = RadioERP1.from({ payload: [0], id: 'ff00ff00' })
+        radio.payload = radio.encode({ MT: 0, RMT: 1 }, { eep: 'd2-50-00', data: 0})
+        radio.senderId = 'ff00ff00'
         
-        var  radio = RadioERP1.from({rorg:0xd2, payload: [0,0,0,0,0,0], id: 'ffe17701' })
-        radio.payload = radio.encode({ MT: 0, DOMC: 2}, { eep: 'd2-50-00', data: 1 })
-        pretty.logESP3(radio)
         decoded = radio.decode('d2-50-00')
         //*****************************************************************************
         var ret = RadioERP1.from({rorg: 0xa5,payload:data.payload})
@@ -50,4 +57,4 @@ transformer.on('data', async data => {
     }
   }
 })
-transformer.write(ESP3Packet.from("55000d0701fdd480ff61000050d2050e0ed10001ffffffff34007b"))
+//transformer.write(ESP3Packet.from("55000d0701fdd480ff61000050d2050e0ed10001ffffffff34007b"))
