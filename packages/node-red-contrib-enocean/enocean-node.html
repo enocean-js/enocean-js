@@ -1,27 +1,71 @@
 <script type="text/javascript">
-    RED.nodes.registerType('enocean',{
+  RED.nodes.registerType('enocean-config-node', {
+    category: 'config',
+    defaults: {
+      serialport: { value: "", required: true }
+    },
+    label: function () {
+      return this.serialport;
+    }
+  });
+</script>
+
+<script type="text/x-red"
+  data-template-name="enocean-config-node">
+  <div class="form-row">
+    <label for="node-config-input-serialport"><i class="icon-bookmark"></i> Serialport</label>
+    <input type="text"
+      id="node-config-input-serialport">
+  </div>
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-actor',{
         category: 'function',
         color: '#a6bbcf',
         defaults: {
-            name: {value:""}
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name:{
+            value:"",
+          },
+          senderid:{
+            value:"",
+          },
+          eep:{
+            value:"",
+          }
         },
-        bla: "hallo",
-        inputs:1,
         outputs:1,
         icon: "file.png",
         label: function() {
-            return this.name||"enocean";
+            return this.name || "enocean-actor";
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="enocean">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> BalBla</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+<script type="text/x-red" data-template-name="enocean-actor">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-senderid">Sender Id</label>
+    <input type="text" id="node-input-senderid">
+  </div>
+  <div class="form-row">
+    <label for="node-input-eep">EEP</label>
+    <input type="text" id="node-input-eep">
+  </div>
 </script>
 
-<script type="text/x-red" data-help-name="enocean">
+<script type="text/x-red" data-help-name="enocean-actor">
     <p>haha</p>
 </script>
