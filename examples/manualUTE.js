@@ -1,4 +1,3 @@
-/eslint-disable/
 const SerialPort = require('serialport')
 const Enocean = require('../packages')
 const ESP3Parser = Enocean.ESP3Parser
