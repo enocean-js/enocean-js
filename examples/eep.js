@@ -36,12 +36,20 @@ transformer.on('data', async data => {
         
         decoded = radio.decode('d2-50-00')
         //*****************************************************************************
-        var ret = RadioERP1.from({rorg: 0xa5,payload:data.payload})
+        var ret = RadioERP1.from({rorg: 0xd4,payload:data.payload})
         ret.senderId = baseId + 1
         ret.destinationId = data.senderId
         ret.payload = ret.payload.setValue(1,0,1) // bidi
         ret.payload = ret.payload.setValue(1,2,2) // teach in successful
         ret.payload = ret.payload.setValue(1,4,4) // this is a teach in response
+        console.log(ret)
+        console.log(RadioERP1.makeTeachIn({
+          rorg: 0xd4,
+          requestPayload: data.payload,
+          bidi: Enocean.UTE_BIDIRECTIONAL,
+          result: Enocean.UTE_TEACH_IN_SUCCESSFULL,
+          cmd: Enocean.UTE_CMD_RESPONSE
+        }))
         console.log(await sender.send(ret.toString()))
         //*******************************************************************************
       }
