@@ -60,7 +60,7 @@ describe('RadioERP1 packets', () => {
     var decoded = radio.decode()
     assert.equal(decoded.eep.func, 0x02)
     assert.equal(decoded.eep.type, 0x0a)
-    assert.equal(decoded.manufacturer.id, 0x0)
+    assert.equal(decoded.manufacturer.id, 0x7ff)
     assert.equal(decoded.eep.toString(), 'a5-02-0a')
     assert.equal(decoded.teachInType, '4BS')
   })
