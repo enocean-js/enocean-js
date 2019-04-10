@@ -63,7 +63,7 @@ module.exports = function (RED) {
       }
       async function btnDown (btn) {
         node.btn.payload = node.btn.encode({ R1: btn, EB: 1 }, { eep: 'f6-02-01', status: 0x30 })
-console.log(node.btn.toString())
+        console.log(node.btn.toString())
         await node.serialport.sender.send(node.btn.toString())
       }
       if (msg.payload === 'A0_down') {
