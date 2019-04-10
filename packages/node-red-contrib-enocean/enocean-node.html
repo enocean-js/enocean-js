@@ -22,8 +22,7 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('enocean-actor',{
-        category: 'function',
-        color: '#a6bbcf',
+        category: 'input',
         defaults: {
           serialport: {
             value: "",
@@ -40,10 +39,13 @@
           }
         },
         outputs:1,
-        icon: "file.png",
+        color: '#063b72',
+        icon: "enocean-js-white.svg",
         label: function() {
-            return this.name || "enocean-actor";
-        }
+            return this.name || this.senderId || "enocean-input";
+        },
+        paletteLabel: 'enocean-in',
+        labelStyle: 'enocean-node'
     });
 </script>
 
@@ -67,5 +69,121 @@
 </script>
 
 <script type="text/x-red" data-help-name="enocean-actor">
-    <p>haha</p>
+  <p>this is a node to listen to incomming enocean telegrams.</p>
+
+  <ul>
+    <li>First select a serialport to conncet to.</li>
+    <li>then provide the id and eep of the device you want to listen to</li>
+    <li>if you don't know the id and/or eep of your device, connect the node to a debug node. it will output all incomming teach in telegrams.</li>
+    <li>then click the teach in button of your device. The sender id and eep will be loged to the debug window</li>
+    <li>fill the node properties with this information.</li>
+    <li>from now on the node will listen to telegrams from the provided id and will output the decoded information of these telegrams</li>
+  </ul>
+
 </script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-4BS',{
+        category: 'output',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name: {
+            value: ""
+          },
+          offset: {
+            value: ""
+          },
+          eep: {
+            value: ""
+          }
+        },
+        inputs:1,
+        color: '#063b72',
+        icon: "enocean-js-white.svg",
+        label: function() {
+            return this.name || "enocean-4BS";
+        },
+        paletteLabel: 'enocean-4BS',
+        labelStyle: 'enocean-node'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-4BS">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-offset">ID</label>
+    <input type="text" id="node-input-offset">
+  </div>
+  <div class="form-row">
+    <label for="node-input-eep">EEP</label>
+    <input type="text" id="node-input-eep">
+  </div>
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-btn',{
+        category: 'output',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name: {
+            value: ""
+          },
+          offset: {
+            value: ""
+          }
+        },
+        inputs:1,
+        color: '#063b72',
+        icon: "enocean-js-white.svg",
+        label: function() {
+            return this.name || "enocean-btn";
+        },
+        paletteLabel: 'enocean-btn',
+        labelStyle: 'enocean-node'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-btn">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-offset">ID</label>
+    <input type="text" id="node-input-offset">
+  </div>
+</script>
+
+<style>
+  .enocean-node{
+    fill:white
+  }
+  #palette_node_enocean-actor .palette_label{
+    color:white
+  }
+  #palette_node_enocean-btn .palette_label{
+    color:white
+  }
+  #palette_node_enocean-4BS .palette_label{
+    color:white
+  }
+</style>

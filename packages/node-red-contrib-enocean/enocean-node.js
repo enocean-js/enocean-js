@@ -1,6 +1,9 @@
 const ESP3Parser = require("@enocean-js/serialport-parser").ESP3Parser
 const SerialPort = require('serialport')
 const ESP3Transfomer = require("@enocean-js/esp3-packets").ESP3Transformer
+const SerialportSender = require("@enocean-js/serialport-sender").SerialportSender
+const Commander = require("@enocean-js/common-command").Commander
+const RadioERP1 = require("@enocean-js/radio-erp1").RadioERP1
 
 module.exports = function(RED) {
   function EnOceanConfigNode(config) {
@@ -8,26 +11,113 @@ module.exports = function(RED) {
       this.serialport = config.serialport;
       this.port = null
       try{
+        this.baseId = ""
         this.port = new SerialPort(this.serialport, { baudRate: 57600 })
+        this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser()})
+        this.commander = new Commander(this.sender)
+        node = this
+        this.getBaseId = async function(){
+          var res = await this.commander.getIdBase()
+          node.baseId = parseInt(res.baseId.toString(),16)
+          console.log(res)
+        }
+        this.getBaseId()
       }catch(err){
         console.log(err)
       }
   }
   RED.nodes.registerType("enocean-config-node",EnOceanConfigNode);
 
+  function EnOcean4BSNode(config) {
+      RED.nodes.createNode(this,config);
+      this.eep = config.eep
+      this.offset = config.offset
+      this.serialport = RED.nodes.getNode(config.serialport);
+      var node = this
+      node.on('input',  async function(msg) {
+        var tel = RadioERP1.from({ eep: node.eep, payload: [0,0,0,0], senderId: this.serialport.baseId + parseInt(node.offset) })
+        if(typeof msg.payload === "string"){
+          if(msg.payload === "LRN"){}
+          // send teach In tel.payload = node.btn.encode({ R1: 0, EB: 0 }, { eep: node.eep})
+        }else{
+          tel.payload = tel.encode(msg.payload, { eep: node.eep})
+          await node.serialport.sender.send(tel.toString())
+        }
+      });
+  }
+  RED.nodes.registerType("enocean-4BS",EnOcean4BSNode);
+
+  function EnOceanButtonNode(config) {
+      RED.nodes.createNode(this,config);
+      this.offset = config.offset
+      this.serialport = RED.nodes.getNode(config.serialport);
+      var node = this
+
+      node.on('input',  async function(msg) {
+        node.btn = RadioERP1.from({ eep: "f6-02-01", payload: [0], senderId: node.serialport.baseId + parseInt(node.offset) })
+        async function release(){
+          node.btn.payload = node.btn.encode({ R1: 0, EB: 0 }, { eep: 'f6-02-01', status: 0x20 })
+          await node.serialport.sender.send(node.btn.toString())
+        }
+        async function btn_down(btn){
+          node.btn.payload = node.btn.encode({ R1: btn, EB: 1 }, { eep: 'f6-02-01', status: 0x30 })
+          await node.serialport.sender.send(node.btn.toString())
+        }
+        if(msg.payload == "A0_down"){
+          await btn_down(1)
+        }
+        if(msg.payload == "A1_down"){
+          await btn_down(0)
+        }
+        if(msg.payload == "B0_down"){
+          await btn_down(3)
+        }
+        if(msg.payload == "B1_down"){
+          await btn_down(2)
+        }
+        if(msg.payload == "A0_click"){
+          await btn_down(1)
+          await release()
+        }
+        if(msg.payload == "A1_click"){
+          await btn_down(0)
+          await release()
+        }
+        if(msg.payload == "B0_click"){
+          await btn_down(3)
+          await release()
+        }
+        if(msg.payload == "B1_click"){
+          await btn_down(2)
+          await release()
+        }
+        if(msg.payload == "release"){
+          await release()
+        }
+      });
+  }
+  RED.nodes.registerType("enocean-btn",EnOceanButtonNode);
+
   function EnoceanActorNode(config) {
     RED.nodes.createNode(this,config);
     this.eep = config.eep
     this.senderId = config.senderid
-    var node=this
+    var node = this
+    if(node.senderId === "" || node.eep === ""){
+      this.status({fill:"red",shape:"ring",text:"unknown EEP"})
+    }else{
+      this.status({fill:"green",shape:"ring",text:"listening"})
+    }
     EnoceanListener(node,config,data=>{
-      if(data.senderId===node.senderId){
-        node.send({payload: data.decode(node.eep) })
+      if(data.senderId === node.senderId){
+        node.send({
+          payload: data.decode(node.eep)
+        })
       }
-      if(node.senderId===""){
-        console.log("unknown",data.teachIn)
+      if(node.senderId === "" || node.eep === ""){
         if(data.teachIn){
-          console.log(data.teachInInfo)
+          this.eep = config.eep
+          this.senderId = config.senderid
           node.send({
             payload: {
               senderId:data.teachInInfo.senderId,
