@@ -35,10 +35,9 @@ module.exports = function (RED) {
     this.serialport = RED.nodes.getNode(config.serialport)
     var node = this
     node.on('input', async function (msg) {
-
       if (typeof msg.payload === 'string') {
         if (msg.payload === 'LRN') {
-          var te = RadioERP1.makeTeachIn({eep:node.eep,senderId: this.serialport.baseId + parseInt(node.offset) })
+          var te = RadioERP1.makeTeachIn({ eep: node.eep, senderId: this.serialport.baseId + parseInt(node.offset) })
           await node.serialport.sender.send(te.toString())
         }
       } else {
@@ -116,8 +115,8 @@ module.exports = function (RED) {
     }
     EnoceanListener(node, config, data => {
       if (data.senderId === node.senderId) {
-        if(data.RORG !== 0xf6 && data.teachIn) return
-        if(data.RORG.toString(16) !== node.eep.split("-")[0]) return
+        if (data.RORG !== 0xf6 && data.teachIn) return
+        if (data.RORG.toString(16) !== node.eep.split('-')[0]) return
         node.send({
           payload: data.decode(node.eep)
         })
