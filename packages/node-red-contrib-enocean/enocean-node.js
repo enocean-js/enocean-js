@@ -35,7 +35,7 @@ module.exports = function (RED) {
     this.serialport = RED.nodes.getNode(config.serialport)
     var node = this
     node.on('input', async function (msg) {
-      var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], senderId: this.serialport.baseId + parseInt(node.offset) })
+      var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], id: this.serialport.baseId + parseInt(node.offset) })
       if (typeof msg.payload === 'string') {
         if (msg.payload === 'LRN') {}
         // send teach In tel.payload = node.btn.encode({ R1: 0, EB: 0 }, { eep: node.eep})
@@ -54,13 +54,16 @@ module.exports = function (RED) {
     var node = this
 
     node.on('input', async function (msg) {
-      node.btn = RadioERP1.from({ eep: 'f6-02-01', payload: [0], senderId: node.serialport.baseId + parseInt(node.offset) })
+      node.btn = RadioERP1.from({ eep: 'f6-02-01', payload: [0], id: node.serialport.baseId + parseInt(node.offset) })
+      console.log()
       async function release () {
         node.btn.payload = node.btn.encode({ R1: 0, EB: 0 }, { eep: 'f6-02-01', status: 0x20 })
+        console.log(node.btn.toString())
         await node.serialport.sender.send(node.btn.toString())
       }
       async function btnDown (btn) {
         node.btn.payload = node.btn.encode({ R1: btn, EB: 1 }, { eep: 'f6-02-01', status: 0x30 })
+console.log(node.btn.toString())
         await node.serialport.sender.send(node.btn.toString())
       }
       if (msg.payload === 'A0_down') {
