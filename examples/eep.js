@@ -61,8 +61,9 @@ var ret = RadioERP1.makeTeachIn({
   senderId: 0x11223344//baseId + 1
 })
 console.log(ret.teachInInfo)
-radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-radio.payload = radio.encode({HUM:50,TMP:22,TSN:1},{eep:"a5-04-01"})
+radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08,0,0,0,0,0,0] })
+//radio.payload = radio.encode({HUM:50,TMP:22,TSN:1},{eep:"a5-04-01"})
+radio.payload = radio.encode({ MT: 0}, { eep: 'd2-50-00', data: 1})
 radio.senderId = 0x11223344
 console.log(radio.toString())
 //transformer.write(ESP3Packet.from("55000d0701fdd480ff61000050d2050e0ed10001ffffffff34007b"))
