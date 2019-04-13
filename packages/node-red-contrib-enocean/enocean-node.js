@@ -27,7 +27,7 @@ module.exports = function (RED) {
   }
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
 
-  function EnOcean4BSNode (config) {
+  function EnOceanOutputNode (config) {
     RED.nodes.createNode(this, config)
     this.eep = config.eep
     this.offset = config.offset
@@ -42,13 +42,14 @@ module.exports = function (RED) {
           await node.serialport.sender.send(te.toString())
         }
       } else {
-        var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], id: this.serialport.baseId + parseInt(node.offset), direction: node.direction, data: node.data })
-        tel.payload = tel.encode(msg.payload, { eep: node.eep })
+        var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], senderId: this.serialport.baseId + parseInt(node.offset), direction: node.direction, data: node.data })
+        tel.payload = tel.encode(msg.payload, { eep: node.eep, direction: node.direction, data: node.data })
+        console.log(tel.toString())
         await node.serialport.sender.send(tel.toString())
       }
     })
   }
-  RED.nodes.registerType('enocean-4BS', EnOcean4BSNode)
+  RED.nodes.registerType('enocean-out', EnOceanOutputNode)
 
   function EnOceanButtonNode (config) {
     RED.nodes.createNode(this, config)
