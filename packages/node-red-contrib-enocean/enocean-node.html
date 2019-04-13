@@ -36,6 +36,9 @@
           },
           eep:{
             value:"",
+          },
+          direction:{
+            value: 1
           }
         },
         outputs:1,
@@ -66,6 +69,12 @@
     <label for="node-input-eep">EEP</label>
     <input type="text" id="node-input-eep">
   </div>
+  <hr/>
+  <h3>optional</h3>
+  <div class="form-row">
+    <label for="node-input-direction">Direction</label>
+    <input type="text" id="node-input-direction">
+  </div>
 </script>
 
 <script type="text/x-red" data-help-name="enocean-actor">
@@ -95,10 +104,17 @@
             value: ""
           },
           offset: {
-            value: ""
+            value: 0
           },
           eep: {
-            value: ""
+            value: "",
+            required: true
+          },
+          direction:{
+            value: 1
+          },
+          data:{
+            value: 0
           }
         },
         inputs:1,
@@ -107,7 +123,7 @@
         label: function() {
             return this.name || "enocean-4BS";
         },
-        paletteLabel: 'enocean-4BS',
+        paletteLabel: '4BS',
         labelStyle: 'enocean-node'
     });
 </script>
@@ -128,6 +144,16 @@
   <div class="form-row">
     <label for="node-input-eep">EEP</label>
     <input type="text" id="node-input-eep">
+  </div>
+  <hr/>
+  <h3>optional</h3>
+  <div class="form-row">
+    <label for="node-input-direction">Direction</label>
+    <input type="text" id="node-input-direction">
+  </div>
+  <div class="form-row">
+    <label for="node-input-data">Data</label>
+    <input type="text" id="node-input-data">
   </div>
 </script>
 
