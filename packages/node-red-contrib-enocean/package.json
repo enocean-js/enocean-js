@@ -9,6 +9,7 @@
     "type" : "git",
     "url" : "https://github.com/enocean-js/enocean-js"
   },
+  "license": "CC0-1.0",
   "dependencies": {
     "serialport": "^7.1.0",
     "enocean-js":"*",
