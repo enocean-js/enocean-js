@@ -44,7 +44,6 @@ module.exports = function (RED) {
       } else {
         var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], senderId: this.serialport.baseId + parseInt(node.offset), direction: node.direction, data: node.data })
         tel.payload = tel.encode(msg.payload, { eep: node.eep, direction: node.direction, data: node.data })
-        console.log(tel.toString())
         await node.serialport.sender.send(tel.toString())
       }
     })
