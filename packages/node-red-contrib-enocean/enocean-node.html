@@ -1,0 +1,215 @@
+<script type="text/javascript">
+  RED.nodes.registerType('enocean-config-node', {
+    category: 'config',
+    defaults: {
+      serialport: { value: "", required: true }
+    },
+    label: function () {
+      return this.serialport;
+    }
+  });
+</script>
+
+<script type="text/x-red"
+  data-template-name="enocean-config-node">
+  <div class="form-row">
+    <label for="node-config-input-serialport"><i class="icon-bookmark"></i> Serialport</label>
+    <input type="text"
+      id="node-config-input-serialport">
+  </div>
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-actor',{
+        category: 'input',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name:{
+            value:"",
+          },
+          senderid:{
+            value:"",
+          },
+          eep:{
+            value:"",
+          },
+          direction:{
+            value: 1
+          }
+        },
+        outputs:1,
+        color: '#063b72',
+        icon: "enocean-js-white.svg",
+        label: function() {
+            return this.name || this.senderId || "enocean-input";
+        },
+        paletteLabel: 'enocean-in',
+        labelStyle: 'enocean-node'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-actor">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-senderid">Sender Id</label>
+    <input type="text" id="node-input-senderid">
+  </div>
+  <div class="form-row">
+    <label for="node-input-eep">EEP</label>
+    <input type="text" id="node-input-eep">
+  </div>
+  <hr/>
+  <h3>optional</h3>
+  <div class="form-row">
+    <label for="node-input-direction">Direction</label>
+    <input type="text" id="node-input-direction">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="enocean-actor">
+  <p>this is a node to listen to incomming enocean telegrams.</p>
+
+  <ul>
+    <li>First select a serialport to conncet to.</li>
+    <li>then provide the id and eep of the device you want to listen to</li>
+    <li>if you don't know the id and/or eep of your device, connect the node to a debug node. it will output all incomming teach in telegrams.</li>
+    <li>then click the teach in button of your device. The sender id and eep will be loged to the debug window</li>
+    <li>fill the node properties with this information.</li>
+    <li>from now on the node will listen to telegrams from the provided id and will output the decoded information of these telegrams</li>
+  </ul>
+
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-out',{
+        category: 'output',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name: {
+            value: ""
+          },
+          offset: {
+            value: 0
+          },
+          eep: {
+            value: "",
+            required: true
+          },
+          direction:{
+            value: 1
+          },
+          data:{
+            value: 0
+          }
+        },
+        inputs:1,
+        color: '#063b72',
+        icon: "enocean-js-white.svg",
+        label: function() {
+            return this.name || "enocean-out";
+        },
+        paletteLabel: 'enocean-out',
+        labelStyle: 'enocean-node'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-out">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-offset">ID</label>
+    <input type="text" id="node-input-offset">
+  </div>
+  <div class="form-row">
+    <label for="node-input-eep">EEP</label>
+    <input type="text" id="node-input-eep">
+  </div>
+  <hr/>
+  <h3>optional</h3>
+  <div class="form-row">
+    <label for="node-input-direction">Direction</label>
+    <input type="text" id="node-input-direction">
+  </div>
+  <div class="form-row">
+    <label for="node-input-data">Data</label>
+    <input type="text" id="node-input-data">
+  </div>
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-btn',{
+        category: 'output',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name: {
+            value: ""
+          },
+          offset: {
+            value: ""
+          }
+        },
+        inputs:1,
+        color: '#063b72',
+        icon: "enocean-js-white.svg",
+        label: function() {
+            return this.name || "enocean-btn";
+        },
+        paletteLabel: 'enocean-btn',
+        labelStyle: 'enocean-node'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-btn">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-offset">ID</label>
+    <input type="text" id="node-input-offset">
+  </div>
+</script>
+
+<style>
+  .enocean-node{
+    fill:white
+  }
+  #palette_node_enocean-actor .palette_label{
+    color:white
+  }
+  #palette_node_enocean-btn .palette_label{
+    color:white
+  }
+  #palette_node_enocean-out .palette_label{
+    color:white
+  }
+</style>
