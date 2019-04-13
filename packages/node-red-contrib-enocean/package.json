@@ -1,21 +1,20 @@
 {
   "name": "node-red-contrib-enocean",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "an enocean node for node-red",
   "main": "enocean-node.js",
   "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
   "license": "CC0-1.0",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/enocean-js/enocean-js"
+    "type": "git",
+    "url": "https://github.com/enocean-js/enocean-js"
   },
-  "license": "CC0-1.0",
   "dependencies": {
     "serialport": "^7.1.0",
-    "enocean-js":"*",
-    "@enocean-js/radio-erp1":"*"
+    "enocean-js": "*",
+    "@enocean-js/radio-erp1": "*"
   },
-  "node-red" : {
+  "node-red": {
     "nodes": {
       "enocean": "enocean-node.js"
     }
