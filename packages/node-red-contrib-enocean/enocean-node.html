@@ -93,7 +93,7 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('enocean-4BS',{
+    RED.nodes.registerType('enocean-out',{
         category: 'output',
         defaults: {
           serialport: {
@@ -121,14 +121,14 @@
         color: '#063b72',
         icon: "enocean-js-white.svg",
         label: function() {
-            return this.name || "enocean-4BS";
+            return this.name || "enocean-out";
         },
-        paletteLabel: '4BS',
+        paletteLabel: 'enocean-out',
         labelStyle: 'enocean-node'
     });
 </script>
 
-<script type="text/x-red" data-template-name="enocean-4BS">
+<script type="text/x-red" data-template-name="enocean-out">
   <div class="form-row">
     <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
     <input type="text" id="node-input-serialport">
@@ -209,7 +209,7 @@
   #palette_node_enocean-btn .palette_label{
     color:white
   }
-  #palette_node_enocean-4BS .palette_label{
+  #palette_node_enocean-out .palette_label{
     color:white
   }
 </style>
