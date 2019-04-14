@@ -1,3 +1,9 @@
 ## node-red-contrib-enocean
 
-bringing enocean to node-red...
+### the enocean-input node
+
+#### automatic teach in
+
+#### manuell teach in
+
+#### combining manuell and automatic teach in
