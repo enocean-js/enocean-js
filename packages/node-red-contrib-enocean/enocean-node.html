@@ -42,7 +42,14 @@
           }
         },
         outputs: 1,
-        inputs: 1,
+        inputs: 0,
+        button: {
+          enabled: true,
+          onclick: function (){
+            console.log(this)
+            fetch("inject/"+this.id,{method:"POST"})
+          }
+        },
         inputLabels: "LRN mode",
         color: '#063b72',
         icon: "enocean-js-white.svg",

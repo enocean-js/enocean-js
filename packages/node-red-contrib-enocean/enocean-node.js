@@ -147,7 +147,9 @@ module.exports = function (RED) {
         clearInterval(node.blink)
       }, sec * 1000)
     }
-
+    node.receive = function (){
+      node.startTeachIn()
+    }
     node.on('input', msg => {
       if (msg.payload === true) {
         node.startTeachIn()
@@ -173,9 +175,7 @@ module.exports = function (RED) {
         })
       }
       if (this.teachInStatus === true) {
-        console.log("i'min teach in mode")
         if (data.teachIn) {
-          console.log('got teach in telegram')
           this.eep = data.teachInInfo.eep.toString()
           this.senderId = data.teachInInfo.senderId
           node.context().set('eep', data.teachInInfo.eep.toString())
