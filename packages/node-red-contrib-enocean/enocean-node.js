@@ -160,7 +160,16 @@ module.exports = function (RED) {
         if (data.RORG !== 0xf6 && data.teachIn) return
         if (data.RORG.toString(16) !== node.eep.split('-')[0]) return
         node.send({
-          payload: data.decode(node.eep, node.direction)
+          payload: data.decode(node.eep, node.direction),
+          meta: {
+            senderId: data.senderId,
+            RORG: data.RORG,
+            RSSI: data.RSSI,
+            payload: data.payload.toString(),
+            subTelNum: data.subTelNum,
+            raw: data.toString(),
+            timestamp: Date.now()
+          }
         })
       }
       if (this.teachInStatus === true) {
