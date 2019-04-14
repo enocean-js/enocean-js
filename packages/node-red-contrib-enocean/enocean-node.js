@@ -14,26 +14,27 @@ module.exports = function (RED) {
     var node = this
     try {
       this.port = new SerialPort(this.serialport, { baudRate: 57600 })
-      this.port.on("error",err=>{
-        node.warn("could not open port. Most likely you are trying to open the same port twice.")
+      this.port.on('error', err => {
+        if (err) {
+          node.warn('could not open port. Most likely you are trying to open the same port twice.')
+        }
       })
       this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser() })
       this.commander = new Commander(this.sender)
-      var node = this
       this.getBaseId = async function (x) {
-        try{
+        try {
           var res = await this.commander.getIdBase()
           node.baseId = parseInt(res.baseId.toString(), 16)
           if (x) {
             setActorNodeStatus(x)
           }
-        }catch(err){
-          node.error("could not get Base ID")
+        } catch (err) {
+          node.error('could not get Base ID')
         }
       }
       this.getBaseId()
     } catch (err) {
-      console.log("err")
+      console.log('err')
     }
   }
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
@@ -149,10 +150,10 @@ module.exports = function (RED) {
     const transformer = new ESP3Transfomer()
     const parser = new ESP3Parser()
     const usb = RED.nodes.getNode(node.serialport)
-    if(usb.baseId === ''){
+    if (usb.baseId === '') {
       await usb.getBaseId(node)
     }
-    //setActorNodeStatus(node)
+    // setActorNodeStatus(node)
     node.on('close', function (done) {
       usb.port.close(done)
     })
@@ -160,18 +161,17 @@ module.exports = function (RED) {
     transformer.on('data', cb)
   }
 
-  function setActorNodeStatus(node){
+  function setActorNodeStatus (node) {
     const usb = RED.nodes.getNode(node.serialport)
-    if(usb.baseId === ''){
+    if (usb.baseId === '') {
       node.status({ fill: 'red', shape: 'dot', text: 'error: no baseId' })
-    }else{
-      if (node.senderId !== '' && node.eep !== ''){
+    } else {
+      if (node.senderId !== '' && node.eep !== '') {
         node.status({ fill: 'green', shape: 'dot', text: 'ready' })
-      }else{
+      } else {
         node.status({ fill: 'grey', shape: 'dot', text: 'connected' })
       }
     }
-
   }
 
   // function EnoceanTeachInInfoNode(config) {
