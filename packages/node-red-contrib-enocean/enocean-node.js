@@ -10,10 +10,13 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
     this.serialport = config.serialport
     this.port = null
+    var node = this
     try {
       this.baseId = ''
       this.port = new SerialPort(this.serialport, { baudRate: 57600 })
-      this.port.on("error",console.log)
+      this.port.on("error",err=>{
+        node.warn("could not open port. Most likely you are trying to open the same port twice.")
+      })
       this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser() })
       this.commander = new Commander(this.sender)
       var node = this
@@ -22,7 +25,7 @@ module.exports = function (RED) {
         var res = await this.commander.getIdBase()
         node.baseId = parseInt(res.baseId.toString(), 16)
       }catch(err){
-        console.log("could not get Base ID")
+        node.error("could not get Base ID")
       }
       }
       this.getBaseId()
