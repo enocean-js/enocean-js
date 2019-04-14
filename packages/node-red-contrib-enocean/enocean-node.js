@@ -13,16 +13,21 @@ module.exports = function (RED) {
     try {
       this.baseId = ''
       this.port = new SerialPort(this.serialport, { baudRate: 57600 })
+      this.port.on("error",console.log)
       this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser() })
       this.commander = new Commander(this.sender)
       var node = this
       this.getBaseId = async function () {
+        try{
         var res = await this.commander.getIdBase()
         node.baseId = parseInt(res.baseId.toString(), 16)
+      }catch(err){
+        console.log("could not get Base ID")
+      }
       }
       this.getBaseId()
     } catch (err) {
-      console.log(err)
+      console.log("err")
     }
   }
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
