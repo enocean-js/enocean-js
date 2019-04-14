@@ -10,9 +10,9 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
     this.serialport = config.serialport
     this.port = null
+    this.baseId = ''
     var node = this
     try {
-      this.baseId = ''
       this.port = new SerialPort(this.serialport, { baudRate: 57600 })
       this.port.on("error",err=>{
         node.warn("could not open port. Most likely you are trying to open the same port twice.")
@@ -20,13 +20,16 @@ module.exports = function (RED) {
       this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser() })
       this.commander = new Commander(this.sender)
       var node = this
-      this.getBaseId = async function () {
+      this.getBaseId = async function (x) {
         try{
-        var res = await this.commander.getIdBase()
-        node.baseId = parseInt(res.baseId.toString(), 16)
-      }catch(err){
-        node.error("could not get Base ID")
-      }
+          var res = await this.commander.getIdBase()
+          node.baseId = parseInt(res.baseId.toString(), 16)
+          if (x) {
+            setActorNodeStatus(x)
+          }
+        }catch(err){
+          node.error("could not get Base ID")
+        }
       }
       this.getBaseId()
     } catch (err) {
@@ -114,13 +117,11 @@ module.exports = function (RED) {
     this.eep = config.eep
     this.senderId = config.senderid
     this.direction = config.direction
+    this.serialport = config.serialport
+    this.status({ fill: 'grey', shape: 'ring', text: 'not initialized' })
     var node = this
-    if (node.senderId === '' || node.eep === '') {
-      this.status({ fill: 'red', shape: 'ring', text: 'unknown EEP' })
-    } else {
-      this.status({ fill: 'green', shape: 'ring', text: 'listening' })
-    }
-    EnoceanListener(node, config, data => {
+
+    EnoceanListener(node, data => {
       if (data.senderId === node.senderId) {
         if (data.RORG !== 0xf6 && data.teachIn) return
         if (data.RORG.toString(16) !== node.eep.split('-')[0]) return
@@ -144,15 +145,33 @@ module.exports = function (RED) {
   }
   RED.nodes.registerType('enocean-actor', EnoceanActorNode)
 
-  function EnoceanListener (node, config, cb) {
+  async function EnoceanListener (node, cb) {
     const transformer = new ESP3Transfomer()
     const parser = new ESP3Parser()
-    const usb = RED.nodes.getNode(config.serialport)
+    const usb = RED.nodes.getNode(node.serialport)
+    if(usb.baseId === ''){
+      await usb.getBaseId(node)
+    }
+    //setActorNodeStatus(node)
     node.on('close', function (done) {
       usb.port.close(done)
     })
     usb.port.pipe(parser).pipe(transformer)
     transformer.on('data', cb)
+  }
+
+  function setActorNodeStatus(node){
+    const usb = RED.nodes.getNode(node.serialport)
+    if(usb.baseId === ''){
+      node.status({ fill: 'red', shape: 'dot', text: 'error: no baseId' })
+    }else{
+      if (node.senderId !== '' && node.eep !== ''){
+        node.status({ fill: 'green', shape: 'dot', text: 'ready' })
+      }else{
+        node.status({ fill: 'grey', shape: 'dot', text: 'connected' })
+      }
+    }
+
   }
 
   // function EnoceanTeachInInfoNode(config) {
