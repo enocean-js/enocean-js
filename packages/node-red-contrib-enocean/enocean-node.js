@@ -147,7 +147,7 @@ module.exports = function (RED) {
         clearInterval(node.blink)
       }, sec * 1000)
     }
-    node.receive = function (){
+    node.receive = function () {
       node.startTeachIn()
     }
     node.on('input', msg => {
