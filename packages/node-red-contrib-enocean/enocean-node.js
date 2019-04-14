@@ -115,13 +115,46 @@ module.exports = function (RED) {
 
   function EnoceanActorNode (config) {
     RED.nodes.createNode(this, config)
-    this.eep = config.eep
-    this.senderId = config.senderid
+    var ctx = this.context()
+    var eep = ctx.get("eep")
+    var sid = ctx.get("senderId")
+    this.eep = (config.eep ? config.eep : eep? eep : "").toLowerCase()
+    this.senderId = (config.senderId ? config.senderId : sid ? sid : "").toLowerCase()
     this.direction = config.direction
     this.serialport = config.serialport
+    this.teachInStatus = false
     this.status({ fill: 'grey', shape: 'ring', text: 'not initialized' })
     var node = this
+    node.stopTeachIn = () =>{
+      node.teachInStatus = false
+      clearTimeout(node.teachInInterval)
+      clearInterval(node.blink)
+      setActorNodeStatus(node)
+    }
+    node.startTeachIn = () =>{
+      var sec = 30
+      var dot = true
+      node.teachInStatus = true
+      node.status({ fill: 'blue', shape: dot?"dot":"ring", text: `teach-in mode ${sec.toFixed(0)}s` })
+      node.blink = setInterval(()=>{
+        sec-=0.5
+        dot = !dot
+        node.status({ fill: 'blue', shape: dot?"dot":"ring", text: `teach-in mode ${sec.toFixed(0)}s` })
+      },500)
+      node.teachInInterval = setTimeout(()=>{
+        node.teachInStatus = false
+        setActorNodeStatus(node)
+        clearInterval(node.blink)
+      },sec*1000)
+    }
 
+    node.on("input",msg => {
+      if(msg.payload === true){
+        node.startTeachIn()
+      }else{
+        node.stopTeachIn()
+      }
+    })
     EnoceanListener(node, data => {
       if (data.senderId === node.senderId) {
         if (data.RORG !== 0xf6 && data.teachIn) return
@@ -130,10 +163,15 @@ module.exports = function (RED) {
           payload: data.decode(node.eep, node.direction)
         })
       }
-      if (node.senderId === '' || node.eep === '') {
+      if (this.teachInStatus === true) {
+        console.log("i'min teach in mode")
         if (data.teachIn) {
-          this.eep = config.eep
-          this.senderId = config.senderid
+          console.log("got teach in telegram")
+          this.eep = data.teachInInfo.eep.toString()
+          this.senderId = data.teachInInfo.senderId
+          node.context().set("eep", data.teachInInfo.eep.toString() )
+          node.context().set("senderId",data.teachInInfo.senderId)
+          node.stopTeachIn()
           node.send({
             payload: {
               senderId: data.teachInInfo.senderId,
