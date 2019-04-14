@@ -28,7 +28,7 @@ instead of automatic teach in you can also provide the sensor id and eep yoursel
 
 **sender Id** can usually be found on the device itself and is written as a 4Byte (8 digit) string in hexadecimal form (f.e.: `001a2b3c`).
 
-**EEP** is the **E**nocean **E**quipment **P**rofile which should be provided with the documentation of your device and is written in the for of 3Bytes seperated by a dash (f.e.: `f6-02-01`).
+**EEP** is the **E**nocean **E**quipment **P**rofile which should be provided with the documentation of your device and is written in the form of 3Bytes seperated by a dash (f.e.: `f6-02-01`).
 The description of the eep and the meaning of the telegram content can be found in the [EEP Specefication](https://www.enocean-alliance.org/wp-content/uploads/2018/02/EEP268_R3_Feb022018_public.pdf)
 
 **Direction**
