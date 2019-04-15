@@ -155,7 +155,7 @@
     <input type="text" id="node-input-eep">
   </div>
   <hr/>
-  <h3>optional</h3>
+  <h4>optional</h4>
   <div class="form-row">
     <label for="node-input-direction">Direction</label>
     <input type="text" id="node-input-direction">
@@ -182,7 +182,14 @@
             value: ""
           },
           offset: {
-            value: ""
+            value: "",
+            validate: v=>{
+              if((v >= 0) && (v <= 127) && Number.isInteger(Number(v)) && !isNaN(parseFloat(v))){
+                return true
+              } else {
+                return false
+              }
+            }
           }
         },
         inputs:1,
@@ -207,13 +214,44 @@
     <input type="text" id="node-input-name">
   </div>
   <div class="form-row">
-    <label for="node-input-offset">ID</label>
+    <label for="node-input-offset">Channel</label>
     <input type="text" id="node-input-offset">
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="enocean-btn">
-  <p>a specialized node, implementing a simple rocker switch</p>
+  <p> a specialized node, implementing a simple rocker switch </p>
+  <h3>Properties</h3>
+    <dl class="message-properties">
+        <dt>Serialport
+          <span class="property-type">config-node</span>
+        </dt>
+        <dd> the serialport to connect to </dd>
+        <dt class="optional">Name
+          <span class="property-type">string</span>
+        </dt>
+        <dd> the nodes name</dd>
+        <dt>Channel
+          <span class="property-type">integer</span>
+        </dt>
+        <dd> the channel you want to send from (0-127)</dd>
+    </dl>
+  <h3>Inputs</h3>
+      <dl class="message-properties">
+          <dt>payload
+              <span class="property-type">string</span>
+          </dt>
+          <dd> "A0_click", "A1_click", "B0_click", "B1_click"
+          "A0_down", "A1_down", "B0_down", "B1_down"
+          "release" </dd>
+      </dl>
+
+<h3>Details</h3>
+ <p>
+   this node implements a 2 Rocker Switch (4 Buttons: A0,A1,B0,B1) that can be "click"ed or "down"ed (A0,A1,B0,B1).
+   "click" means the button is immediately released after beeing pressed. When "down"ed you have to release the button yourself.
+   send "A0_click" or "B0_click" to teach in button "A" or "B" into an external device (the button behaves as a physical enocean rocker switch)
+ </p>
 </script>
 
 <style>
