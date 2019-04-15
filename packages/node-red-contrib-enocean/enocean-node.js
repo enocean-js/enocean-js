@@ -51,12 +51,12 @@ module.exports = function (RED) {
       if (typeof msg.payload === 'string') {
         if (msg.payload === 'LRN') {
           var te = RadioERP1.makeTeachIn({ eep: node.eep, senderId: this.serialport.baseId + parseInt(node.offset) })
-          await node.serialport.sender.send(te.toString())
+          var res = await node.serialport.sender.send(te.toString())
         }
       } else {
-        var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], senderId: this.serialport.baseId + parseInt(node.offset), direction: node.direction, data: node.data })
+        var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], id: this.serialport.baseId + parseInt(node.offset), direction: node.direction, data: node.data })
         tel.payload = tel.encode(msg.payload, { eep: node.eep, direction: node.direction, data: node.data })
-        await node.serialport.sender.send(tel.toString())
+        var res = await node.serialport.sender.send(tel.toString())
       }
     })
   }
@@ -166,6 +166,7 @@ module.exports = function (RED) {
           meta: {
             senderId: data.senderId,
             RORG: data.RORG,
+            eep: node.eep,
             RSSI: data.RSSI,
             payload: data.payload.toString(),
             subTelNum: data.subTelNum,
@@ -184,7 +185,18 @@ module.exports = function (RED) {
           node.send({
             payload: {
               senderId: data.teachInInfo.senderId,
-              eep: data.teachInInfo.eep.toString()
+              eep: data.teachInInfo.eep.toString(),
+              manufacturer: data.teachInInfo.manufacturer
+            },
+            meta:{
+              senderId: data.teachInInfo.senderId,
+              RORG: data.RORG,
+              eep: data.teachInInfo.eep.toString(),
+              RSSI: data.RSSI,
+              payload: data.payload.toString(),
+              subTelNum: data.subTelNum,
+              raw: data.toString(),
+              timestamp: Date.now()
             }
           })
         }
