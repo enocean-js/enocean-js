@@ -79,7 +79,7 @@
     <input type="text" id="node-input-eep">
   </div>
   <hr/>
-  <h3>optional</h3>
+  <h4>optional</h4>
   <div class="form-row">
     <label for="node-input-direction">Direction</label>
     <input type="text" id="node-input-direction">
@@ -91,10 +91,9 @@
 
   <ul>
     <li>First select a serialport to conncet to.</li>
-    <li>then provide the id and eep of the device you want to listen to</li>
-    <li>if you don't know the id and/or eep of your device, connect the node to a debug node. it will output all incomming teach in telegrams.</li>
-    <li>then click the teach in button of your device. The sender id and eep will be loged to the debug window</li>
-    <li>fill the node properties with this information.</li>
+    <li>press the button of the node to turn on the teach in mode</li>
+    <li>then press the LRN button of the device you want to teach in, the device should automatically be paired with this node.</li>
+    <li>alternatively you can provide (or overwrite) the senderId and EEP yourself</li>
     <li>from now on the node will listen to telegrams from the provided id and will output the decoded information of these telegrams</li>
   </ul>
 
