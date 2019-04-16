@@ -14,6 +14,28 @@ function append (data) {
 function hexr (x) {
   return parseInt(x).toString(16).padStart(2, '0')
 }
+
+function eepTable (data) {
+  var eepArray = data.eep.split('-')
+  return `<table>
+    <tr>
+      <th>rorg</th>
+      <td>${eepArray[0]}</td>
+      <td>${data.rorg_title}</td>
+    </tr>
+    <tr>
+      <th>func</th>
+      <td>${eepArray[1]}</td>
+      <td>${data.func_title}</td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td>${eepArray[2]}</td>
+      <td>${data.title}</td>
+    </tr>
+  </table>`
+}
+
 eepfiles.forEach(file => {
   var eepstr = fs.readFileSync(eepPath + '/' + file, 'utf8')
   eepstr = eepstr.replace(/"/g, '\\"')
@@ -28,5 +50,5 @@ eepfiles.forEach(file => {
     append(`    * **${hexr(json.rorg_number)}-${hexr(json.func_number)}** ${json.func_title} `)
   }
   append(`        * [**${json.eep}** ${json.title}](eep/${json.eep}.md) `)
-  fs.writeFileSync(docsPath + 'eeps/' + `${json.eep}.md`, `# ${json.eep}`)
+  fs.writeFileSync(docsPath + 'eeps/' + `${json.eep}.md`, `${eepTable(json)}`)
 })
