@@ -27,6 +27,6 @@ eepfiles.forEach(file => {
     func = json.func_number
     append(`    * **${hexr(json.rorg_number)}-${hexr(json.func_number)}** ${json.func_title} `)
   }
-  append(`        * [**${json.eep}** ${json.title}](${json.eep}.md) `)
+  append(`        * [**${json.eep}** ${json.title}](eep/${json.eep}.md) `)
   fs.writeFileSync(docsPath + 'eeps/' + `${json.eep}.md`, `# ${json.eep}`)
 })
