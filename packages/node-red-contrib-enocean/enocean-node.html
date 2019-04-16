@@ -69,7 +69,7 @@
             var sid = this._config.senderid
           }
           var res = await fetch(`https://enocean-js.github.io/enocean-js/eeps/${eep}.md`)
-          this.info = "<hr/>"//"**hi**" + await res.text()
+          this.info = await res.text()
           document.querySelector("#node-input-eep").setAttribute("placeholder",eep)
           document.querySelector("#node-input-senderid").setAttribute("placeholder",sid)
         }
@@ -270,6 +270,7 @@
 </script>
 
 <style>
+  .node-help td {border: 1px solid black}
   .enocean-node{
     fill:white
   }
