@@ -68,8 +68,8 @@
             var eep = this._config.eep
             var sid = this._config.senderid
           }
-          var res = await fetch(`https://enocean-js.github.io/enocean-js/`)
-          this.info = await res.text()
+          var res = await fetch(`https://enocean-js.github.io/enocean-js/eeps/${eep}.md`)
+          this.info = "<hr/>"//"**hi**" + await res.text()
           document.querySelector("#node-input-eep").setAttribute("placeholder",eep)
           document.querySelector("#node-input-senderid").setAttribute("placeholder",sid)
         }

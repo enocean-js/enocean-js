@@ -17,23 +17,13 @@ function hexr (x) {
 
 function eepTable (data) {
   var eepArray = data.eep.split('-')
-  return `<table>
-    <tr>
-      <th>rorg</th>
-      <td>${eepArray[0]}</td>
-      <td>${data.rorg_title}</td>
-    </tr>
-    <tr>
-      <th>func</th>
-      <td>${eepArray[1]}</td>
-      <td>${data.func_title}</td>
-    </tr>
-    <tr>
-      <th>type</th>
-      <td>${eepArray[2]}</td>
-      <td>${data.title}</td>
-    </tr>
-  </table>`
+  return `
+|    |   |   |
+| -- | - | - |
+| rorg | ${eepArray[0]} | ${data.rorg_title} |
+| func | ${eepArray[1]} | ${data.func_title} |
+| type | ${eepArray[2]} | ${data.title} |
+`
 }
 
 eepfiles.forEach(file => {
