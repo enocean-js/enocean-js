@@ -52,6 +52,9 @@ module.exports = function (RED) {
         if (msg.payload === 'LRN') {
           var te = RadioERP1.makeTeachIn({ eep: node.eep, senderId: this.serialport.baseId + parseInt(node.offset) })
           await node.serialport.sender.send(te.toString())
+          var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], id: this.serialport.baseId + parseInt(node.offset), direction: node.direction, data: node.data })
+          tel.payload = tel.encode({}, { eep: node.eep, direction: node.direction, data: node.data })
+          await node.serialport.sender.send(tel.toString())
         }
       } else {
         var tel = RadioERP1.from({ eep: node.eep, payload: [0, 0, 0, 0], id: this.serialport.baseId + parseInt(node.offset), direction: node.direction, data: node.data })
@@ -226,7 +229,7 @@ module.exports = function (RED) {
       node.status({ fill: 'red', shape: 'dot', text: 'error: no baseId' })
     } else {
       if (node.senderId !== '' && node.eep !== '') {
-        node.status({ fill: 'green', shape: 'dot', text: 'ready' })
+        node.status({ fill: 'green', shape: 'dot', text: node.senderId })
       } else {
         node.status({ fill: 'grey', shape: 'dot', text: 'connected' })
       }
