@@ -7,6 +7,7 @@ var eepfiles = fs.readdirSync(eepPath)
 var docsPath = 'resources/enocean-specification/Enocean Equipment Profiles/'
 var func = ''
 var rorg = ''
+var all = []
 fs.writeFileSync(docsPath + 'readme.md', '')
 function append (data) {
   fs.appendFileSync(docsPath + 'readme.md', data + '\n')
@@ -26,6 +27,57 @@ function eepTable (data) {
 `
 }
 
+function datafieldTable (df) {
+  var res = `| key | data | description | values |
+| --- | --- | --- | --- |
+  `
+  df.forEach(item => {
+    for (n in item) {
+      if (!all.find(x => x === n)) {
+        all.push(n)
+      }
+    }
+    if (item.reserved) {
+    } else {
+      res += `| ${item.shortcut} | ${item.data} | ${item.description} | ... | \n`
+    }
+  })
+  return res
+}
+function details (data) {
+  var res = ''
+  if (data.case) {
+    if (data.case.length > 1) {
+      if (data.case[0].condition) {
+        data.case.forEach((item, index) => {
+          res += `### case ${index}`
+        })
+      } else {
+        res += `### spec broken`
+      }
+    } else {
+      // most common case. just 1 case, no condition
+      if (!Array.isArray(data.case)) {
+        console.log('boom')
+      } else {
+        if (!Array.isArray(data.case[0].datafield)) {
+          console.log(data.eep)
+        } else {
+          res += `${datafieldTable(data.case[0].datafield)}`
+        }
+      }
+    }
+  } else {
+    if (data.ref) {
+      res += `see [${data.ref}](${data.ref}.md)`
+    } else {
+      console.log('something went wrong')
+    }
+  }
+
+  return res
+}
+
 eepfiles.forEach(file => {
   var eepstr = fs.readFileSync(eepPath + '/' + file, 'utf8')
   eepstr = eepstr.replace(/"/g, '\\"')
@@ -40,5 +92,7 @@ eepfiles.forEach(file => {
     append(`    * **${hexr(json.rorg_number)}-${hexr(json.func_number)}** ${json.func_title} `)
   }
   append(`        * [**${json.eep}** ${json.title}](https://enocean-js.github.io/enocean-js/eeps/${json.eep}.md) `)
-  fs.writeFileSync('docs/eeps/' + `${json.eep}.md`, `${eepTable(json)}`)
+  fs.writeFileSync('docs/eeps/' + `${json.eep}.md`, `${eepTable(json)}\n${details(json)}
+  `)
 })
+console.log(all.join('\n'))
