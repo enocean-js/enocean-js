@@ -1,0 +1,83 @@
+{
+  "number": "0x0A",
+  "title": "Temperature Sensor Range +50°C to +90°C",
+  "status": "released",
+  "case": [{
+    "datafield": [{
+      "reserved": {},
+      "data": {},
+      "shortcut": {},
+      "description": {},
+      "bitoffs": "0",
+      "bitsize": "16",
+      "scale": ""
+    }, {
+      "reserved": {},
+      "data": {},
+      "shortcut": {},
+      "description": {},
+      "bitoffs": "24",
+      "bitsize": "4",
+      "scale": ""
+    }, {
+      "reserved": {},
+      "data": {},
+      "shortcut": {},
+      "description": {},
+      "bitoffs": "29",
+      "bitsize": "3",
+      "scale": ""
+    }, {
+      "data": "LRN Bit",
+      "shortcut": "LRNB",
+      "description": "LRN Bit",
+      "bitoffs": "28",
+      "bitsize": "1",
+      "enum": {
+        "item": [{
+          "value": "0",
+          "description": "Teach-in telegram"
+        }, {
+          "value": "1",
+          "description": "Data telegram"
+        }]
+      }
+    }, {
+      "data": "Temperature",
+      "shortcut": "TMP",
+      "description": "Temperature (linear)",
+      "info": "DB_1 Temperature (8 bit) 50... +90°C, linear n=255...0",
+      "bitoffs": "16",
+      "bitsize": "8",
+      "range": {
+        "min": "255",
+        "max": "0"
+      },
+      "scale": {
+        "min": "+50",
+        "max": "+90"
+      },
+      "unit": "°C"
+    }],
+    "condition":{"hallo":"bla"}
+  },
+  {"datafield":[],"condition":{"hallo":"bla"}}],
+  "originalIndex": 22,
+  "eep": {
+    "id" : "a5-02-0a",
+    "rorg" : {
+      "number" : 165,
+      "title" : "4BS Telegram"
+    },
+    "func" : {
+      "number" : 2,
+      "title" : "Temperature Sensors"
+    },
+    "type" : {
+      "number" : 10,
+      "title" : "Temperature Sensor Range +50°C to +90°C"
+    }
+  },
+  "description": "",
+  "submitter": []
+}

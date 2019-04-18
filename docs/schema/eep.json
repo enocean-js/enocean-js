@@ -5,7 +5,24 @@
   "description" : "Enocean Equipment Profile",
   "type" : "object",
   "properties" : {
-    "case": {},
+    "case": {
+      "oneOf":[
+        {
+          "type" : "array",
+          "maxItems":1,
+          "items":{
+            "$ref":"#/definitions/datafieldArray"
+          }
+         },
+         {
+           "type" : "array",
+           "minItems":2,
+           "items":{
+             "$ref":"#/definitions/datafieldWithCondition"
+           }
+          }
+      ]
+    },
     "eep": {
       "type" : "object",
       "properties" : {
@@ -13,21 +30,58 @@
           "type" : "string"
         },
         "rorg" : {
-          "description" : "RORG part of the eep",
-          "&ref" : "https://enocean-js.github.io/enocean-js/schema/eep-identifier.json"
+          "properties": {
+            "number" : {
+              "type" : "number",
+              "enum" : [165]
+            },
+            "title":{
+              "type" : "string"
+            }
+          }
         },
         "func" : {
           "description" : "Func part of the eep",
-          "&ref" : "https://enocean-js.github.io/enocean-js/schema/eep-identifier.json"
+          "$ref" : "#/definitions/functype"
         },
         "type" : {
           "description" : "Type part of the eep",
-          "&ref" : "https://enocean-js.github.io/enocean-js/schema/eep-identifier.json"
+          "$ref" : "#/definitions/functype"
         }
-      }
+      },
+      "required" : [ "rorg", "func", "type", "id"]
     },
     "description": {},
     "submitter": {},
     "ref": {}
+  },
+  "definitions": {
+    "functype":{
+      "type" : "object",
+      "properties": {
+        "number" : {
+          "type" : "number"
+        },
+        "title":{
+          "type" : "string"
+        }
+      },
+      "reqired" : [ "number", "title" ],
+      "additionalProperties" : false
+    },
+    "datafieldArray":{
+      "type":"object",
+      "properties":{
+        "datafield":{"type":"array"},
+        "condition":{"type":"object"}
+      },
+      "required":["datafield"]
+    },
+    "datafieldWithCondition":{
+      "allOf":[
+        {"$ref":"#/definitions/datafieldArray"},
+        {"required":["condition"]}
+      ]
+    }
   }
 }

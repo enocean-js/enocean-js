@@ -32,11 +32,6 @@ function datafieldTable (df) {
 | --- | --- | --- | --- |
   `
   df.forEach(item => {
-    for (n in item) {
-      if (!all.find(x => x === n)) {
-        all.push(n)
-      }
-    }
     if (item.reserved) {
     } else {
       res += `| ${item.shortcut} | ${item.data} | ${item.description} | ... | \n`
@@ -83,6 +78,11 @@ eepfiles.forEach(file => {
   eepstr = eepstr.replace(/"/g, '\\"')
   eepstr = eepstr.replace(/'/g, '"')
   var json = JSON.parse(eepstr.substr(21))
+  for (var n in json) {
+    if (!all.find(x => x === n)) {
+      all.push(n)
+    }
+  }
   if (json.rorg_number !== rorg) {
     rorg = json.rorg_number
     append(`* **${hexr(json.rorg_number)}** ${json.rorg_title} `)
