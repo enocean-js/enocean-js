@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://enocean-js.github.io/enocean-js/schema/eep.json",
+  "title" : "EEP",
+  "description" : "Enocean Equipment Profile",
+  "type" : "object",
+  "properties" : {
+    "case": {},
+    "eep": {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "rorg" : {
+          "description" : "RORG part of the eep",
+          "&ref" : "https://enocean-js.github.io/enocean-js/schema/eep-identifier.json"
+        },
+        "func" : {
+          "description" : "Func part of the eep",
+          "&ref" : "https://enocean-js.github.io/enocean-js/schema/eep-identifier.json"
+        },
+        "type" : {
+          "description" : "Type part of the eep",
+          "&ref" : "https://enocean-js.github.io/enocean-js/schema/eep-identifier.json"
+        }
+      }
+    },
+    "description": {},
+    "submitter": {},
+    "ref": {}
+  }
+}
