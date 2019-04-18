@@ -1,0 +1,26 @@
+{
+  "definitions": {
+    "functype":{
+      "type" : "object",
+      "properties": {
+        "number" : {
+          "type" : "number"
+        },
+        "title":{
+          "type" : "string"
+        }
+      },
+      "reqired" : [ "number", "title" ],
+      "additionalProperties" : false
+    },
+    "datafield":{
+      "type":"array"
+    },
+    "DatafieldWithCondition":{
+      "allOf":[
+        {"$ref":"#/definitions/datafield"},
+        {"required":["condition"]}
+      ]
+    }
+  }
+}
