@@ -1,87 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://enocean-js.github.io/enocean-js/schema/eep.json",
+  "$id": "new.json",
   "title" : "EEP",
   "description" : "Enocean Equipment Profile",
   "type" : "object",
   "properties" : {
-    "case": {
-      "oneOf":[
-        {
-          "type" : "array",
-          "maxItems":1,
-          "items":{
-            "$ref":"#/definitions/datafieldArray"
-          }
-         },
-         {
-           "type" : "array",
-           "minItems":2,
-           "items":{
-             "$ref":"#/definitions/datafieldWithCondition"
-           }
-          }
-      ]
-    },
-    "eep": {
-      "type" : "object",
-      "properties" : {
-        "id" : {
-          "type" : "string"
-        },
-        "rorg" : {
-          "properties": {
-            "number" : {
-              "type" : "number",
-              "enum" : [165]
-            },
-            "title":{
-              "type" : "string"
-            }
-          }
-        },
-        "func" : {
-          "description" : "Func part of the eep",
-          "$ref" : "#/definitions/functype"
-        },
-        "type" : {
-          "description" : "Type part of the eep",
-          "$ref" : "#/definitions/functype"
-        }
-      },
-      "required" : [ "rorg", "func", "type", "id"]
-    },
-    "description": {},
-    "submitter": {},
-    "ref": {}
-  },
-  "definitions": {
-    "functype":{
-      "type" : "object",
-      "properties": {
-        "number" : {
-          "type" : "number"
-        },
-        "title":{
-          "type" : "string"
-        }
-      },
-      "reqired" : [ "number", "title" ],
-      "additionalProperties" : false
-    },
-    "datafieldArray":{
-      "type":"object",
-      "properties":{
-        "datafield":{"type":"array"},
-        "condition":{"type":"object"}
-      },
-      "required":["datafield"]
-    },
-    "datafieldWithCondition":{
-      "allOf":[
-        {"$ref":"#/definitions/datafieldArray"},
-        {"required":["condition"]}
-      ]
+    "datafield": {
+      "$ref":"definitions.json#/definitions/datafield"
     }
-  }
+  },
+  "additionalProperties" : false
 }
