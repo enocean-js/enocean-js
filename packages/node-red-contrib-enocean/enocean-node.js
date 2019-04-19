@@ -12,6 +12,9 @@ module.exports = function (RED) {
     this.port = null
     this.baseId = ''
     var node = this
+    node.on('close', function (done) {
+      node.port.close(done)
+    })
     try {
       this.port = new SerialPort(this.serialport, { baudRate: 57600 })
       this.port.on('error', err => {
@@ -19,7 +22,10 @@ module.exports = function (RED) {
           node.warn('could not open port. Most likely you are trying to open the same port twice.')
         }
       })
-      this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser() })
+      this.transformer = new ESP3Transfomer()
+      this.parser = new ESP3Parser()
+      this.port.pipe(this.parser).pipe(this.transformer)
+      this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser()})
       this.commander = new Commander(this.sender)
       this.getBaseId = async function (x) {
         try {
@@ -216,11 +222,7 @@ module.exports = function (RED) {
       await usb.getBaseId(node)
     }
     // setActorNodeStatus(node)
-    node.on('close', function (done) {
-      usb.port.close(done)
-    })
-    usb.port.pipe(parser).pipe(transformer)
-    transformer.on('data', cb)
+    usb.transformer.on('data', cb)
   }
 
   function setActorNodeStatus (node) {
