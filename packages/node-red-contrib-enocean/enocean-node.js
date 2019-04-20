@@ -171,7 +171,7 @@ module.exports = function (RED) {
         if (data.RORG !== 0xf6 && data.teachIn) return
         if (data.RORG.toString(16) !== node.eep.split('-')[0]) return
         node.status({ fill: 'green', shape: 'dot', text: node.senderId })
-        setTimeout(()=>node.status({ fill: 'green', shape: 'ring', text: node.senderId }),100)
+        setTimeout(() => node.status({ fill: 'green', shape: 'ring', text: node.senderId }), 100)
         node.send({
           payload: data.decode(node.eep, node.direction),
           meta: {
