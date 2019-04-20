@@ -21,10 +21,14 @@
 
 starting with **enocean-js@0.0.1-beta.8** there is now an installable package. you can start using and testing it!
 
+## slack
+
+[![join the conversation on slack](https://cdn.brandfolder.io/5H442O3W/as/pl546j-7le8zk-5guop3/Slack_RGB.png?height=64)](https://join.slack.com/t/enocean-js/shared_invite/enQtNTE0MzU2OTE1ODc2LTgzYTdhNDJkZWE3ZDk1MzVmYzk0NzcwZGVkMjNiMzg3MTU2MGNlNjEwYWVjNWNjYTcwZTNiOTdkZjk0NmYyOTU)
+
 ## install
 
     npm i -S enocean-js
-    
+
 ## simple examle
 
     nmp i -S enocean-js serialport
