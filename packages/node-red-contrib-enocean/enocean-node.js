@@ -25,7 +25,7 @@ module.exports = function (RED) {
       this.transformer = new ESP3Transfomer()
       this.parser = new ESP3Parser()
       this.port.pipe(this.parser).pipe(this.transformer)
-      this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser()})
+      this.sender = SerialportSender({ port: this.port, parser: new ESP3Parser() })
       this.commander = new Commander(this.sender)
       this.getBaseId = async function (x) {
         try {
@@ -215,8 +215,6 @@ module.exports = function (RED) {
   RED.nodes.registerType('enocean-actor', EnoceanActorNode)
 
   async function EnoceanListener (node, cb) {
-    const transformer = new ESP3Transfomer()
-    const parser = new ESP3Parser()
     const usb = RED.nodes.getNode(node.serialport)
     if (usb.baseId === '') {
       await usb.getBaseId(node)

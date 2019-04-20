@@ -34,11 +34,16 @@ function datafieldTable (df) {
   df.forEach(item => {
     if (item.reserved) {
     } else {
-      res += `| ${item.shortcut} | ${item.data} | ${item.description} | ... | \n`
+      res += `| ${item.shortcut} | ${item.data} | ${item.description} | ${datafieldContent(item)} | \n`
     }
   })
   return res
 }
+
+function datafieldContent () {
+
+}
+
 function details (data) {
   var res = ''
   if (data.case) {
@@ -69,7 +74,6 @@ function details (data) {
       console.log('something went wrong')
     }
   }
-
   return res
 }
 
