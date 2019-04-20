@@ -170,6 +170,8 @@ module.exports = function (RED) {
       if (data.senderId === node.senderId) {
         if (data.RORG !== 0xf6 && data.teachIn) return
         if (data.RORG.toString(16) !== node.eep.split('-')[0]) return
+        node.status({ fill: 'green', shape: 'dot', text: node.senderId })
+        setTimeout(()=>node.status({ fill: 'green', shape: 'ring', text: node.senderId }),200)
         node.send({
           payload: data.decode(node.eep, node.direction),
           meta: {
@@ -213,13 +215,11 @@ module.exports = function (RED) {
     })
   }
   RED.nodes.registerType('enocean-actor', EnoceanActorNode)
-
   async function EnoceanListener (node, cb) {
     const usb = RED.nodes.getNode(node.serialport)
     if (usb.baseId === '') {
       await usb.getBaseId(node)
     }
-    // setActorNodeStatus(node)
     usb.transformer.on('data', cb)
   }
 
@@ -229,7 +229,7 @@ module.exports = function (RED) {
       node.status({ fill: 'red', shape: 'dot', text: 'error: no baseId' })
     } else {
       if (node.senderId !== '' && node.eep !== '') {
-        node.status({ fill: 'green', shape: 'dot', text: node.senderId })
+        node.status({ fill: 'green', shape: 'ring', text: node.senderId })
       } else {
         node.status({ fill: 'grey', shape: 'dot', text: 'connected' })
       }
