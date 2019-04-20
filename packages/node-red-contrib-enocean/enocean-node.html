@@ -94,24 +94,60 @@
     <input type="text" id="node-input-eep">
   </div>
   <hr/>
-  <h4>optional</h4>
   <div class="form-row">
     <label for="node-input-direction">Direction</label>
     <input type="text" id="node-input-direction">
   </div>
+   <div class="form-tips">
+     <b>automatic teach in: </b>just connect to a serialport. After implementing the flow, bring the node into *teach in* state and press **LRN Button** on the external device you want to pair.
+   </div>
+   <br/>
+   <div class="form-tips">
+     <b>manual teach in: </b>after connecting to a serialport, you can type in your sensors id and eep by hand.
+   </div>
+   <br/>
+   <div class="form-tips">
+     <b>direction</b> is only used in very rare cases. and usually does not have to be touched.<br/>
+     the following eep might need a direction setting other then 1:
+     <ul>
+      <li>a5-11-05</li>
+      <li>a5-20-01</li>
+      <li>a5-20-02</li>
+      <li>a5-20-03</li>
+      <li>a5-20-04</li>
+      <li>a5-20-10</li>
+      <li>a5-20-11</li>
+      <li>d2-a0-01</li>
+     </ul>
+   </div>
 </script>
 
 <script type="text/x-red" data-help-name="enocean-actor">
   <p>this is a node to listen to incomming enocean telegrams.</p>
-
-  <ul>
-    <li>First select a serialport to conncet to.</li>
-    <li>press the button of the node to turn on the teach in mode</li>
-    <li>then press the LRN button of the device you want to teach in, the device should automatically be paired with this node.</li>
-    <li>alternatively you can provide (or overwrite) the senderId and EEP yourself</li>
-    <li>from now on the node will listen to telegrams from the provided id and will output the decoded information of these telegrams</li>
-  </ul>
-
+  <h3>Output</h3>
+    <dl class="message-properties">
+      <dt>payload
+        <span class="property-type">object</span>
+      </dt>
+      <dd>the decoded content of the telegram. this is dependent on the tought in sensor. for details see the node description after teaching in a sensor</dd>
+    </dl>
+    <dl class="message-properties">
+      <dt>meta
+        <span class="property-type">object</span>
+      </dt>
+      <dd>meta information about the telegram. Here you can find the RSSI, senderId, the raw payload, a timestamp etc.</dd>
+    </dl>
+  <h3>Button</h3>
+    <dl class="message-properties">
+      <dt>click
+        <span class="property-type">event</span>
+      </dt>
+      <dd> set the node into the *teach in* state. you can now send **LRN Telegrams** from your device, and the sender and device will be paired (after succesfull pairing the nodes state becomes green and shows the external sensors id) </dd>
+    </dl>
+  <h3>Details</h3>
+   <p>
+     to receive some data you have to first teach in a sensor. this can be done either manually or automatically by sending an **LRN Telegram** from your device.
+   </p>
 </script>
 
 
@@ -252,21 +288,20 @@
         <dd> the channel you want to send from (0-127)</dd>
     </dl>
   <h3>Inputs</h3>
-      <dl class="message-properties">
-          <dt>payload
-              <span class="property-type">string</span>
-          </dt>
-          <dd> "A0_click", "A1_click", "B0_click", "B1_click"
-          "A0_down", "A1_down", "B0_down", "B1_down"
-          "release" </dd>
-      </dl>
-
-<h3>Details</h3>
- <p>
-   this node implements a 2 Rocker Switch (4 Buttons: A0,A1,B0,B1) that can be "click"ed or "down"ed (A0,A1,B0,B1).
-   "click" means the button is immediately released after beeing pressed. When "down"ed you have to release the button yourself.
-   send "A0_click" or "B0_click" to teach in button "A" or "B" into an external device (the button behaves as a physical enocean rocker switch)
- </p>
+    <dl class="message-properties">
+      <dt>payload
+        <span class="property-type">string</span>
+      </dt>
+      <dd> "A0_click", "A1_click", "B0_click", "B1_click"
+      "A0_down", "A1_down", "B0_down", "B1_down"
+      "release" </dd>
+    </dl>
+  <h3>Details</h3>
+   <p>
+     this node implements a 2 Rocker Switch (4 Buttons: A0,A1,B0,B1) that can be "click"ed or "down"ed (A0,A1,B0,B1).
+     "click" means the button is immediately released after beeing pressed. When "down"ed you have to release the button yourself.
+     send "A0_click" or "B0_click" to teach in button "A" or "B" into an external device (the button behaves as a physical enocean rocker switch)
+   </p>
 </script>
 
 <style>
