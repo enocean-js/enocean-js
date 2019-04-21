@@ -4,7 +4,7 @@ module.exports = RED => {
     var ctx = this.context()
     var eep = ctx.get('eep')
     var sid = ctx.get('senderId')
-    setSensor(this,config, eep, sid)
+    setSensor(this, config, eep, sid)
 
     this.direction = config.direction
     this.serialport = config.serialport
@@ -32,7 +32,7 @@ module.exports = RED => {
   return EnoceanActorNode
 }
 
-function setSensor (node,config, eep, sid) {
+function setSensor (node, config, eep, sid) {
   node.eep = (config.eep ? config.eep : eep || '').toLowerCase()
   node.senderId = (config.senderId ? config.senderId : sid || '').toLowerCase()
 }

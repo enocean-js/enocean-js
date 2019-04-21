@@ -9,17 +9,17 @@ module.exports = RED => {
     var node = this
 
     node.on('input', async function (msg) {
-      node.btn = RadioERP1.from({ eep: 'f6-02-01', payload: [0], id: node.serialport.baseId + msg.payload.channel  })
-      func[msg.payload.event](node,msg.payload.button)
+      node.btn = RadioERP1.from({ eep: 'f6-02-01', payload: [0], id: node.serialport.baseId + msg.payload.channel })
+      func[msg.payload.event](node, msg.payload.button)
     })
   }
   return EnOceanButtonNode
 }
 
 var func = {
-  "click": btnClick,
-  "down": btnDown,
-  "release": release
+  'click': btnClick,
+  'down': btnDown,
+  'release': release
 }
 
 async function btnClick (node, btn) {
