@@ -1,28 +1,27 @@
 module.exports = RED => {
   function EnoceanActorNode (config) {
     RED.nodes.createNode(this, config)
-
     var ctx = this.context()
     var eep = ctx.get('eep')
     var sid = ctx.get('senderId')
     setSensor(config, eep, sid)
-
     this.direction = config.direction
     this.serialport = config.serialport
     this.teachInStatus = false
-
     this.status({ fill: 'grey', shape: 'ring', text: 'not initialized' })
-
     var node = this
     makeStateRefreshable(node, RED)
     makeLearner(node)
     makeInjectionable(node)
+    EnoceanListener(node, makeEnoceanListenerCallback(node))
+  }
 
+  async function EnoceanListener (node, cb) {
     const usb = RED.nodes.getNode(node.serialport)
     if (usb.baseId === '') {
-      usb.getBaseId(node)
+      await usb.getBaseId(node)
     }
-    usb.transformer.on('data', makeEnoceanListenerCallback(node))
+    usb.transformer.on('data', cb)
   }
 
   return EnoceanActorNode
