@@ -32,7 +32,7 @@ module.exports = RED => {
   return EnOceanConfigNode
 }
 
-function makeTP(node){
+function makeTP (node) {
   node.transformer = new ESP3Transfomer()
   node.parser = new ESP3Parser()
 }
