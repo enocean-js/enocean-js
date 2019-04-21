@@ -22,19 +22,15 @@ module.exports = RED => {
         }
       })
       makeCommander(node)
-      makeListener(node)
+      node.transformer = new ESP3Transfomer()
+      node.parser = new ESP3Parser()
+      node.port.pipe(this.parser).pipe(node.transformer)
       node.getBaseId()
     } catch (err) {
       console.log('err')
     }
   }
   return EnOceanConfigNode
-}
-
-function makeListener (node) {
-  node.transformer = new ESP3Transfomer()
-  node.parser = new ESP3Parser()
-  node.port.pipe(this.parser).pipe(node.transformer)
 }
 
 function makeCommander (node) {

@@ -90,12 +90,12 @@ function makeStateRefreshable (node, red) {
     const usb = red.nodes.getNode(node.serialport)
     if (usb.baseId === '') {
       node.status({ fill: 'red', shape: 'dot', text: 'error: no baseId' })
+      return
+    }
+    if (node.senderId !== '' && node.eep !== '') {
+      node.status({ fill: 'green', shape: 'ring', text: node.senderId })
     } else {
-      if (node.senderId !== '' && node.eep !== '') {
-        node.status({ fill: 'green', shape: 'ring', text: node.senderId })
-      } else {
-        node.status({ fill: 'grey', shape: 'dot', text: 'connected' })
-      }
+      node.status({ fill: 'grey', shape: 'dot', text: 'connected' })
     }
   }
 }
