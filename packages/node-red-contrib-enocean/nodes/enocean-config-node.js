@@ -31,14 +31,13 @@ module.exports = RED => {
   return EnOceanConfigNode
 }
 
-
-function makeListener(node){
+function makeListener (node) {
   node.transformer = new ESP3Transfomer()
   node.parser = new ESP3Parser()
   node.port.pipe(this.parser).pipe(node.transformer)
 }
 
-function makeCommander(node){
+function makeCommander (node) {
   node.sender = SerialportSender({ port: node.port, parser: new ESP3Parser() })
   node.commander = new Commander(node.sender)
   node.getBaseId = async function (x) {
