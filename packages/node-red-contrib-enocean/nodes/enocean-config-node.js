@@ -16,20 +16,24 @@ module.exports = RED => {
       node.port.close(done)
     })
     try {
-      node.port = new SerialPort(this.serialport, { baudRate: 57600 })
-      node.port.on('error', err => {
-        if (err) {
-          node.warn('could not open port. Most likely you are trying to open the same port twice.')
-        }
-      })
-      makeCommander(node)
-      node.port.pipe(this.parser).pipe(node.transformer)
-      node.getBaseId()
+      openPort(node)
     } catch (err) {
-      console.log('err')
+      console.log(err)
     }
   }
   return EnOceanConfigNode
+}
+
+function openPort (node) {
+  node.port = new SerialPort(node.serialport, { baudRate: 57600 })
+  node.port.on('error', err => {
+    if (err) {
+      node.warn('could not open port. Most likely you are trying to open the same port twice.')
+    }
+  })
+  makeCommander(node)
+  node.port.pipe(node.parser).pipe(node.transformer)
+  node.getBaseId()
 }
 
 function makeTP (node) {
@@ -42,7 +46,7 @@ function makeCommander (node) {
   node.commander = new Commander(node.sender)
   node.getBaseId = async function (x) {
     try {
-      var res = await this.commander.getIdBase()
+      var res = await node.commander.getIdBase()
       node.baseId = parseInt(res.baseId.toString(), 16)
       if (x) {
         x.refreshState()
