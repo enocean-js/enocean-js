@@ -32,9 +32,10 @@ module.exports = function (RED) {
           var res = await this.commander.getIdBase()
           node.baseId = parseInt(res.baseId.toString(), 16)
           if (x) {
-            setActorNodeStatus(x)
+            x.refreshState()
           }
         } catch (err) {
+          console.log(err)
           node.error('could not get Base ID')
         }
       }
@@ -122,127 +123,5 @@ module.exports = function (RED) {
   }
   RED.nodes.registerType('enocean-btn', EnOceanButtonNode)
 
-  function EnoceanActorNode (config) {
-    RED.nodes.createNode(this, config)
-    var ctx = this.context()
-    var eep = ctx.get('eep')
-    var sid = ctx.get('senderId')
-    this.eep = (config.eep ? config.eep : eep || '').toLowerCase()
-    this.senderId = (config.senderId ? config.senderId : sid || '').toLowerCase()
-    this.direction = config.direction
-    this.serialport = config.serialport
-    this.teachInStatus = false
-    this.status({ fill: 'grey', shape: 'ring', text: 'not initialized' })
-    var node = this
-    node.stopTeachIn = () => {
-      node.teachInStatus = false
-      clearTimeout(node.teachInInterval)
-      clearInterval(node.blink)
-      setActorNodeStatus(node)
-    }
-    node.startTeachIn = () => {
-      var sec = 30
-      var dot = true
-      node.teachInStatus = true
-      node.status({ fill: 'blue', shape: 'dot', text: `teach-in mode ${sec.toFixed(0)}s` })
-      node.blink = setInterval(() => {
-        sec -= 0.5
-        dot = !dot
-        node.status({ fill: 'blue', shape: dot ? 'dot' : 'ring', text: `teach-in mode ${sec.toFixed(0)}s` })
-      }, 500)
-      node.teachInInterval = setTimeout(() => {
-        node.teachInStatus = false
-        setActorNodeStatus(node)
-        clearInterval(node.blink)
-      }, sec * 1000)
-    }
-    node.receive = function () {
-      node.startTeachIn()
-    }
-    node.on('input', msg => {
-      if (msg.payload === true) {
-        node.startTeachIn()
-      } else {
-        node.stopTeachIn()
-      }
-    })
-    EnoceanListener(node, data => {
-      if (data.senderId === node.senderId) {
-        if (data.RORG !== 0xf6 && data.teachIn) return
-        if (data.RORG.toString(16) !== node.eep.split('-')[0]) return
-        node.status({ fill: 'green', shape: 'dot', text: node.senderId })
-        setTimeout(() => node.status({ fill: 'green', shape: 'ring', text: node.senderId }), 100)
-        node.send({
-          payload: data.decode(node.eep, node.direction),
-          meta: {
-            senderId: data.senderId,
-            RORG: data.RORG,
-            eep: node.eep,
-            RSSI: data.RSSI,
-            payload: data.payload.toString(),
-            subTelNum: data.subTelNum,
-            raw: data.toString(),
-            timestamp: Date.now()
-          }
-        })
-      }
-      if (this.teachInStatus === true) {
-        if (data.teachIn) {
-          this.eep = data.teachInInfo.eep.toString()
-          this.senderId = data.teachInInfo.senderId
-          node.context().set('eep', data.teachInInfo.eep.toString())
-          node.context().set('senderId', data.teachInInfo.senderId)
-          node.stopTeachIn()
-          node.send({
-            payload: {
-              senderId: data.teachInInfo.senderId,
-              eep: data.teachInInfo.eep.toString(),
-              manufacturer: data.teachInInfo.manufacturer
-            },
-            meta: {
-              senderId: data.teachInInfo.senderId,
-              RORG: data.RORG,
-              eep: data.teachInInfo.eep.toString(),
-              RSSI: data.RSSI,
-              payload: data.payload.toString(),
-              subTelNum: data.subTelNum,
-              raw: data.toString(),
-              timestamp: Date.now()
-            }
-          })
-        }
-      }
-    })
-  }
-  RED.nodes.registerType('enocean-actor', EnoceanActorNode)
-  async function EnoceanListener (node, cb) {
-    const usb = RED.nodes.getNode(node.serialport)
-    if (usb.baseId === '') {
-      await usb.getBaseId(node)
-    }
-    usb.transformer.on('data', cb)
-  }
-
-  function setActorNodeStatus (node) {
-    const usb = RED.nodes.getNode(node.serialport)
-    if (usb.baseId === '') {
-      node.status({ fill: 'red', shape: 'dot', text: 'error: no baseId' })
-    } else {
-      if (node.senderId !== '' && node.eep !== '') {
-        node.status({ fill: 'green', shape: 'ring', text: node.senderId })
-      } else {
-        node.status({ fill: 'grey', shape: 'dot', text: 'connected' })
-      }
-    }
-  }
-
-  // function EnoceanTeachInInfoNode(config) {
-  //   RED.nodes.createNode(this,config);
-  //   EnoceanListener(this,config,data=>{
-  //     if(data.teachIn){
-  //       node.send({payload: data.teachInInfo })
-  //     }
-  //   })
-  // }
-  // RED.nodes.registerType("enocean-teach-in-info", EnoceanTeachInInfoNode);
+  RED.nodes.registerType('enocean-actor', require('./nodes/enocean-in.js')(RED))
 }
