@@ -144,7 +144,7 @@ module.exports = function (RED) {
       var sec = 30
       var dot = true
       node.teachInStatus = true
-      node.status({ fill: 'blue', shape: dot ? 'dot' : 'ring', text: `teach-in mode ${sec.toFixed(0)}s` })
+      node.status({ fill: 'blue', shape: 'dot', text: `teach-in mode ${sec.toFixed(0)}s` })
       node.blink = setInterval(() => {
         sec -= 0.5
         dot = !dot

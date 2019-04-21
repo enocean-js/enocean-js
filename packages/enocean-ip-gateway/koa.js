@@ -4,7 +4,7 @@ var app = new Koa()
 const send = require('koa-send')
 
 var Commander = require('@enocean-js/common-command').Commander
-const ESP3Parser = require('@enocean-js/serialport-parser').ESP3Parser
+//const ESP3Parser = require('@enocean-js/serialport-parser').ESP3Parser
 const SerialportSender = require('@enocean-js/serialport-sender').SerialportSender
 const SerialPort = require('serialport')
 var serialPort = '/dev/ttyUSB0'

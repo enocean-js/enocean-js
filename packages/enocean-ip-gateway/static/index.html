@@ -19,9 +19,10 @@
       fetch("/stream").then(response => response.body.getReader()).then(reader=>read(reader))
       async function read(reader){
         var res = await reader.read()
-        document.write(
-          Array.from(res.value).map(item=>String.fromCharCode(item)).join("")
-        )
+        // write output e.g.:
+        // document.write(
+        //   Array.from(res.value).map(item=>String.fromCharCode(item)).join("")
+        // )
         if(res.done===false){
           read(reader)
         }

@@ -41,7 +41,7 @@ function datafieldTable (df) {
 }
 
 function datafieldContent () {
-
+  return ''
 }
 
 function details (data) {

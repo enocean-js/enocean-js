@@ -9,7 +9,7 @@ const parser = new ESP3Parser()
 const transformer = new ESP3Transformer()
 const sender = Enocean.SerialportSender({ port: port, parser: new ESP3Parser() })
 const Commander = new Enocean.Commander(sender)
-const pretty = Enocean.pretty
+//const pretty = Enocean.pretty
 var baseId=""
 
 port.pipe(parser).pipe(transformer)
@@ -20,7 +20,7 @@ async function init(){
   console.log(res.baseId.toString())
 }
 var known = {}
-const ESP3Packet = Enocean.ESP3Packet
+//const ESP3Packet = Enocean.ESP3Packet
 transformer.on('data', async data => {
   //console.log(data.decode("d2-50-00"))
   if (data && data.constructor.name === "RadioERP1") {
@@ -30,7 +30,7 @@ transformer.on('data', async data => {
       if(!known.hasOwnProperty(teachInInfo.senderId)){
         if(baseId==="") await init()
         known[data.senderId] = teachInInfo
-        radio = RadioERP1.from({ payload: [0], id: 'ff00ff00' })
+        var radio = RadioERP1.from({ payload: [0], id: 'ff00ff00' })
         radio.payload = radio.encode({ MT: 0, RMT: 1 }, { eep: 'd2-50-00', data: 0})
         radio.senderId = 'ff00ff00'
         decoded = radio.decode('d2-50-00')
@@ -44,6 +44,7 @@ transformer.on('data', async data => {
           destinationId: data.senderId,
           senderId: baseId + 1
         })
+        console.log(ret.toString())
         //console.log(await sender.send(ret.toString()))
         //*******************************************************************************
       }

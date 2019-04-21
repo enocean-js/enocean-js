@@ -9,7 +9,7 @@ router.get('/info', async (ctx, next) => {
     code: 1000,
     message: 'OK'
   })
-  baseIdInfo = await ctx.commander.getIdBase()
+  var baseIdInfo = await ctx.commander.getIdBase()
   var version = await ctx.commander.getVersion()
   var frequency = await ctx.commander.getFrequency()
   if (frequency.returnCode === 2) {
