@@ -247,16 +247,6 @@
           },
           name: {
             value: ""
-          },
-          offset: {
-            value: "",
-            validate: v=>{
-              if((v >= 0) && (v <= 127) && Number.isInteger(Number(v)) && !isNaN(parseFloat(v))){
-                return true
-              } else {
-                return false
-              }
-            }
           }
         },
         inputs:1,
@@ -280,14 +270,10 @@
     <label for="node-input-name">Name</label>
     <input type="text" id="node-input-name">
   </div>
-  <div class="form-row">
-    <label for="node-input-offset">Channel</label>
-    <input type="text" id="node-input-offset">
-  </div>
 </script>
 
 <script type="text/x-red" data-help-name="enocean-btn">
-  <p> a specialized node, implementing a simple rocker switch </p>
+  <p> a specialized node, implementing a simple 2-rocker switch (4 buttons)</p>
   <h3>Properties</h3>
     <dl class="message-properties">
         <dt>Serialport
@@ -298,25 +284,32 @@
           <span class="property-type">string</span>
         </dt>
         <dd> the nodes name</dd>
-        <dt>Channel
-          <span class="property-type">integer</span>
-        </dt>
-        <dd> the channel you want to send from (0-127)</dd>
     </dl>
   <h3>Inputs</h3>
     <dl class="message-properties">
       <dt>payload
+        <span class="property-type">object</span>
+      </dt>
+      <dd>defines events, channel and button </dd>
+      <dt>payload.event
         <span class="property-type">string</span>
       </dt>
-      <dd> "A0_click", "A1_click", "B0_click", "B1_click"
-      "A0_down", "A1_down", "B0_down", "B1_down"
-      "release" </dd>
+      <dd>can be one of "click","down","release". Defines the event to send</dd>
+      <dt>payload.button
+        <span class="property-type">number</span>
+      </dt>
+      <dd>can be 0, 1, 2, 3 . The button to click on the simulated rocker. </dd>
+      <dt>payload.channel
+        <span class="property-type">number</span>
+      </dt>
+      <dd>can be 0-127. The channel to send on. It's an offset off the baseId of your USB 300.</dd>
     </dl>
   <h3>Details</h3>
    <p>
-     this node implements a 2 Rocker Switch (4 Buttons: A0,A1,B0,B1) that can be "click"ed or "down"ed (A0,A1,B0,B1).
+     this node implements a 2 Rocker Switch (4 Buttons: 0, 1, 2, 3) that can be "click"ed or "down"ed.
      "click" means the button is immediately released after beeing pressed. When "down"ed you have to release the button yourself.
-     send "A0_click" or "B0_click" to teach in button "A" or "B" into an external device (the button behaves as a physical enocean rocker switch)
+     When a receiver is in LRN mode, send either `button: 0` or `button: 1` to teach in Rocker 1, or send `button: 2` or `button: 3` to teach in Rocker 2.
+     With one USB you can send on up to 128 (0-127) channels. so you can simulate 256 Rocker switches.
    </p>
 </script>
 
