@@ -10,6 +10,7 @@ module.exports = RED => {
     this.serialport = config.serialport
     this.port = null
     this.baseId = ''
+    makeTP(this)
     var node = this
     node.on('close', function (done) {
       node.port.close(done)
@@ -22,8 +23,6 @@ module.exports = RED => {
         }
       })
       makeCommander(node)
-      node.transformer = new ESP3Transfomer()
-      node.parser = new ESP3Parser()
       node.port.pipe(this.parser).pipe(node.transformer)
       node.getBaseId()
     } catch (err) {
@@ -31,6 +30,11 @@ module.exports = RED => {
     }
   }
   return EnOceanConfigNode
+}
+
+function makeTP(node){
+  node.transformer = new ESP3Transfomer()
+  node.parser = new ESP3Parser()
 }
 
 function makeCommander (node) {
