@@ -4,15 +4,20 @@ module.exports = RED => {
     var ctx = this.context()
     var eep = ctx.get('eep')
     var sid = ctx.get('senderId')
-    setSensor(config, eep, sid)
+    setSensor(this,config, eep, sid)
+
     this.direction = config.direction
     this.serialport = config.serialport
     this.teachInStatus = false
+
     this.status({ fill: 'grey', shape: 'ring', text: 'not initialized' })
+
     var node = this
+
     makeStateRefreshable(node, RED)
     makeLearner(node)
     makeInjectionable(node)
+
     EnoceanListener(node, makeEnoceanListenerCallback(node))
   }
 
@@ -27,9 +32,9 @@ module.exports = RED => {
   return EnoceanActorNode
 }
 
-function setSensor (config, eep, sid) {
-  this.eep = (config.eep ? config.eep : eep || '').toLowerCase()
-  this.senderId = (config.senderId ? config.senderId : sid || '').toLowerCase()
+function setSensor (node,config, eep, sid) {
+  node.eep = (config.eep ? config.eep : eep || '').toLowerCase()
+  node.senderId = (config.senderId ? config.senderId : sid || '').toLowerCase()
 }
 
 function makeEnoceanListenerCallback (node) {
@@ -60,6 +65,9 @@ function makeEnoceanListenerCallback (node) {
 }
 
 function isDataTelegram (node, tel) {
+  if (tel.constructor.name !== 'RadioERP1') {
+    return false
+  }
   if (tel.RORG !== 0xf6 && tel.teachIn) {
     return false
   }
