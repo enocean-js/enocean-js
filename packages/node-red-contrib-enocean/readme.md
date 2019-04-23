@@ -69,13 +69,11 @@ It is controled by a simple JSON payload:
 ```
 #### button
 
-button can have the value `0`, `1`, `2` or `3`. The node implements a 2 Rocker (4 Button) Switch.
+button can have the value `0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`. The node implements a 4 Rocker (8 Button) Switch.
 
-the buttons are numbered like this:
+the buttons come in pairs.
 
-![btnS](https://user-images.githubusercontent.com/10807348/56549766-f52d0400-6583-11e9-8e90-810123f926fd.JPG)
-
-so to switch a light on send `"button": 0 ` and to switch it of send `"button": 1`. Or `2` and `3` respectively
+so to switch a light on send `"button": 0 ` and to switch it of send `"button": 1`... Or `2` and `3`, `4` and `5`, `6` and `7` respectively.
 
 #### event
 
@@ -87,5 +85,6 @@ For blind conrtrol or dimming lights, you send a `down` event, to start a blind 
 
 #### channel
 
-you can send telegrams on up to 128 channels (`0` - `127`)
-Each channel represents one virtual device. For this node, each channel represents one 2-Rocker switch.
+you can send telegrams on up to 128 channels (`0` - `127`) per USB Stick.
+Each channel represents one virtual device. For this node, each channel represents one 4-Rocker switch.
+So you can emulate up to 512 Rockers or 1024 Buttons per USB Stick.

@@ -273,7 +273,7 @@
 </script>
 
 <script type="text/x-red" data-help-name="enocean-btn">
-  <p> a specialized node, implementing a simple 2-rocker switch (4 buttons)</p>
+  <p> a specialized node, implementing a simple 4-rocker switch (8 buttons)</p>
   <h3>Properties</h3>
     <dl class="message-properties">
         <dt>Serialport
@@ -298,7 +298,7 @@
       <dt>payload.button
         <span class="property-type">number</span>
       </dt>
-      <dd>can be 0, 1, 2, 3 . The button to click on the simulated rocker. </dd>
+      <dd>can be 0, 1, 2, 3, 4, 5, 6, 7 . The button to click on the simulated rocker. </dd>
       <dt>payload.channel
         <span class="property-type">number</span>
       </dt>
@@ -306,9 +306,9 @@
     </dl>
   <h3>Details</h3>
    <p>
-     this node implements a 2 Rocker Switch (4 Buttons: 0, 1, 2, 3) that can be "click"ed or "down"ed.
+     this node implements a 2 Rocker Switch (8 Buttons: 0, 1, 2, 3, 4, 5, 6, 7) that can be "click"ed or "down"ed.
      "click" means the button is immediately released after beeing pressed. When "down"ed you have to release the button yourself.
-     When a receiver is in LRN mode, send either `button: 0` or `button: 1` to teach in Rocker 1, or send `button: 2` or `button: 3` to teach in Rocker 2.
+     When a receiver is in LRN mode, send either `button: 0` or `button: 1` to teach in Rocker 1, send `button: 2` or `button: 3` to teach in Rocker 2 etc..
      With one USB you can send on up to 128 (0-127) channels. so you can simulate 256 Rocker switches.
    </p>
 </script>
