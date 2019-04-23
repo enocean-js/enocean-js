@@ -9,7 +9,7 @@ module.exports = RED => {
     var node = this
 
     node.on('input', async function (msg) {
-      node.btn = RadioERP1.from({ eep: 'f6-02-01', payload: [0], id: node.serialport.baseId + msg.payload.channel })
+      node.btn = RadioERP1.from({ eep: 'f6-03-01', payload: [0], id: node.serialport.baseId + msg.payload.channel })
       func[msg.payload.event](node, msg.payload.button)
     })
   }
@@ -28,11 +28,11 @@ async function btnClick (node, btn) {
 }
 
 async function release (node) {
-  node.btn.payload = node.btn.encode({ R1: 0, EB: 0 }, { eep: 'f6-02-01', status: 0x20 })
+  node.btn.payload = node.btn.encode({ R1: 0, EB: 0 }, { eep: 'f6-03-01', status: 0x0 })
   await node.serialport.sender.send(node.btn.toString())
 }
 
 async function btnDown (node, btn) {
-  node.btn.payload = node.btn.encode({ R1: btn, EB: 1 }, { eep: 'f6-02-01', status: 0x30 })
+  node.btn.payload = node.btn.encode({ R1: btn, EB: 1 }, { eep: 'f6-03-01', status: 0x10 })
   await node.serialport.sender.send(node.btn.toString())
 }
