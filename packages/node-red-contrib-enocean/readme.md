@@ -50,6 +50,7 @@ is used for the rare case of bidirectional telegram encodindgs where the from an
 
 ### enocean-out
 
+API is still unstable... no docs until i'm exactly sure how this node should behave...
 
 ### enocean-btn
 
