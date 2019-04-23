@@ -7,7 +7,7 @@
   "license": "CC0-1.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/enocean-js/enocean-js"
+    "url": "https://github.com/enocean-js/enocean-js/tree/master/packages/node-red-contrib-enocean"
   },
   "dependencies": {
     "serialport": "^7.1.0",
