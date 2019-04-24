@@ -33,6 +33,6 @@ async function release (node) {
 }
 
 async function btnDown (node, btn) {
-  node.btn.payload = node.btn.encode({ R1: btn, EB: 1 }, { eep: 'f6-03-01', status: 0x10 })
+  node.btn.payload = node.btn.encode({ R1: btn, EB: 1 }, { eep: 'f6-03-01', status: 0b00010000 })
   await node.serialport.sender.send(node.btn.toString())
 }
