@@ -19,7 +19,23 @@
 
 ![npm](https://img.shields.io/npm/dt/enocean-js.svg)
 
-starting with **enocean-js@0.0.1-beta.8** there is now an installable package. you can start using and testing it!
+This is the monorepo for all things enocean in javascript. It is home to a library of tools to work with enocean telegrams in javascript.
+some of the features are:
+
+* a general encoder/decoder for all EEPs that runs in node.js and the browser allowing you to go from binary representation to JSON back and forth
+* a serialport ESP3Parser
+* a common command interface for managing your USB device
+* a transformer to turn ESP3 packets into concrete types with all their interfaces.
+
+you can install and use these tools separately or in a complete package. so either `npm install enocean-js` or `npm install @enocean-js/some-tool`.
+You can find all the installable modules [at the enocean-js npm organisation](https://www.npmjs.com/settings/enocean-js/packages)
+
+
+You will also find some full blown apps here:
+
+* [node-red-contrib-enocean](packages/node-red-contrib-enocean)
+* [enocean-ip-gateway (very early alpha)](packages/enocean-ip-gateway)
+* [dolphin view like tool based on electron (not started yet)](packages/octopus-view)
 
 ## slack
 
