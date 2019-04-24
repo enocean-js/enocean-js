@@ -22,7 +22,7 @@
 This is the monorepo for all things enocean in javascript. It is home to a library of tools to work with enocean telegrams in javascript.
 some of the features are:
 
-* a general encoder/decoder for all EEPs that runs in node.js and the browser allowing you to go from binary representation to JSON back and forth
+* a general encoder/decoder for all EEPs that runs in node.js and the browser allowing you to go from binary representation to JSON back and forth. i call it the transcoder.
 * a serialport ESP3Parser
 * a common command interface for managing your USB device
 * a transformer to turn ESP3 packets into concrete types with all their interfaces.
@@ -36,6 +36,9 @@ You will also find some full blown apps here:
 * [node-red-contrib-enocean](packages/node-red-contrib-enocean)
 * [enocean-ip-gateway (very early alpha)](packages/enocean-ip-gateway)
 * [dolphin view like tool based on electron (not started yet)](packages/octopus-view)
+
+Some work has started on creating an EEP Description Language (EEPDL) based on JSON. I started creating a [json-schema](https://github.com/enocean-js/enocean-js/tree/master/docs/schema) for it. It will be used for [documentation](resources/enocean-specification/Enocean%20Equipment%20Profiles) as well as beeing an integral part of the transcoder.
+I will also publish the json descritions of all the EEPs for other implementers. For this to be useful, the describing language must be well defined.
 
 ## slack
 
