@@ -218,22 +218,24 @@
 
 <script type="text/x-red" data-help-name="enocean-out">
   <p>this is a node to send out enocean telegrams</p>
-  <h3>Input</h3>
-    <dl class="message-properties">
-      <dt>payload
-        <span class="property-type">object|string</span>
-      </dt>
-      <dd>send either the string *LRN* to send a learn telegram to pair with external actors, or an object that will be encoded based on the settings in this node. what can be encoded with the current EEP, the the nodes description. </dd>
-    </dl>
-    <dl class="message-properties">
-      <dt>meta
-        <span class="property-type">object</span>
-      </dt>
-      <dd>direction, status and data selectors (not yet implemented)</dd>
-    </dl>
+
   <h3>Details</h3>
    <p>
-     first connect to a serialport, then provide the info on what channel you want to send and which EEP should be used to encode your data.
+     <pre>
+{
+ "meta": {
+   "eep": "a5-12-04",
+   "channel": 3
+   "type": "data", // "data" or "teach-in"
+ },
+ "teach-in":{ // only required when meta.type == "teach-in"
+   "type": "4BS" // "4BS", "UTE", "RPS", "1BS"
+ },
+ "data": { // allways required also for "teach-in"
+   "TMP": 0
+ }
+}
+     </pre>
    </p>
 </script>
 
