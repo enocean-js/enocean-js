@@ -195,30 +195,30 @@ describe('RadioERP1 packets', () => {
     })
     it('MSB-LSB splited fields', () => {
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.payload = radio.encode({ LOT: 90, LAT: 0 }, { eep: 'a5-13-06' })
+      radio.encode({ LOT: 90, LAT: 0 }, { eep: 'a5-13-06' })
       decoded = radio.decode('a5-13-06')
       assert.equal(decoded['LOT'].value.toFixed(0), 90)
       assert.equal(decoded['LAT'].value.toFixed(0), 0)
 
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.payload = radio.encode({ SRA: 1900 }, { eep: 'a5-13-10' })
+      radio.encode({ SRA: 1900 }, { eep: 'a5-13-10' })
       decoded = radio.decode('a5-13-10')
       assert.equal(decoded['SRA'].value, 1900)
     })
     it('a5-20-10', () => {
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.payload = radio.encode({ CVAR: 90 }, { eep: 'a5-20-10', direction: 2 })
+      radio.encode({ CVAR: 90 }, { eep: 'a5-20-10', direction: 2 })
       decoded = radio.decode('a5-20-10', 2)
       assert.equal(decoded.CVAR.value, 90)
     })
     it('a5-38-08', () => {
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.payload = radio.encode({ COM: 1, TIM: 100 }, { eep: 'a5-38-08', data: 1 })
+      radio.encode({ COM: 1, TIM: 100 }, { eep: 'a5-38-08', data: 1 })
       decoded = radio.decode('a5-38-08')
       assert.equal(decoded.TIM.value.toFixed(0), 100)
 
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.payload = radio.encode({ COM: 2, EDIM: 50 }, { eep: 'a5-38-08', data: 2 })
+      radio.encode({ COM: 2, EDIM: 50 }, { eep: 'a5-38-08', data: 2 })
       decoded = radio.decode('a5-38-08')
       assert.equal(decoded.EDIM.value.toFixed(0), 50)
     })
@@ -233,7 +233,7 @@ describe('RadioERP1 packets', () => {
   describe('EEP encoding', () => {
     it('d2', () => {
       radio = RadioERP1.from({ payload: [0], id: 'ff00ff00' })
-      radio.payload = radio.encode({ MT: 1, RMT: 1 }, { eep: 'd2-50-00', data: 0 })
+      radio.encode({ MT: 1, RMT: 1 }, { eep: 'd2-50-00', data: 0 })
       radio.senderId = 'ff00ff00'
       decoded = radio.decode('d2-50-00')
 
