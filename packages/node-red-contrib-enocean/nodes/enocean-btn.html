@@ -1,0 +1,75 @@
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-btn',{
+        category: 'EnOcean',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name: {
+            value: ""
+          }
+        },
+        inputs:1,
+        color: '#90d669',
+        icon: "enocean-js-white.svg",
+        align: 'right',
+        label: function() {
+            return this.name || "EO Switch";
+        },
+        paletteLabel: 'switch',
+        labelStyle: 'enocean-node'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-btn">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="enocean-btn">
+  <p> a specialized node, implementing a simple 4-rocker switch (8 buttons)</p>
+  <h3>Properties</h3>
+    <dl class="message-properties">
+        <dt>Serialport
+          <span class="property-type">config-node</span>
+        </dt>
+        <dd> the serialport to connect to </dd>
+        <dt class="optional">Name
+          <span class="property-type">string</span>
+        </dt>
+        <dd> the nodes name</dd>
+    </dl>
+  <h3>Inputs</h3>
+    <dl class="message-properties">
+      <dt>payload
+        <span class="property-type">object</span>
+      </dt>
+      <dd>defines events, channel and button </dd>
+      <dt>payload.event
+        <span class="property-type">string</span>
+      </dt>
+      <dd>can be one of "click","down","release". Defines the event to send</dd>
+      <dt>payload.button
+        <span class="property-type">number</span>
+      </dt>
+      <dd>can be 0, 1, 2, 3, 4, 5, 6, 7 . The button to click on the simulated rocker. </dd>
+      <dt>payload.channel
+        <span class="property-type">number</span>
+      </dt>
+      <dd>can be 0-127. The channel to send on. It's an offset off the baseId of your USB 300.</dd>
+    </dl>
+  <h3>Details</h3>
+   <p>
+     this node implements a 2 Rocker Switch (8 Buttons: 0, 1, 2, 3, 4, 5, 6, 7) that can be "click"ed or "down"ed.
+     "click" means the button is immediately released after beeing pressed. When "down"ed you have to release the button yourself.
+     When a receiver is in LRN mode, send either `button: 0` or `button: 1` to teach in Rocker 1, send `button: 2` or `button: 3` to teach in Rocker 2 etc..
+     With one USB you can send on up to 128 (0-127) channels. so you can simulate 256 Rocker switches.
+   </p>
+</script>

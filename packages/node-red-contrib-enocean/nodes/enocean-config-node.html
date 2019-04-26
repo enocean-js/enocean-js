@@ -1,0 +1,20 @@
+<script type="text/javascript">
+  RED.nodes.registerType('enocean-config-node', {
+    category: 'config',
+    defaults: {
+      serialport: { value: "", required: true }
+    },
+    label: function () {
+      return this.serialport;
+    }
+  });
+</script>
+
+<script type="text/x-red"
+  data-template-name="enocean-config-node">
+  <div class="form-row">
+    <label for="node-config-input-serialport"><i class="icon-bookmark"></i> Serialport</label>
+    <input type="text"
+      id="node-config-input-serialport">
+  </div>
+</script>

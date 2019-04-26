@@ -5,6 +5,7 @@ const SerialportSender = require('@enocean-js/serialport-sender').SerialportSend
 const Commander = require('@enocean-js/common-command').Commander
 
 module.exports = RED => {
+  console.log("cn")
   function EnOceanConfigNode (config) {
     RED.nodes.createNode(this, config)
     this.serialport = config.serialport
@@ -21,7 +22,7 @@ module.exports = RED => {
       console.log(err)
     }
   }
-  return EnOceanConfigNode
+  RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
 }
 
 function openPort (node) {

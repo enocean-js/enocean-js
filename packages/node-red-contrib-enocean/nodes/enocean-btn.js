@@ -13,7 +13,7 @@ module.exports = RED => {
       func[msg.payload.event](node, msg.payload.button)
     })
   }
-  return EnOceanButtonNode
+  RED.nodes.registerType('enocean-btn', EnOceanButtonNode)
 }
 
 var func = {

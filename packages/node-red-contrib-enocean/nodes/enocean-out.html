@@ -1,0 +1,87 @@
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-out',{
+        category: 'EnOcean',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name: {
+            value: ""
+          },
+          offset: {
+            value: 0
+          },
+          eep: {
+            value: "",
+            required: true
+          },
+          direction:{
+            value: 1
+          },
+          data:{
+            value: 0
+          }
+        },
+        inputs:1,
+        color: '#90d669',
+        icon: "enocean-js-white.svg",
+        align: 'right',
+        label: function() {
+            return this.name || "EO Sender";
+        },
+        paletteLabel: 'sender',
+        labelStyle: 'enocean-node'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-out">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-offset">Channel</label>
+    <input type="text" id="node-input-offset">
+  </div>
+  <div class="form-row">
+    <label for="node-input-eep">EEP</label>
+    <input type="text" id="node-input-eep">
+  </div>
+  <hr/>
+  <div class="form-row">
+    <label for="node-input-direction">Direction</label>
+    <input type="text" id="node-input-direction">
+  </div>
+  <div class="form-row">
+    <label for="node-input-data">Data</label>
+    <input type="text" id="node-input-data">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="enocean-out">
+  <p>this is a node to send out enocean telegrams</p>
+
+  <h3>Details</h3>
+   <p>
+     <pre>
+{
+ "meta": {
+   "eep": "a5-12-04",
+   "channel": 3
+   "type": "data", // "data" or "teach-in"
+ },
+ "teach-in":{ // only required when meta.type == "teach-in"
+   "type": "4BS" // "4BS", "UTE", "RPS", "1BS"
+ },
+ "data": { // allways required also for "teach-in"
+   "TMP": 0
+ }
+}
+     </pre>
+   </p>
+</script>

@@ -28,8 +28,7 @@ module.exports = RED => {
     }
     usb.transformer.on('data', cb)
   }
-
-  return EnoceanActorNode
+  RED.nodes.registerType('enocean-actor', EnoceanActorNode)
 }
 
 function setSensor (node, config, eep, sid) {

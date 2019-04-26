@@ -1,0 +1,129 @@
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-actor',{
+        category: 'EnOcean',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name:{
+            value:"",
+          },
+          senderid:{
+            value:"",
+          },
+          eep:{
+            value:"",
+          },
+          direction:{
+            value: 1
+          }
+        },
+        outputs: 1,
+        inputs: 0,
+        button: {
+          enabled: true,
+          onclick: function (){
+            console.log(this)
+            fetch("inject/"+this.id,{method:"POST"})
+          }
+        },
+        inputLabels: "LRN mode",
+        color: '#77a5dd',
+        icon: "enocean-js-white.svg",
+        label: function() {
+            return this.name || this.senderId || "EO Receiver";
+        },
+        paletteLabel: 'receiver',
+        labelStyle: 'enocean-node',
+        oneditprepare:async function(){
+          var res = await fetch("/context/node/"+this.id)
+          var json = await res.json()
+          try{
+            var eep = json.default.eep.msg
+            var sid = json.default.senderId.msg
+          }catch(err){
+            var eep = this._config.eep
+            var sid = this._config.senderid
+          }
+          var res = await fetch(`https://enocean-js.github.io/enocean-js/eeps/${eep}.md`)
+          this.info = await res.text()
+          document.querySelector("#node-input-eep").setAttribute("placeholder",eep)
+          document.querySelector("#node-input-senderid").setAttribute("placeholder",sid)
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-actor">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-senderid">Sender Id</label>
+    <input type="text" id="node-input-senderid">
+  </div>
+  <div class="form-row">
+    <label for="node-input-eep">EEP</label>
+    <input type="text" id="node-input-eep">
+  </div>
+  <hr/>
+  <div class="form-row">
+    <label for="node-input-direction">Direction</label>
+    <input type="text" id="node-input-direction">
+  </div>
+   <div class="form-tips">
+     <b>automatic teach in: </b>just connect to a serialport. After implementing the flow, bring the node into *teach in* state and press **LRN Button** on the external device you want to pair.
+   </div>
+   <br/>
+   <div class="form-tips">
+     <b>manual teach in: </b>after connecting to a serialport, you can type in your sensors id and eep by hand.
+   </div>
+   <br/>
+   <div class="form-tips">
+     <b>direction</b> is only used in very rare cases. and usually does not have to be touched.<br/>
+     the following eep might need a direction setting other than 1:
+     <ul>
+      <li>a5-11-05</li>
+      <li>a5-20-01</li>
+      <li>a5-20-02</li>
+      <li>a5-20-03</li>
+      <li>a5-20-04</li>
+      <li>a5-20-10</li>
+      <li>a5-20-11</li>
+      <li>d2-a0-01</li>
+     </ul>
+   </div>
+</script>
+
+<script type="text/x-red" data-help-name="enocean-actor">
+  <p>this is a node to listen to incomming enocean telegrams.</p>
+  <h3>Output</h3>
+    <dl class="message-properties">
+      <dt>payload
+        <span class="property-type">object</span>
+      </dt>
+      <dd>the decoded content of the telegram. this is dependent on the tought in sensor. for details see the node description after teaching in a sensor</dd>
+    </dl>
+    <dl class="message-properties">
+      <dt>meta
+        <span class="property-type">object</span>
+      </dt>
+      <dd>meta information about the telegram. Here you can find the RSSI, senderId, the raw payload, a timestamp etc.</dd>
+    </dl>
+  <h3>Button</h3>
+    <dl class="message-properties">
+      <dt>click
+        <span class="property-type">event</span>
+      </dt>
+      <dd> set the node into the *teach in* state. you can now send **LRN Telegrams** from your device, and the sender and device will be paired (after succesfull pairing the nodes state becomes green and shows the external sensors id) </dd>
+    </dl>
+  <h3>Details</h3>
+   <p>
+     to receive some data you have to first teach in a sensor. this can be done either manually or automatically by sending an **LRN Telegram** from your device.
+   </p>
+</script>

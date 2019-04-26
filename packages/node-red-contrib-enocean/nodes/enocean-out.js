@@ -27,7 +27,7 @@ module.exports = RED => {
       }
     })
   }
-  return EnOceanOutputNode
+  RED.nodes.registerType('enocean-out', EnOceanOutputNode)
 }
 //
 // {

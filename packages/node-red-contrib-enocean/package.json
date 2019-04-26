@@ -16,7 +16,10 @@
   },
   "node-red": {
     "nodes": {
-      "enocean": "enocean-node.js"
+      "enocean-config-node": "nodes/enocean-config-node.js",
+      "enocean-in": "nodes/enocean-in.js",
+      "enocean-out": "nodes/enocean-out.js",
+      "enocean-btn": "nodes/enocean-btn.js"
     }
   },
   "keywords": [
