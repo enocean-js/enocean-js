@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('enocean-actor',{
+    RED.nodes.registerType('enocean-in',{
         category: 'EnOcean',
         defaults: {
           serialport: {
@@ -29,7 +29,7 @@
           }
         },
         inputLabels: "LRN mode",
-        color: '#77a5dd',
+        color: '#99ccff',
         icon: "enocean-js-white.svg",
         label: function() {
             return this.name || this.senderId || "EO Receiver";
@@ -54,7 +54,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="enocean-actor">
+<script type="text/x-red" data-template-name="enocean-in">
   <div class="form-row">
     <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
     <input type="text" id="node-input-serialport">
@@ -100,7 +100,7 @@
    </div>
 </script>
 
-<script type="text/x-red" data-help-name="enocean-actor">
+<script type="text/x-red" data-help-name="enocean-in">
   <p>this is a node to listen to incomming enocean telegrams.</p>
   <h3>Output</h3>
     <dl class="message-properties">
