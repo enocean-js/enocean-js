@@ -1,5 +1,5 @@
 module.exports = RED => {
-  function EnoceanActorNode (config) {
+  function EnoceanInNode (config) {
     RED.nodes.createNode(this, config)
     var ctx = this.context()
     var eep = ctx.get('eep')
@@ -28,7 +28,7 @@ module.exports = RED => {
     }
     usb.transformer.on('data', cb)
   }
-  RED.nodes.registerType('enocean-in', EnoceanActorNode)
+  RED.nodes.registerType('enocean-in', EnoceanInNode)
 }
 
 function setSensor (node, config, eep, sid) {
