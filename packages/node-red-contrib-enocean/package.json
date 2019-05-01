@@ -10,7 +10,7 @@
     "url": "https://github.com/enocean-js/enocean-js/tree/master/packages/node-red-contrib-enocean"
   },
   "dependencies": {
-    "serialport": "^7.1.0",
+    "serialport": "^7.1.5",
     "enocean-js": ">=0.0.1-beta.19",
     "@enocean-js/radio-erp1": ">=0.0.1-beta.19"
   },
@@ -19,7 +19,8 @@
       "enocean-config-node": "nodes/enocean-config-node.js",
       "enocean-in": "nodes/enocean-in.js",
       "enocean-out": "nodes/enocean-out.js",
-      "enocean-btn": "nodes/enocean-btn.js"
+      "enocean-btn": "nodes/enocean-btn.js",
+      "enocean-single-actor": "nodes/enocean-single-actor.js"
     }
   },
   "keywords": [
