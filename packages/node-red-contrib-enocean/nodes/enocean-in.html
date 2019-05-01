@@ -24,7 +24,6 @@
         button: {
           enabled: true,
           onclick: function (){
-            console.log(this)
             fetch("inject/"+this.id,{method:"POST"})
           }
         },
