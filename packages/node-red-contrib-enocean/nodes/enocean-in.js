@@ -141,9 +141,9 @@ function makeLearner (node) {
 function makeInjectionable (node) {
   node.receive = function () {
     // this function gets called when the inject button is clicked
-    if(node.teachInStatus === true){
+    if (node.teachInStatus === true) {
       node.stopTeachIn()
-    }else{
+    } else {
       node.startTeachIn()
     }
   }

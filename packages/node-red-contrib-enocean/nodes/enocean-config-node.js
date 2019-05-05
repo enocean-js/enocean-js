@@ -25,10 +25,11 @@ module.exports = RED => {
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
 
   RED.httpAdmin.get('/enocean-js/eep/:eep', function (req, res) {
-    try{
+    try {
       res.send(getEEP(req.params.eep))
-    }catch(err){
-      res.send("")
+    } catch (err) {
+      // console.log(req.params.eep)
+      res.send('')
     }
   })
 }

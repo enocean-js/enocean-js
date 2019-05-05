@@ -57,10 +57,11 @@
             var eep = json.default.eep.msg
             var sid = json.default.senderId.msg
           }catch(err){
-            var eep = this._config.eep
-            var sid = this._config.senderId
+            var eep = this.eep
+            var sid = this.senderId
           }
-          var res = await getEEP(eep)
+          var realeep = this.eep !== "" ? this.eep : eep
+          var res = await getEEP(realeep)
           this.info = res.title
           $("#node-eep-info").text(this.info)
           $("#node-input-senderId").attr("placeholder",sid)
