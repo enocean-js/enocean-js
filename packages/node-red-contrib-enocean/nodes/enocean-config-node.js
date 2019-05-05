@@ -3,6 +3,7 @@ const SerialPort = require('serialport')
 const ESP3Transfomer = require('@enocean-js/esp3-packets').ESP3Transformer
 const SerialportSender = require('@enocean-js/serialport-sender').SerialportSender
 const Commander = require('@enocean-js/common-command').Commander
+const getEEP = require('@enocean-js/eep-transcoder').getEEP
 
 module.exports = RED => {
   function EnOceanConfigNode (config) {
@@ -22,6 +23,10 @@ module.exports = RED => {
     }
   }
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
+
+  RED.httpAdmin.get('/enocean-js/eep/:eep', function (req, res) {
+    res.send(getEEP(req.params.eep))
+  })
 }
 
 function openPort (node) {

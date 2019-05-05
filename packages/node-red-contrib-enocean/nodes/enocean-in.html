@@ -36,6 +36,19 @@
         paletteLabel: 'input',
         labelStyle: 'enocean-node',
         oneditprepare:async function(){
+          var node = this
+          async function getEEP(eep){
+            try{
+              var res = await fetch(`/enocean-js/eep/${eep}`)
+              return await res.json()
+            }catch(err){
+              return "unknown EEP"
+            }
+          }
+          document.querySelector("#node-input-eep").addEventListener("keyup",async (e)=>{
+            var res = await getEEP($("#node-input-eep").val())
+            $("#node-eep-info").text(res.title)
+          })
           var res = await fetch("/context/node/"+this.id)
           var json = await res.json()
           try{
@@ -45,11 +58,15 @@
             var eep = this._config.eep
             var sid = this._config.senderId
           }
-          var res = await fetch(`https://enocean-js.github.io/enocean-js/eeps/${eep}.md`)
-          this.info = await res.text()
-          document.querySelector("#node-input-eep").setAttribute("placeholder",eep)
-          document.querySelector("#node-input-senderid").setAttribute("placeholder",sid)
-        }
+          var res = await getEEP(eep)
+          this.info = res.title
+          $("#node-eep-info").text(this.info)
+          $("#node-input-senderId").attr("placeholder",sid)
+          $("#node-input-eep").attr("placeholder",eep)
+        },
+      changeHandler(e){
+        console.log(this)
+      }
     });
 </script>
 
@@ -69,6 +86,8 @@
   <div class="form-row">
     <label for="node-input-eep">EEP</label>
     <input type="text" id="node-input-eep">
+  </div>
+  <div id="node-eep-info">
   </div>
   <hr/>
   <div class="form-row">
