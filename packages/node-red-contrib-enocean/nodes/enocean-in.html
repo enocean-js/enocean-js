@@ -9,7 +9,7 @@
           name:{
             value:"",
           },
-          senderid:{
+          senderId:{
             value:"",
           },
           eep:{
@@ -31,9 +31,9 @@
         color: '#99ccff',
         icon: "enocean-js-white.svg",
         label: function() {
-            return this.name || this.senderId || "EO Receiver";
+            return this.name || this.senderId || "input";
         },
-        paletteLabel: 'receiver',
+        paletteLabel: 'input',
         labelStyle: 'enocean-node',
         oneditprepare:async function(){
           var res = await fetch("/context/node/"+this.id)
@@ -43,7 +43,7 @@
             var sid = json.default.senderId.msg
           }catch(err){
             var eep = this._config.eep
-            var sid = this._config.senderid
+            var sid = this._config.senderId
           }
           var res = await fetch(`https://enocean-js.github.io/enocean-js/eeps/${eep}.md`)
           this.info = await res.text()
@@ -63,8 +63,8 @@
     <input type="text" id="node-input-name">
   </div>
   <div class="form-row">
-    <label for="node-input-senderid">Sender Id</label>
-    <input type="text" id="node-input-senderid">
+    <label for="node-input-senderId">Sender Id</label>
+    <input type="text" id="node-input-senderId">
   </div>
   <div class="form-row">
     <label for="node-input-eep">EEP</label>
