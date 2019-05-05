@@ -3,7 +3,7 @@
 module.exports = RED => {
   function EnOceanButtonNode (config) {
     RED.nodes.createNode(this, config)
-    this.serialport = RED.nodes.getNode(config.serialport)
+    //this.serialport = RED.nodes.getNode(config.serialport)
 
     var node = this
     node.payload = {

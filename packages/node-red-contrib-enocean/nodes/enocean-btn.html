@@ -2,10 +2,6 @@
     RED.nodes.registerType('enocean-btn',{
         category: 'EnOcean',
         defaults: {
-          serialport: {
-            value: "",
-            type: "enocean-config-node"
-          },
           name: {
             value: ""
           }
@@ -24,10 +20,6 @@
 </script>
 
 <script type="text/x-red" data-template-name="enocean-btn">
-  <div class="form-row">
-    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
-    <input type="text" id="node-input-serialport">
-  </div>
   <div class="form-row">
     <label for="node-input-name">Name</label>
     <input type="text" id="node-input-name">
