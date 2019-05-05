@@ -12,7 +12,8 @@
   "dependencies": {
     "serialport": "^7.1.5",
     "enocean-js": ">=0.0.1-beta.20",
-    "@enocean-js/radio-erp1": ">=0.0.1-beta.20"
+    "@enocean-js/radio-erp1": ">=0.0.1-beta.20",
+    "@enocean-js/eep-transcoder": ">=0.0.1-beta.20"
   },
   "node-red": {
     "nodes": {
@@ -20,7 +21,7 @@
       "enocean-in": "nodes/enocean-in.js",
       "enocean-out": "nodes/enocean-out.js",
       "enocean-btn": "nodes/enocean-btn.js",
-      "enocean-single-actor": "nodes/enocean-single-actor.js"
+      "enocean-single-actor": "nodes/enocean-actor.js"
     }
   },
   "keywords": [

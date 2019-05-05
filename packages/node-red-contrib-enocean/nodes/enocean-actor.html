@@ -1,0 +1,93 @@
+<script src="enocean-js/funcs.js"></script>
+<script type="text/javascript" id="ABCDEF23">
+    RED.nodes.registerType('enocean-actor',{
+        category: 'EnOcean',
+        defaults: {
+          name:{
+            value:""
+          },
+          teachInDuration:{
+            value: 30,
+          },
+          sensors:{
+            value:""
+          },
+          eeplist:{
+            value:[
+              {senderId:"00112233", eep:"a5-03-11", rssi: 57},
+              {senderId:"002a1d7e", eep:"f6-02-01", rssi: 45, name: "test rocker"}
+            ]
+          }
+        },
+        outputs: 1,
+        inputs: 1,
+        color: '#99ccff',
+        icon: "enocean-js-white.svg",
+        label: function() {
+            return this.name || this.senderId || "actor";
+        },
+        paletteLabel: 'actor',
+        oneditprepare: editprepare
+    });
+
+    var st = document.createElement("script")
+    st.setAttribute("type","module")
+    st.setAttribute("src","enocean-js/test.js")
+    document.body.appendChild(st)
+
+</script>
+
+
+<script type="text/x-red" data-template-name="enocean-actor">
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-teachInDuration">TeachIn Duration</label>
+    <input type="number" id="node-input-teachInDuration">
+  </div>
+  <div class="form-row" style="display:none">
+    <label for="node-input-sensors" >Sensors</label>
+    <input type="hidden" id="node-input-sensors">
+  </div>
+  <div class="form-row">
+    <label><button id="eo-lrn-btn" >start</button></label>
+    <span id="eo-sensor-info">
+      <svg height="10px" style="width:calc(100% - 150px)">
+        <rect x="0" y="0" width="100%" stroke="red" height="10px" fill="blue"/>
+      </svg>
+    </span>
+  </div>
+  <div class="form-row">
+    <sensor-list id="enocean-sensorlist"></sensor-list>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="enocean-actor">
+  <p>this is a node to listen to incomming enocean telegrams.</p>
+  <h3>Output</h3>
+    <dl class="message-properties">
+      <dt>payload
+        <span class="property-type">object</span>
+      </dt>
+      <dd>the decoded content of the telegram. this is dependent on the tought in sensor. for details see the node description after teaching in a sensor</dd>
+    </dl>
+    <dl class="message-properties">
+      <dt>meta
+        <span class="property-type">object</span>
+      </dt>
+      <dd>meta information about the telegram. Here you can find the RSSI, senderId, the raw payload, a timestamp etc.</dd>
+    </dl>
+  <h3>Button</h3>
+    <dl class="message-properties">
+      <dt>click
+        <span class="property-type">event</span>
+      </dt>
+      <dd> set the node into the *teach in* state. you can now send **LRN Telegrams** from your device, and the sender and device will be paired (after succesfull pairing the nodes state becomes green and shows the external sensors id) </dd>
+    </dl>
+  <h3>Details</h3>
+   <p>
+     to receive some data you have to first teach in a sensor. this can be done either manually or automatically by sending an **LRN Telegram** from your device.
+   </p>
+</script>

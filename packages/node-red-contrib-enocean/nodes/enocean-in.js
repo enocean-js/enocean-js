@@ -33,33 +33,36 @@ module.exports = RED => {
 
 function setSensor (node, config, eep, sid) {
   node.eep = (config.eep ? config.eep : eep || '').toLowerCase()
-  node.senderId = (config.senderId ? config.senderId : sid || '').toLowerCase()
+  node.senderId = (config.senderid ? config.senderid : sid || '').toLowerCase()
 }
 
 function makeEnoceanListenerCallback (node) {
   return function (data) {
-    if (data.senderId === node.senderId && isDataTelegram(node, data)) {
-      node.status({ fill: 'green', shape: 'dot', text: node.senderId })
-      setTimeout(() => node.status({ fill: 'green', shape: 'ring', text: node.senderId }), 100)
-      node.send({
-        payload: data.decode(node.eep, node.direction),
-        meta: makeMeta(data.senderId, node.eep, data)
-      })
-    }
-    if (node.teachInStatus === true) {
-      if (data.teachIn) {
-        saveSender(node, data.teachInInfo.senderId, data.teachInInfo.eep.toString())
-        node.stopTeachIn()
-        node.send({
-          payload: {
-            senderId: data.teachInInfo.senderId,
-            eep: data.teachInInfo.eep.toString(),
-            manufacturer: data.teachInInfo.manufacturer
-          },
-          meta: makeMeta(data.teachInInfo.senderId, data.teachInInfo.eep.toString(), data)
-        })
-      }
-    }
+    node.send({
+      payload: data
+    })
+    // if (data.senderId === node.senderId && isDataTelegram(node, data)) {
+    //   node.status({ fill: 'green', shape: 'dot', text: node.senderId })
+    //   setTimeout(() => node.status({ fill: 'green', shape: 'ring', text: node.senderId }), 100)
+    //   node.send({
+    //     payload: data.decode(node.eep, node.direction),
+    //     meta: makeMeta(data.senderId, node.eep, data)
+    //   })
+    // }
+    // if (node.teachInStatus === true) {
+    //   if (data.teachIn) {
+    //     saveSender(node, data.teachInInfo.senderId, data.teachInInfo.eep.toString())
+    //     node.stopTeachIn()
+    //     node.send({
+    //       payload: {
+    //         senderId: data.teachInInfo.senderId,
+    //         eep: data.teachInInfo.eep.toString(),
+    //         manufacturer: data.teachInInfo.manufacturer
+    //       },
+    //       meta: makeMeta(data.teachInInfo.senderId, data.teachInInfo.eep.toString(), data)
+    //     })
+    //   }
+    // }
   }
 }
 
@@ -121,6 +124,10 @@ function makeLearner (node) {
     node.refreshState()
   }
   node.startTeachIn = () => {
+    if(node.teachInStatus === true){
+      node.stopTeachIn()
+      return
+    }
     var sec = 30
     var dot = true
     node.teachInStatus = true

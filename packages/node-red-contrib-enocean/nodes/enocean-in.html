@@ -31,9 +31,9 @@
         color: '#99ccff',
         icon: "enocean-js-white.svg",
         label: function() {
-            return this.name || this.senderId || "EO Receiver";
+            return this.name || this.senderId || "input";
         },
-        paletteLabel: 'receiver',
+        paletteLabel: 'input',
         labelStyle: 'enocean-node',
         oneditprepare:async function(){
           var res = await fetch("/context/node/"+this.id)
