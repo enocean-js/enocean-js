@@ -38,12 +38,14 @@
         oneditprepare:async function(){
           var node = this
           async function getEEP(eep){
+            var info = ""
             try{
               var res = await fetch(`/enocean-js/eep/${eep}`)
-              return await res.json()
+              info = await res.json()
             }catch(err){
-              return "unknown EEP"
+              info = {title:"unknown EEP"}
             }
+            return info
           }
           document.querySelector("#node-input-eep").addEventListener("keyup",async (e)=>{
             var res = await getEEP($("#node-input-eep").val())
