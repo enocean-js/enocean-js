@@ -5,18 +5,6 @@
         defaults: {
           name:{
             value:""
-          },
-          teachInDuration:{
-            value: 30,
-          },
-          sensors:{
-            value:""
-          },
-          eeplist:{
-            value:[
-              {senderId:"00112233", eep:"a5-03-11", rssi: 57},
-              {senderId:"002a1d7e", eep:"f6-02-01", rssi: 45, name: "test rocker"}
-            ]
           }
         },
         outputs: 1,
@@ -24,12 +12,11 @@
         color: '#99ccff',
         icon: "enocean-js-white.svg",
         label: function() {
-            return this.name || this.senderId || "actor";
+            return this.name || "actor";
         },
         paletteLabel: 'actor',
         oneditprepare: editprepare
     });
-
     var st = document.createElement("script")
     st.setAttribute("type","module")
     st.setAttribute("src","enocean-js/test.js")
@@ -44,23 +31,29 @@
     <input type="text" id="node-input-name">
   </div>
   <div class="form-row">
-    <label for="node-input-teachInDuration">TeachIn Duration</label>
-    <input type="number" id="node-input-teachInDuration">
-  </div>
-  <div class="form-row" style="display:none">
-    <label for="node-input-sensors" >Sensors</label>
-    <input type="hidden" id="node-input-sensors">
-  </div>
-  <div class="form-row">
-    <label><button id="eo-lrn-btn" >start</button></label>
-    <span id="eo-sensor-info">
-      <svg height="10px" style="width:calc(100% - 150px)">
-        <rect x="0" y="0" width="100%" stroke="red" height="10px" fill="blue"/>
-      </svg>
-    </span>
-  </div>
-  <div class="form-row">
     <sensor-list id="enocean-sensorlist"></sensor-list>
+  </div>
+  <div class="form-tips">
+    <b>automatic teach in: </b>just connect to a serialport. After implementing the flow, bring the node into *teach in* state and press **LRN Button** on the external device you want to pair.
+  </div>
+  <br/>
+  <div class="form-tips">
+    <b>manual teach in: </b>after connecting to a serialport, you can type in your sensors id and eep by hand.
+  </div>
+  <br/>
+  <div class="form-tips">
+    <b>direction</b> is only used in very rare cases. and usually does not have to be touched.<br/>
+    the following eep might need a direction setting other than 1:
+    <ul>
+     <li>a5-11-05</li>
+     <li>a5-20-01</li>
+     <li>a5-20-02</li>
+     <li>a5-20-03</li>
+     <li>a5-20-04</li>
+     <li>a5-20-10</li>
+     <li>a5-20-11</li>
+     <li>d2-a0-01</li>
+    </ul>
   </div>
 </script>
 

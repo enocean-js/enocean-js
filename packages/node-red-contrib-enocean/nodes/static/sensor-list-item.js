@@ -43,7 +43,6 @@ class SensorListItem extends LitElement {
     this.dispatchEvent(event)
   }
   async getInfo () {
-    console.log(this.eep)
     try {
       var info = await fetch('enocean-js/eep/' + this.eep)
       this.info = (await info.json()).title
