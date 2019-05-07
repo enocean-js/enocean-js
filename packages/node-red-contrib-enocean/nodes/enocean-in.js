@@ -5,7 +5,7 @@ module.exports = RED => {
     var eep = ctx.get('eep')
     var sid = ctx.get('senderId')
     setSensor(this, config, eep, sid)
-
+    this.name = config.name
     this.direction = config.direction
     this.serialport = config.serialport
     this.teachInStatus = false
@@ -43,7 +43,7 @@ function makeEnoceanListenerCallback (node) {
       setTimeout(() => node.status({ fill: 'green', shape: 'ring', text: node.senderId }), 100)
       node.send({
         payload: data.decode(node.eep, node.direction),
-        meta: makeMeta(data.senderId, node.eep, data)
+        meta: makeMeta(data.senderId, node.eep, data, node.name)
       })
     }
     if (node.teachInStatus === true) {
@@ -56,7 +56,7 @@ function makeEnoceanListenerCallback (node) {
             eep: data.teachInInfo.eep.toString(),
             manufacturer: data.teachInInfo.manufacturer
           },
-          meta: makeMeta(data.teachInInfo.senderId, data.teachInInfo.eep.toString(), data)
+          meta: makeMeta(data.teachInInfo.senderId, data.teachInInfo.eep.toString(), data, node.name)
         })
       }
     }
@@ -85,7 +85,7 @@ function saveSender (node, sender, eep) {
   node.context().set('senderId', sender)
 }
 
-function makeMeta (sender, eep, data) {
+function makeMeta (sender, eep, data, name) {
   return {
     senderId: sender,
     RORG: data.RORG,
@@ -94,7 +94,8 @@ function makeMeta (sender, eep, data) {
     payload: data.payload.toString(),
     subTelNum: data.subTelNum,
     raw: data.toString(),
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    name: name
   }
 }
 
