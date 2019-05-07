@@ -17,18 +17,18 @@ class SensorListItem extends LitElement {
       rssi: { type: Number }
     }
   }
-  async firstUpdated(changedProperties) {
+  async firstUpdated (changedProperties) {
     await this.getInfo()
   }
-  updated(changedProperties) {
+  updated (changedProperties) {
     changedProperties.forEach(async (oldVal, name) => {
-      if(name === "eep"){
+      if (name === 'eep') {
         await this.getInfo()
       }
-    });
+    })
   }
-  async change(evt){
-    let att = evt.target.getAttribute("data-att")
+  async change (evt) {
+    let att = evt.target.getAttribute('data-att')
     var oldValue = this[att]
     var newValue = evt.target.value
     this[att] = newValue
@@ -39,18 +39,18 @@ class SensorListItem extends LitElement {
         oldValue: oldValue,
         newValue: newValue
       }
-    });
-    this.dispatchEvent(event);
+    })
+    this.dispatchEvent(event)
   }
-  async getInfo(){
+  async getInfo () {
     console.log(this.eep)
-    try{
-      var info = await fetch("enocean-js/eep/" + this.eep)
+    try {
+      var info = await fetch('enocean-js/eep/' + this.eep)
       this.info = (await info.json()).title
-    }catch(err){
-      this.info = "unknown EEP"
+    } catch (err) {
+      this.info = 'unknown EEP'
     }
-this.requestUpdate()
+    this.requestUpdate()
   }
   render () {
     return html`

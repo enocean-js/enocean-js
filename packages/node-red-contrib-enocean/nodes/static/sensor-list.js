@@ -9,10 +9,10 @@ class SensorList extends LitElement {
   static get properties () {
     return {}
   }
-  listchanged(e){
-    this._items[e.target.senderId][e.detail.attribute]=e.detail.newValue
-    let event = new Event('change');
-    this.dispatchEvent(event);
+  listchanged (e) {
+    this._items[e.target.senderId][e.detail.attribute] = e.detail.newValue
+    let event = new Event('change')
+    this.dispatchEvent(event)
   }
   render () {
     return html`
@@ -23,9 +23,9 @@ class SensorList extends LitElement {
     </style>
     <div>
       ${Object.keys(this._items).map(key => {
-        var item = this._items[key]
-        return html`<sensor-list-item @updated="${this.listchanged}" name="${item.name ? item.name : ""}" senderId="${item.senderId}" eep="${item.eep}" rssi="${item.rssi}" info="${item.info}"></sensor-list-item>`
-      })}
+    var item = this._items[key]
+    return html`<sensor-list-item @updated="${this.listchanged}" name="${item.name ? item.name : ''}" senderId="${item.senderId}" eep="${item.eep}" rssi="${item.rssi}" info="${item.info}"></sensor-list-item>`
+  })}
     </div>`
   }
   addItem (item) {
@@ -34,9 +34,9 @@ class SensorList extends LitElement {
       this.requestUpdate()
     }
   }
-  getList(){
+  getList () {
     var ret = []
-    for(var id in this._items){
+    for (var id in this._items) {
       let item = this._items[id]
       ret.push({
         senderId: item.senderId,
