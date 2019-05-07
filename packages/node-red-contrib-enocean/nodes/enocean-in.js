@@ -5,7 +5,7 @@ module.exports = RED => {
     var eep = ctx.get('eep')
     var sid = ctx.get('senderId')
     setSensor(this, config, eep, sid)
-
+    this.name = config.name
     this.direction = config.direction
     this.serialport = config.serialport
     this.teachInStatus = false
@@ -88,7 +88,7 @@ function saveSender (node, sender, eep) {
   node.context().set('senderId', sender)
 }
 
-function makeMeta (sender, eep, data) {
+function makeMeta (sender, eep, data, name) {
   return {
     senderId: sender,
     RORG: data.RORG,
@@ -97,7 +97,8 @@ function makeMeta (sender, eep, data) {
     payload: data.payload.toString(),
     subTelNum: data.subTelNum,
     raw: data.toString(),
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    name: name
   }
 }
 
@@ -148,7 +149,11 @@ function makeLearner (node) {
 function makeInjectionable (node) {
   node.receive = function () {
     // this function gets called when the inject button is clicked
-    node.startTeachIn()
+    if (node.teachInStatus === true) {
+      node.stopTeachIn()
+    } else {
+      node.startTeachIn()
+    }
   }
   node.on('input', msg => {
     if (msg.payload === true) {
