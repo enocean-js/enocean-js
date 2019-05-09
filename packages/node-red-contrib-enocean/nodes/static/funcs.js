@@ -16,7 +16,7 @@ async function editprepare () {
   ctx.get('sensorList').forEach(item => {
     objSensorList.addItem(item)
   })
-  document.querySelector('#enocean-sensorlist').addEventListener("change",async e=>{
+  document.querySelector('#enocean-sensorlist').addEventListener('change', async e => {
     var res = await fetch(`/enocean-js/context/${node.id}/set/sensorList/${JSON.stringify(objSensorList.getList())}`)
   })
 }
