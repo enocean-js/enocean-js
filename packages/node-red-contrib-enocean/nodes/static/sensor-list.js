@@ -10,7 +10,7 @@ class SensorList extends LitElement {
     return {}
   }
   listchanged (e) {
-    this._items[e.target.senderId][e.detail.attribute] = e.detail.newValue
+    this._items[`${e.target.senderId}_${e.target.eep}`][e.detail.attribute] = e.detail.newValue
     let event = new Event('change')
     this.dispatchEvent(event)
   }
@@ -29,10 +29,8 @@ class SensorList extends LitElement {
     </div>`
   }
   addItem (item) {
-    if (!this._items.hasOwnProperty(item.senderId)) {
-      this._items[item.senderId] = item
-      this.requestUpdate()
-    }
+    this._items[`${item.senderId}_${item.eep}`] = item
+    this.requestUpdate()
   }
   getList () {
     var ret = []
