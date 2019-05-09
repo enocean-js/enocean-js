@@ -30,7 +30,7 @@ module.exports = RED => {
     res.send(getEEP(req.params.eep))
   })
   RED.httpAdmin.get('/enocean-js/context/:node/set/:name/:value', function (req, res) {
-    var ol = RED.nodes.getNode(req.params.node).context().set(req.params.name,JSON.parse(req.params.value))
+    RED.nodes.getNode(req.params.node).context().set(req.params.name, JSON.parse(req.params.value))
   })
   RED.httpAdmin.get('/enocean-js/:filename', function (req, res) {
     var options = {
