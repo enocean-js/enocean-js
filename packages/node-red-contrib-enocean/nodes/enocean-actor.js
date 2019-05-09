@@ -71,6 +71,8 @@ module.exports = RED => {
                   meta: makeMeta(item.senderId, item.eep, msg.payload, item.name, node.name)
                 })
               } else {
+                node.status({ fill: 'red', shape: 'dot', text: 'data' })
+                setTimeout(() => node.status({ fill: 'grey', shape: 'ring', text: 'data' }), 100)
                 node.warn(`received an unknown RORG (${msg.payload.RORG.toString(16)} instead of ${item.eep.split('-')[0]}) from a konwn Sensor (${item.senderId}).`)
               }
             })
