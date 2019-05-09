@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-enocean",
-  "version": "0.4.14",
+  "version": "0.5.0-alpha.1",
   "description": "an enocean node for node-red",
   "main": "enocean-node.js",
   "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
@@ -12,12 +12,14 @@
   "dependencies": {
     "serialport": "^7.1.5",
     "enocean-js": ">=0.0.1-beta.20",
-    "@enocean-js/radio-erp1": ">=0.0.1-beta.20"
+    "@enocean-js/radio-erp1": ">=0.0.1-beta.20",
+    "@enocean-js/eep-transcoder": ">=0.0.1-beta.20"
   },
   "node-red": {
     "nodes": {
       "enocean-config-node": "nodes/enocean-config-node.js",
       "enocean-in": "nodes/enocean-in.js",
+      "enocean-single-actor": "nodes/enocean-actor.js",
       "enocean-out": "nodes/enocean-out.js",
       "enocean-btn": "nodes/enocean-btn.js"
     }

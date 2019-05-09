@@ -4,6 +4,7 @@ const ESP3Transfomer = require('@enocean-js/esp3-packets').ESP3Transformer
 const SerialportSender = require('@enocean-js/serialport-sender').SerialportSender
 const Commander = require('@enocean-js/common-command').Commander
 const getEEP = require('@enocean-js/eep-transcoder').getEEP
+const path = require('path')
 
 module.exports = RED => {
   function EnOceanConfigNode (config) {
@@ -14,6 +15,7 @@ module.exports = RED => {
     makeTP(this)
     var node = this
     node.on('close', function (done) {
+      node.port.removeListener('error', errorHandler)
       node.port.close(done)
     })
     try {
@@ -25,22 +27,31 @@ module.exports = RED => {
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
 
   RED.httpAdmin.get('/enocean-js/eep/:eep', function (req, res) {
-    try {
-      res.send(getEEP(req.params.eep))
-    } catch (err) {
-      // console.log(req.params.eep)
-      res.send('')
-    }
+    res.send(getEEP(req.params.eep))
   })
+  RED.httpAdmin.get('/enocean-js/context/:node/set/:name/:value', function (req, res) {
+    var n = RED.nodes.getNode(req.params.node)
+    n.context().set(req.params.name, JSON.parse(req.params.value))
+    n.sensors = n.context().get(req.params.name)
+  })
+  RED.httpAdmin.get('/enocean-js/:filename', function (req, res) {
+    var options = {
+      root: path.join(__dirname, '/static/'),
+      dotfiles: 'deny'
+    }
+    res.sendFile(req.params.filename, options)
+  })
+}
+
+function errorHandler (err) {
+  if (err) {
+    this.warn('could not open port. Most likely you are trying to open the same port twice.')
+  }
 }
 
 function openPort (node) {
   node.port = new SerialPort(node.serialport, { baudRate: 57600 })
-  node.port.on('error', err => {
-    if (err) {
-      node.warn('could not open port. Most likely you are trying to open the same port twice.')
-    }
-  })
+  node.port.on('error', errorHandler.bind(node))
   makeCommander(node)
   node.port.pipe(node.parser).pipe(node.transformer)
   node.getBaseId()
