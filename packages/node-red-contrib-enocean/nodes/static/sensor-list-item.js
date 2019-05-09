@@ -27,7 +27,7 @@ class SensorListItem extends LitElement {
       }
     })
   }
-  async change (evt) {
+  async changeValue (evt) {
     let att = evt.target.getAttribute('data-att')
     var oldValue = this[att]
     var newValue = evt.target.value
@@ -69,39 +69,25 @@ class SensorListItem extends LitElement {
         border-color: #aaa; border-style: solid solid none solid; border-width:1px;
       }
       rssi-indicator {--fill-color: var(--rssi-fill-color,white);--empty-color:rgb(255,255,255,0);width:20px;height:20px}
-      input{height:25px; border:1px solid #bbb; border-radius: 3px; padding-left:5px; color: #555}
+      .value{ border:1px solid #bbb; border-radius: 3px; padding:5px; color: #333;margin:5px}
+      #senderId{ background: #99ff99}
+      #eep{ background: #ffff99}
       header input{height:15px; border-style: none; background:none; outline: none; width:420px;font-weight:bold}
       #info {font-size: 10px;line-height: 10px;color: #666; padding-left: 5px}
-      .body-row:{display: flex}
-      #main-body{padding:10px; border-color: #aaa; border-style: none solid solid solid; border-width:1px; border-radius:0 0 var(--br) var(--br); }
-      #senderId {padding-left:5px;font-weight:bold}
+      .body-row {display: flex; align-items: center}
+      #main-body{padding:5px; border-color: #aaa; border-style: none solid solid solid; border-width:1px; border-radius:0 0 var(--br) var(--br); }
       #altSenderId {font-size:0.7em; padding-left:5px}
       #body {display:flex;flex-direction: row}
       #rorg{
         border-radius:0 0 0 var(--br)
       }
-      .eep{
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:1em;
-        width:30px;
-        height:30px;
-      }
-      .c0, .f6 {background: #875fff; color: white}
-      .c1, .d5 {background: #6B8E23; color: white}
-      .c2, .a5 {background: #FFA500; color: black}
-      .c3, .d2 {background: #FFFF00; color: black}
-      .c4 {background: #00CED1; color: black}
-      .c5 {background: #69a5e7; color: white}
-      .c6 {background: #5dd65d; color: black}
-      .c7 {background: #505762; color: white}
-
+      #spacer{flex:1}
+      #delete_btn{cursor:pointer}
     </style>
     <div>
       <header>
         <div>
-          <input id="input-name" data-att="name" placeholder="No Name" @keyup="${this.change}" value="${this.name}"/>
+          <input id="input-name" data-att="name" placeholder="Type in a name here" @change="${this.changeValue}" value="${this.name}"/>
           <div id="info">
             ${this.info}
           </div>
@@ -110,10 +96,12 @@ class SensorListItem extends LitElement {
       </header>
       <div id="main-body">
         <div class="body-row">
-          <label for="input-id" >ID</label>
-          <input data-att="senderId" id="blablaid" @keyup="${this.change}" value="${this.senderId}"/>
-          <label for="input-eep">EEP</label>
-          <input data-att="eep" id="input-eep" @keyup="${this.change}" value="${this.eep}"/>
+          <label>ID</label>
+          <div class="value" id="senderId">${this.senderId}</div>
+          <label>EEP</label>
+          <div class="value" id="eep">${this.eep}</div>
+          <div id="spacer"></div>
+          <img id="delete_btn" src="enocean-js/delete.svg" width="16px" height="16px"/>
         </div>
 
       </div>
