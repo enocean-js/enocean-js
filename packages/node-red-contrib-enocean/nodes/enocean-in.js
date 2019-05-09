@@ -7,6 +7,8 @@ module.exports = RED => {
     var node = this
     makeStateRefreshable(node, RED)
     EnoceanListener(node, data => {
+      node.status({ fill: 'green', shape: 'dot', text: 'data' })
+      setTimeout(() => node.status({ fill: 'green', shape: 'ring', text: 'data' }), 100)
       node.send({
         payload: data
       })
@@ -29,7 +31,7 @@ function makeStateRefreshable (node, red) {
     if (usb.baseId === '') {
       node.status({ fill: 'red', shape: 'dot', text: 'error: no baseId' })
     } else {
-      node.status({ fill: 'green', shape: 'dot', text: 'connected' })
+      node.status({ fill: 'green', shape: 'ring', text: 'data' })
     }
   }
 }
