@@ -15,6 +15,7 @@ module.exports = RED => {
     makeTP(this)
     var node = this
     node.on('close', function (done) {
+      node.port.removeListener('error', errorHandler)
       node.port.close(done)
     })
     try {
@@ -37,13 +38,15 @@ module.exports = RED => {
   })
 }
 
+function errorHandler (err) {
+  if (err) {
+    this.warn('could not open port. Most likely you are trying to open the same port twice.')
+  }
+}
+
 function openPort (node) {
   node.port = new SerialPort(node.serialport, { baudRate: 57600 })
-  node.port.on('error', err => {
-    if (err) {
-      node.warn('could not open port. Most likely you are trying to open the same port twice.')
-    }
-  })
+  node.port.on('error', errorHandler.bind(node))
   makeCommander(node)
   node.port.pipe(node.parser).pipe(node.transformer)
   node.getBaseId()
