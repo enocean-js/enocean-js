@@ -34,7 +34,7 @@
 </script>
 
 <script type="text/x-red" data-help-name="enocean-actor">
-  <p>this is a node to listen to incomming enocean telegrams.</p>
+  <p>this node is used to decode incomming telegrams</p>
   <h3>Output</h3>
     <dl class="message-properties">
       <dt>payload
@@ -48,15 +48,6 @@
       </dt>
       <dd>meta information about the telegram. Here you can find the RSSI, senderId, the raw payload, a timestamp etc.</dd>
     </dl>
-  <h3>Button</h3>
-    <dl class="message-properties">
-      <dt>click
-        <span class="property-type">event</span>
-      </dt>
-      <dd> set the node into the *teach in* state. you can now send **LRN Telegrams** from your device, and the sender and device will be paired (after succesfull pairing the nodes state becomes green and shows the external sensors id) </dd>
-    </dl>
-  <h3>Details</h3>
-   <p>
-     to receive some data you have to first teach in a sensor. this can be done either manually or automatically by sending an **LRN Telegram** from your device.
-   </p>
+  <h3>Input</h3>
+    TODO
 </script>
