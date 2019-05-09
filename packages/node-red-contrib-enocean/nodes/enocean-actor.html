@@ -21,9 +21,7 @@
     st.setAttribute("type","module")
     st.setAttribute("src","enocean-js/test.js")
     document.body.appendChild(st)
-
 </script>
-
 
 <script type="text/x-red" data-template-name="enocean-actor">
   <div class="form-row">
@@ -32,28 +30,6 @@
   </div>
   <div class="form-row">
     <sensor-list id="enocean-sensorlist"></sensor-list>
-  </div>
-  <div class="form-tips">
-    <b>automatic teach in: </b>just connect to a serialport. After implementing the flow, bring the node into *teach in* state and press **LRN Button** on the external device you want to pair.
-  </div>
-  <br/>
-  <div class="form-tips">
-    <b>manual teach in: </b>after connecting to a serialport, you can type in your sensors id and eep by hand.
-  </div>
-  <br/>
-  <div class="form-tips">
-    <b>direction</b> is only used in very rare cases. and usually does not have to be touched.<br/>
-    the following eep might need a direction setting other than 1:
-    <ul>
-     <li>a5-11-05</li>
-     <li>a5-20-01</li>
-     <li>a5-20-02</li>
-     <li>a5-20-03</li>
-     <li>a5-20-04</li>
-     <li>a5-20-10</li>
-     <li>a5-20-11</li>
-     <li>d2-a0-01</li>
-    </ul>
   </div>
 </script>
 
