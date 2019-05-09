@@ -27,7 +27,7 @@ class SensorListItem extends LitElement {
       }
     })
   }
-  deleteSelf(){
+  deleteSelf () {
     let event = new CustomEvent('request_delete', {
       detail: {
         message: `please delete me`,
