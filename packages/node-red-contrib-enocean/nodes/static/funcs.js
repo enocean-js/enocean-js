@@ -12,7 +12,11 @@ async function getContext (nodeID) {
 async function editprepare () {
   var node = this
   var ctx = await getContext(node.id)
+  var objSensorList = document.querySelector('#enocean-sensorlist')
   ctx.get('sensorList').forEach(item => {
-    document.querySelector('#enocean-sensorlist').addItem(item)
+    objSensorList.addItem(item)
+  })
+  document.querySelector('#enocean-sensorlist').addEventListener("change",async e=>{
+    var res = await fetch(`/enocean-js/context/${node.id}/set/sensorList/${JSON.stringify(objSensorList.getList())}`)
   })
 }
