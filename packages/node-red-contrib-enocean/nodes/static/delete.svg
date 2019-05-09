@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="32" height="32"
+     viewBox="0 0 100 100 " >
+     <linearGradient id="lg1" gradientTransform="rotate(45)">
+       <stop offset="0" stop-color="firebrick"/>
+       <stop offset="1" stop-color="darkred"/>
+     </linearGradient>
+     <linearGradient id="lg2" gradientTransform="rotate(90)">
+       <stop offset="0" stop-color="white"/>
+       <stop offset="0.2" stop-color="white" stop-opacity="0.5"/>
+       <stop offset="1" stop-color="white" stop-opacity="0"/>
+     </linearGradient>
+     <linearGradient id="lg3" x1="0" y1="1" x2="0" y2="0">
+       <stop offset="0" stop-color="#500"/>
+       <stop offset="0.2" stop-color="#500" stop-opacity="0.5"/>
+       <stop offset="1" stop-color="#500" stop-opacity="0"/>
+     </linearGradient>
+     <circle cx="50" cy="50" r="47" fill="url(#lg1)"/>
+     <g transform ="rotate(45,50,50)" >
+       <rect x="15" y="40" width="70" height="20" fill="white"/>
+       <rect y="15" x="40" height="70" width="20" fill="white"/>
+     </g>
+     <circle cx="50" cy="50" r="45" fill="url(#lg2)"/>
+     <ellipse cx="50" cy="85" rx="25" ry="10" fill="url(#lg3)"/>
+</svg>
