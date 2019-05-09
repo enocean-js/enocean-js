@@ -14,6 +14,13 @@ class SensorList extends LitElement {
     let event = new Event('change')
     this.dispatchEvent(event)
   }
+  deleteItem(e) {
+    delete this._items[e.detail.id]
+    console.log(this._item)
+    let event = new Event('change')
+    this.dispatchEvent(event)
+    this.requestUpdate()
+  }
   render () {
     return html`
     <style>
@@ -24,7 +31,7 @@ class SensorList extends LitElement {
     <div>
       ${Object.keys(this._items).map(key => {
     var item = this._items[key]
-    return html`<sensor-list-item @updated="${this.listchanged}" name="${item.name ? item.name : ''}" senderId="${item.senderId}" eep="${item.eep}" rssi="${item.rssi}" info="${item.info}"></sensor-list-item>`
+    return html`<sensor-list-item @request_delete="${this.deleteItem}" @updated="${this.listchanged}" name="${item.name ? item.name : ''}" senderId="${item.senderId}" eep="${item.eep}" rssi="${item.rssi}" info="${item.info}"></sensor-list-item>`
   })}
     </div>`
   }

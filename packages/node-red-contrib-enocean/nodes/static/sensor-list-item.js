@@ -27,6 +27,15 @@ class SensorListItem extends LitElement {
       }
     })
   }
+  deleteSelf(){
+    let event = new CustomEvent('request_delete', {
+      detail: {
+        message: `please delete me`,
+        id: `${this.senderId}_${this.eep}`
+      }
+    })
+    this.dispatchEvent(event)
+  }
   async changeValue (evt) {
     let att = evt.target.getAttribute('data-att')
     var oldValue = this[att]
@@ -101,7 +110,7 @@ class SensorListItem extends LitElement {
           <label>EEP</label>
           <div class="value" id="eep">${this.eep}</div>
           <div id="spacer"></div>
-          <img id="delete_btn" src="enocean-js/delete.svg" width="16px" height="16px"/>
+          <img id="delete_btn" @click="${this.deleteSelf}" src="enocean-js/delete.svg" width="16px" height="16px"/>
         </div>
 
       </div>
