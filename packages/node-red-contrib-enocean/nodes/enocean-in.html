@@ -18,39 +18,7 @@
             return this.name || this.senderId || "input";
         },
         paletteLabel: 'input',
-        labelStyle: 'enocean-node',
-        oneditprepare:async function(){
-          // var node = this
-          // async function getEEP(eep){
-          //   var info = ""
-          //   try{
-          //     var res = await fetch(`/enocean-js/eep/${eep}`)
-          //     info = await res.json()
-          //   }catch(err){
-          //     info = {title:"unknown EEP"}
-          //   }
-          //   return info
-          // }
-          // document.querySelector("#node-input-eep").addEventListener("keyup",async (e)=>{
-          //   var res = await getEEP($("#node-input-eep").val())
-          //   $("#node-eep-info").text(res.title)
-          // })
-          // var res = await fetch("/context/node/"+this.id)
-          // var json = await res.json()
-          // try{
-          //   var eep = json.default.eep.msg
-          //   var sid = json.default.senderId.msg
-          // }catch(err){
-          //   var eep = this.eep
-          //   var sid = this.senderId
-          // }
-          // var realeep = this.eep !== "" ? this.eep : eep
-          // var res = await getEEP(realeep)
-          // this.info = res.title
-          // $("#node-eep-info").text(this.info)
-          // $("#node-input-senderId").attr("placeholder",sid)
-          // $("#node-input-eep").attr("placeholder",eep)
-        }
+        labelStyle: 'enocean-node'
     });
 </script>
 
