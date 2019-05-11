@@ -1,5 +1,5 @@
 // const getEEP = require('@enocean-js/eep-transcoder').getEEP
-
+const RadioERP1 = require('@enocean-js/radio-erp1').RadioERP1
 module.exports = RED => {
   function EnoceanActorNode (config) {
     RED.nodes.createNode(this, config)
@@ -13,7 +13,8 @@ module.exports = RED => {
     }
     this.sensors = this.context().get('sensorList')
     var node = this
-    this.on('input', async function (msg) {
+    this.on('input', async function (m) {
+      var msg = m
       if (msg.payload.type && msg.payload.type === 'LRN' && msg.payload.duration) {
         node.startTeachIn(msg.payload.duration)
         return
@@ -42,6 +43,9 @@ module.exports = RED => {
         node.context().set('sensorList', node.sensors)
         return
       }
+      if (msg.payload.type && msg.payload.type === 'data') {
+        msg.payload = RadioERP1.from(m.payload.data)
+      }
       if (node.teachOutStatus === true) {
         if (msg.payload.teachIn) {
           let tei = msg.payload.teachInInfo
@@ -52,6 +56,7 @@ module.exports = RED => {
         }
       }
       if (node.teachInStatus === true) {
+        console.log('payload', msg.payload.teachIn)
         if (msg.payload.teachIn) {
           let tei = msg.payload.teachInInfo
           if (!node.sensors.find(item => (item.senderId === tei.senderId && item.eep === tei.eep.toString()))) {
