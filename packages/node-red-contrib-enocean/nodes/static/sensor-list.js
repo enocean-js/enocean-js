@@ -16,7 +16,6 @@ class SensorList extends LitElement {
   }
   deleteItem (e) {
     delete this._items[e.detail.id]
-    console.log(this._item)
     let event = new Event('change')
     this.dispatchEvent(event)
     this.requestUpdate()
