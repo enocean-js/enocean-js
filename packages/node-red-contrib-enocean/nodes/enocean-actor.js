@@ -56,7 +56,6 @@ module.exports = RED => {
         }
       }
       if (node.teachInStatus === true) {
-        console.log('payload', msg.payload.teachIn)
         if (msg.payload.teachIn) {
           let tei = msg.payload.teachInInfo
           if (!node.sensors.find(item => (item.senderId === tei.senderId && item.eep === tei.eep.toString()))) {
