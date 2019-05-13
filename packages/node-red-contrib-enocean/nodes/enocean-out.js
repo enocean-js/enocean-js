@@ -3,10 +3,7 @@ const Response = require('@enocean-js/esp3-packets').Response
 module.exports = RED => {
   function EnOceanOutputNode (config) {
     RED.nodes.createNode(this, config)
-    this.eep = config.eep
-    this.offset = config.offset
-    this.direction = config.direction
-    this.data = config.data
+    this.logOutput = config.logOutput
     this.serialport = RED.nodes.getNode(config.serialport)
     var node = this
     node.on('input', async function (msg) {
@@ -28,6 +25,12 @@ module.exports = RED => {
         var res = Response.from(ret)
         if (res.responseType !== 'RET_OK') {
           node.warn(res.responseType)
+        }
+        console.log(node.logOutput)
+        if (node.logOutput) {
+          node.send({
+            payload: tel.toString()
+          })
         }
       }
     })
