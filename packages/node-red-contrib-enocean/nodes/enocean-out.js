@@ -26,7 +26,7 @@ module.exports = RED => {
         tel.teachIn = false
         var ret = await node.serialport.sender.send(tel.toString())
         var res = Response.from(ret)
-        if(res.responseType !== "RET_OK"){
+        if (res.responseType !== 'RET_OK') {
           node.warn(res.responseType)
         }
       }

@@ -12,9 +12,15 @@ module.exports = RED => {
       if (data.constructor.name === 'RadioERP1') {
         // TODO: cast to concrete types on receivers end
         node.send({
-          payload:  data.toString(),
-          meta:{
+          payload: data.toString(),
+          meta: {
             type: 'radio-erp1',
+            rorg: data.RORG,
+            senderId: data.senderId,
+            destinationId: data.destinationId,
+            subTelNum: data.subTelNum,
+            rssi: data.RSSI,
+            timestamp: Date.now()
           }
         })
       }
