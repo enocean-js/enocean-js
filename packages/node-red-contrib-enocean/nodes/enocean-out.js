@@ -26,7 +26,7 @@ module.exports = RED => {
         if (res.responseType !== 'RET_OK') {
           node.warn(res.responseType)
         }
-        if(node.logOutput){
+        if (node.logOutput) {
           node.send({
             payload: tel.toString()
           })
