@@ -43,8 +43,8 @@ module.exports = RED => {
         node.context().set('sensorList', node.sensors)
         return
       }
-      if (msg.payload.type && msg.payload.type === 'data') {
-        msg.payload = RadioERP1.from(m.payload.data)
+      if (msg.meta.type && msg.meta.type === 'radio-erp1') {
+        msg.payload = RadioERP1.from(m.payload)
       }
       if (node.teachOutStatus === true) {
         if (msg.payload.teachIn) {
