@@ -25,7 +25,14 @@ module.exports = RED => {
     }
   }
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
-
+  RED.httpAdmin.get('/enocean-js/info/:node/baseid/', function (req, res) {
+    try {
+      var node = RED.nodes.getNode(req.params.node)
+      res.send({ baseId: node.serialport.baseId })
+    } catch (err) {
+      res.send({ baseId: 'unknown' })
+    }
+  })
   RED.httpAdmin.get('/enocean-js/eep/:eep', function (req, res) {
     res.send(getEEP(req.params.eep))
   })
