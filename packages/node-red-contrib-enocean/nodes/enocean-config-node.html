@@ -6,6 +6,16 @@
     },
     label: function () {
       return this.serialport;
+    },
+    oneditprepare: async function(){
+      var portListResponse = await fetch("/enocean-js/port/list")
+      var portList = await portListResponse.json()
+      var opt = portList.map(item=>{
+        var option = document.createElement("option")
+        option.setAttribute("value",item.comName)
+        option.appendChild(document.createTextNode(`${item.comName} (${item.manufacturer})`))
+        document.querySelector("#node-config-input-serialport").appendChild(option)
+      })
     }
   });
 </script>
@@ -14,7 +24,7 @@
   data-template-name="enocean-config-node">
   <div class="form-row">
     <label for="node-config-input-serialport"><i class="icon-bookmark"></i> Serialport</label>
-    <input type="text"
-      id="node-config-input-serialport">
+    <select id="node-config-input-serialport">
+    </select>
   </div>
 </script>

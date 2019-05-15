@@ -34,9 +34,9 @@ module.exports = RED => {
       res.send({ baseId: 'unknown' })
     }
   })
-  // RED.httpAdmin.get('/enocean-js/port/list', async function (req, res) {
-  //   res.send(await SerialPort.list())
-  // })
+  RED.httpAdmin.get('/enocean-js/port/list', async function (req, res) {
+    res.send(await SerialPort.list())
+  })
   RED.httpAdmin.get('/enocean-js/eep/:eep', function (req, res) {
     res.send(getEEP(req.params.eep))
   })
