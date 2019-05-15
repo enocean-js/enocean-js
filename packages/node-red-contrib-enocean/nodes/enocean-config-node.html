@@ -13,6 +13,9 @@
       var opt = portList.map(item=>{
         var option = document.createElement("option")
         option.setAttribute("value",item.comName)
+        if(item.comName === this.serialport){
+          option.setAttribute("selected","selected")
+        }
         option.appendChild(document.createTextNode(`${item.comName} (${item.manufacturer})`))
         document.querySelector("#node-config-input-serialport").appendChild(option)
       })
