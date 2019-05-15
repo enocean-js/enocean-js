@@ -7,6 +7,12 @@ module.exports = RED => {
     this.serialport = RED.nodes.getNode(config.serialport)
     var node = this
     node.on('input', async function (msg) {
+      if (node.serialport.baseId === '') {
+        var suc = await node.serialport.getBaseId(node)
+        if (!suc) {
+          return
+        }
+      }
       if (typeof msg.payload === 'string') {
         await enoSend(node, msg.payload)
         return
