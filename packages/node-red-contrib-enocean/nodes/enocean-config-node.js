@@ -17,6 +17,7 @@ module.exports = RED => {
     node.on('close', function (done) {
       node.port.removeListener('error', errorHandler)
       node.port.close(done)
+      node.log('port closed')
     })
     try {
       openPort(node)
@@ -25,7 +26,17 @@ module.exports = RED => {
     }
   }
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
-
+  RED.httpAdmin.get('/enocean-js/info/:node/baseid/', function (req, res) {
+    try {
+      var node = RED.nodes.getNode(req.params.node)
+      res.send({ baseId: node.serialport.baseId })
+    } catch (err) {
+      res.send({ baseId: 'unknown' })
+    }
+  })
+  RED.httpAdmin.get('/enocean-js/port/list', async function (req, res) {
+    res.send(await SerialPort.list())
+  })
   RED.httpAdmin.get('/enocean-js/eep/:eep', function (req, res) {
     res.send(getEEP(req.params.eep))
   })
@@ -45,16 +56,24 @@ module.exports = RED => {
 
 function errorHandler (err) {
   if (err) {
-    this.warn('could not open port. Most likely you are trying to open the same port twice.')
+    this.warn(err)
   }
 }
 
-function openPort (node) {
-  node.port = new SerialPort(node.serialport, { baudRate: 57600 })
+async function openPort (node) {
+  node.port = new SerialPort(node.serialport, { baudRate: 57600, autoOpen: false })
+  node.port.open(async err => {
+    if (err) {
+      node.warn(err)
+    } else {
+      node.log('port opened')
+      await node.getBaseId()
+      node.log(`Your BaseID is ${node.baseId.toString(16)}`)
+    }
+  })
   node.port.on('error', errorHandler.bind(node))
   makeCommander(node)
   node.port.pipe(node.parser).pipe(node.transformer)
-  node.getBaseId()
 }
 
 function makeTP (node) {
@@ -67,14 +86,20 @@ function makeCommander (node) {
   node.commander = new Commander(node.sender)
   node.getBaseId = async function (x) {
     try {
-      var res = await node.commander.getIdBase()
-      node.baseId = parseInt(res.baseId.toString(), 16)
-      if (x) {
-        x.refreshState()
+      if (node.port.isOpen) {
+        var res = await node.commander.getIdBase()
+        node.baseId = parseInt(res.baseId.toString(), 16)
+        if (x) {
+          x.refreshState()
+        }
+        return true
+      } else {
+        node.warn('port is not open')
+        return false
       }
     } catch (err) {
       console.log(err)
-      node.error('could not get Base ID')
+      return false
     }
   }
 }

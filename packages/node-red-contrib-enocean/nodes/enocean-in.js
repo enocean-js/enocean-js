@@ -12,9 +12,15 @@ module.exports = RED => {
       if (data.constructor.name === 'RadioERP1') {
         // TODO: cast to concrete types on receivers end
         node.send({
-          payload: {
-            type: 'data',
-            data: data.toString()
+          payload: data.toString(),
+          meta: {
+            type: 'radio-erp1',
+            rorg: data.RORG,
+            senderId: data.senderId,
+            destinationId: data.destinationId,
+            subTelNum: data.subTelNum,
+            rssi: data.RSSI,
+            timestamp: Date.now()
           }
         })
       }
@@ -23,9 +29,6 @@ module.exports = RED => {
 
   async function EnoceanListener (node, cb) {
     const usb = RED.nodes.getNode(node.serialport)
-    if (usb.baseId === '') {
-      await usb.getBaseId(node)
-    }
     usb.transformer.on('data', cb)
   }
   RED.nodes.registerType('enocean-in', EnoceanInNode)

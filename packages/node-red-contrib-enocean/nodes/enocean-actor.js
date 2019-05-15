@@ -43,8 +43,8 @@ module.exports = RED => {
         node.context().set('sensorList', node.sensors)
         return
       }
-      if (msg.payload.type && msg.payload.type === 'data') {
-        msg.payload = RadioERP1.from(m.payload.data)
+      if (msg.meta.type && msg.meta.type === 'radio-erp1') {
+        msg.payload = RadioERP1.from(m.payload)
       }
       if (node.teachOutStatus === true) {
         if (msg.payload.teachIn) {
@@ -72,7 +72,7 @@ module.exports = RED => {
                 setTimeout(() => node.status({ fill: 'grey', shape: 'ring', text: 'data' }), 100)
                 node.send({
                   payload: msg.payload.decode(item.eep, item.direction),
-                  meta: makeMeta(item.senderId, item.eep, msg.payload, item.name, node.name)
+                  meta: makeMeta(item.senderId, item.eep, msg.payload, item.name, node.name, msg)
                 })
               } else {
                 node.status({ fill: 'red', shape: 'dot', text: 'data' })
@@ -162,17 +162,11 @@ function startTeachOut (dur) {
   }, dur * 1000)
 }
 
-function makeMeta (sender, eep, data, name, group) {
-  return {
-    senderId: sender,
-    RORG: data.RORG,
-    eep: eep,
-    RSSI: data.RSSI,
-    payload: data.payload.toString(),
-    subTelNum: data.subTelNum,
-    raw: data.toString(),
-    timestamp: Date.now(),
-    name: name,
-    actorName: group
-  }
+function makeMeta (sender, eep, data, name, group, msg) {
+  msg.meta.eep = eep
+  msg.meta.payload = data.payload.toString()
+  msg.raw = data.toString()
+  msg.meta.name = name
+  msg.meta.actorName = group
+  return msg.meta
 }

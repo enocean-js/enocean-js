@@ -8,9 +8,13 @@
           },
           name: {
             value: ""
+          },
+          logOutput:{
+            value: false
           }
         },
         inputs:1,
+        outputs: 1,
         color: '#99ff99', // #ffff99 #99ff99 #99ccff
         icon: "enocean-js-white.svg",
         align: 'right',
@@ -18,7 +22,12 @@
             return this.name || "output";
         },
         paletteLabel: 'output',
-        labelStyle: 'enocean-node'
+        labelStyle: 'enocean-node',
+        oneditprepare : async function(){
+          var res = await fetch(`/enocean-js/info/${this.id}/baseid`)
+          var id = await res.json()
+          $("#enocean-base-id").text(id.baseId.toString(16))
+        }
     });
 </script>
 
@@ -30,6 +39,14 @@
   <div class="form-row">
     <label for="node-input-name">Name</label>
     <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-logOutput">Log output</label>
+    <input type="checkbox" id="node-input-logOutput"  style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
+  <div class="form-row">
+    <label>Base ID</label>
+    <span id="enocean-base-id"></span>
   </div>
 </script>
 
