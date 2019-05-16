@@ -13,11 +13,8 @@
       var opt = portList.map(item=>{
         var option = document.createElement("option")
         option.setAttribute("value",item.comName)
-        if(item.comName === this.serialport){
-          option.setAttribute("selected","selected")
-        }
         option.appendChild(document.createTextNode(`${item.comName} (${item.manufacturer})`))
-        document.querySelector("#node-config-input-serialport").appendChild(option)
+        document.querySelector("#eno-serialports").appendChild(option)
       })
     }
   });
@@ -27,7 +24,9 @@
   data-template-name="enocean-config-node">
   <div class="form-row">
     <label for="node-config-input-serialport"><i class="icon-bookmark"></i> Serialport</label>
-    <select id="node-config-input-serialport">
+    <input type="text" id="node-config-input-serialport" list="eno-serialports" >
+    <datalist id="eno-serialports">
+    </datalist>
     </select>
   </div>
 </script>
