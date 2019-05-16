@@ -15,6 +15,12 @@ module.exports = RED => {
     var node = this
     this.on('input', async function (m) {
       var msg = m
+      if (msg.payload.eep) {
+        msg.payload.eep = msg.payload.eep.toLowerCase()
+      }
+      if (msg.payload.senderId) {
+        msg.payload.senderId = msg.payload.senderId.toLowerCase()
+      }
       if (msg.payload.type && msg.payload.type === 'LRN' && msg.payload.duration) {
         node.startTeachIn(msg.payload.duration)
         return

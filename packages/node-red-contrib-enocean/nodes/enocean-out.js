@@ -18,6 +18,11 @@ module.exports = RED => {
         return
       }
       var senderId = this.serialport.baseId + parseInt(msg.payload.meta.channel)
+      msg.payload.meta.eep = msg.payload.meta.eep.toLowerCase()
+      for (var field in msg.payload.data) {
+        msg.payload.data[field.toUpperCase()] = msg.payload.data[field]
+        delete msg.payload.data[field]
+      }
       if (msg.payload.meta.type === 'teach-in') {
         // send teach-in
         var te = RadioERP1.makeTeachIn({ type: msg.payload['teach-in'].type, eep: msg.payload.meta.eep, senderId: senderId })
