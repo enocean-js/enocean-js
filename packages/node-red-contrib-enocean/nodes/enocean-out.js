@@ -30,13 +30,17 @@ module.exports = RED => {
         await enoSend(node, te.toString())
         // followed by a data telegram
         var tel0 = RadioERP1.from({ rorg: parseInt(msg.payload.meta.eep.split('-')[0], 16), eep: msg.payload.meta.eep, payload: [0], id: senderId, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
-        tel0.teachIn = false
+        if(msg.payload.meta.eep.split("-")[0]!=="f6"){
+          tel0.teachIn = false
+        }
         tel0.encode(msg.payload.data, { eep: msg.payload.meta.eep, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
         await enoSend(node, tel0.toString())
       } else {
         var tel = RadioERP1.from({ rorg: parseInt(msg.payload.meta.eep.split('-')[0], 16), eep: msg.payload.meta.eep, payload: [0], id: senderId, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
         tel.encode(msg.payload.data, { eep: msg.payload.meta.eep, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
-        tel.teachIn = false
+        if(msg.payload.meta.eep.split("-")[0]!=="f6"){
+          tel0.teachIn = false
+        }
         await enoSend(node, tel.toString())
       }
     })
