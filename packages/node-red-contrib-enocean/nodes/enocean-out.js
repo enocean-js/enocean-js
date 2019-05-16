@@ -24,7 +24,6 @@ module.exports = RED => {
         delete msg.payload.data[field]
         msg.payload.data[field.toUpperCase()] = val
       }
-      console.log(msg)
       if (msg.payload.meta.type === 'teach-in') {
         // send teach-in
         var te = RadioERP1.makeTeachIn({ type: msg.payload['teach-in'].type, eep: msg.payload.meta.eep, senderId: senderId })
