@@ -40,6 +40,8 @@
     "express": "^4.16.4",
     "express-rate-limit": "^3.5.0",
     "mocha": "^6.1.4",
+    "node-red": "^0.20.5",
+    "node-red-node-test-helper": "^0.2.2",
     "nyc": "^14.0.0",
     "serialport": "^7.1.5",
     "sinon": "^7.2.0",
