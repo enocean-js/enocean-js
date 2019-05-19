@@ -47,7 +47,7 @@ module.exports = RED => {
         if (msg.payload.meta.eep.split('-')[0] !== 'f6' && msg.payload.meta.eep.split('-')[0] !== 'd2') {
           tel.teachIn = false
         }
-        tel.destinationId = msg.payload.meta.destinationId || "ffffffff"
+        tel.destinationId = msg.payload.meta.destinationId || 'ffffffff'
         await enoSend(node, tel.toString())
       }
     })

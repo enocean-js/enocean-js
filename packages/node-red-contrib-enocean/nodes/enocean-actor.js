@@ -67,21 +67,21 @@ module.exports = RED => {
       if (node.teachInStatus === true) {
         if (msg.payload.teachIn) {
           let tei = msg.payload.teachInInfo
-          if(tei.responseExpected === 0){
-            //var ret = RadioERP1.makeTeachIn()
-            node.send([null,{
-              payload:{
+          if (tei.responseExpected === 0) {
+            // var ret = RadioERP1.makeTeachIn()
+            node.send([null, {
+              payload: {
                 data: {
                   type: 'UTE',
                   requestPayload: msg.payload.payload,
                   bidi: EO.UTE_BIDIRECTIONAL,
                   result: EO.UTE_TEACH_IN_SUCCESSFULL,
                   cmd: EO.UTE_CMD_RESPONSE,
-                  destinationId: tei.senderId,
+                  destinationId: tei.senderId
                 },
-                meta:{
-                  "type": "teach-in-response",
-                  "channel": node.channel
+                meta: {
+                  'type': 'teach-in-response',
+                  'channel': node.channel
                 }
               }
             }])
@@ -101,7 +101,7 @@ module.exports = RED => {
                 node.send([{
                   payload: msg.payload.decode(item.eep, item.direction),
                   meta: makeMeta(item.senderId, item.eep, msg.payload, item.name, node.name, msg)
-                },null])
+                }, null])
               } else {
                 node.status({ fill: 'red', shape: 'dot', text: 'data' })
                 setTimeout(() => node.status({ fill: 'grey', shape: 'ring', text: 'data' }), 100)
