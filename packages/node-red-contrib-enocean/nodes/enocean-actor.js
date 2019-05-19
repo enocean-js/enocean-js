@@ -1,10 +1,13 @@
 // const getEEP = require('@enocean-js/eep-transcoder').getEEP
 const RadioERP1 = require('@enocean-js/radio-erp1').RadioERP1
+const EO = require('@enocean-js/radio-erp1')
+
 module.exports = RED => {
   function EnoceanActorNode (config) {
     RED.nodes.createNode(this, config)
     this.duration = config.teachInDuration
     this.name = config.name
+    this.channel = config.channel
     this.teachInStatus = false
     this.teachOutStatus = false
     this.status({ fill: 'grey', shape: 'ring', text: 'data' })
@@ -64,6 +67,25 @@ module.exports = RED => {
       if (node.teachInStatus === true) {
         if (msg.payload.teachIn) {
           let tei = msg.payload.teachInInfo
+          if (tei.responseExpected === 0) {
+            // var ret = RadioERP1.makeTeachIn()
+            node.send([null, {
+              payload: {
+                data: {
+                  type: 'UTE',
+                  requestPayload: msg.payload.payload,
+                  bidi: EO.UTE_BIDIRECTIONAL,
+                  result: EO.UTE_TEACH_IN_SUCCESSFULL,
+                  cmd: EO.UTE_CMD_RESPONSE,
+                  destinationId: tei.senderId
+                },
+                meta: {
+                  'type': 'teach-in-response',
+                  'channel': node.channel
+                }
+              }
+            }])
+          }
           if (!node.sensors.find(item => (item.senderId === tei.senderId && item.eep === tei.eep.toString()))) {
             saveSensor(node, tei.senderId, tei.eep.toString(), msg.payload.RSSI)
             node.stopTeachIn()
@@ -76,10 +98,10 @@ module.exports = RED => {
               if (item.eep.split('-')[0] === msg.payload.RORG.toString(16)) {
                 node.status({ fill: 'green', shape: 'dot', text: 'data' })
                 setTimeout(() => node.status({ fill: 'grey', shape: 'ring', text: 'data' }), 100)
-                node.send({
+                node.send([{
                   payload: msg.payload.decode(item.eep, item.direction),
                   meta: makeMeta(item.senderId, item.eep, msg.payload, item.name, node.name, msg)
-                })
+                }, null])
               } else {
                 node.status({ fill: 'red', shape: 'dot', text: 'data' })
                 setTimeout(() => node.status({ fill: 'grey', shape: 'ring', text: 'data' }), 100)

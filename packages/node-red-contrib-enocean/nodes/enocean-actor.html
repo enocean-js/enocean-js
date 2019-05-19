@@ -5,9 +5,13 @@
         defaults: {
           name:{
             value:""
+          },
+          channel:{
+            value: 1
           }
         },
-        outputs: 1,
+        outputs: 2,
+        outputLabels:["data","teachIn Response"],
         inputs: 1,
         color: '#99ccff',
         icon: "enocean-js-white.svg",
@@ -27,6 +31,10 @@
   <div class="form-row">
     <label for="node-input-name">Name</label>
     <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-channel">Channel</label>
+    <input type="text" id="node-input-channel">
   </div>
   <div class="form-row">
     <sensor-list id="enocean-sensorlist"></sensor-list>

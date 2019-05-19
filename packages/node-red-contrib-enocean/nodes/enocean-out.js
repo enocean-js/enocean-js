@@ -18,6 +18,12 @@ module.exports = RED => {
         return
       }
       var senderId = this.serialport.baseId + parseInt(msg.payload.meta.channel)
+      if (msg.payload.meta.type === 'teach-in-response') {
+        msg.payload.data.senderId = senderId
+        var ret = RadioERP1.makeTeachIn(msg.payload.data)
+        await enoSend(node, ret.toString())
+        return
+      }
       msg.payload.meta.eep = msg.payload.meta.eep.toLowerCase()
       for (var field in msg.payload.data) {
         var val = msg.payload.data[field]
@@ -30,7 +36,7 @@ module.exports = RED => {
         await enoSend(node, te.toString())
         // followed by a data telegram
         var tel0 = RadioERP1.from({ rorg: parseInt(msg.payload.meta.eep.split('-')[0], 16), eep: msg.payload.meta.eep, payload: [0], id: senderId, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
-        if (msg.payload.meta.eep.split('-')[0] !== 'f6') {
+        if (msg.payload.meta.eep.split('-')[0] !== 'f6' && msg.payload.meta.eep.split('-')[0] !== 'd2') {
           tel0.teachIn = false
         }
         tel0.encode(msg.payload.data, { eep: msg.payload.meta.eep, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
@@ -38,9 +44,10 @@ module.exports = RED => {
       } else {
         var tel = RadioERP1.from({ rorg: parseInt(msg.payload.meta.eep.split('-')[0], 16), eep: msg.payload.meta.eep, payload: [0], id: senderId, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
         tel.encode(msg.payload.data, { eep: msg.payload.meta.eep, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
-        if (msg.payload.meta.eep.split('-')[0] !== 'f6') {
+        if (msg.payload.meta.eep.split('-')[0] !== 'f6' && msg.payload.meta.eep.split('-')[0] !== 'd2') {
           tel.teachIn = false
         }
+        tel.destinationId = msg.payload.meta.destinationId || 'ffffffff'
         await enoSend(node, tel.toString())
       }
     })
