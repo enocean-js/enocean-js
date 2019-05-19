@@ -4,6 +4,9 @@
         defaults: {
           name: {
             value: ""
+          },
+          encoding: {
+            value: "f6-02-01"
           }
         },
         inputs:1,
@@ -23,6 +26,15 @@
   <div class="form-row">
     <label for="node-input-name">Name</label>
     <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-encoding">Encoding</label>
+    <select  id="node-input-encoding" >
+      <option value="f6-02-01">f6-02-01</option>
+      <option value="f6-02-02">f6-02-02</option>
+      <option value="f6-03-01">f6-03-01</option>
+      <option value="f6-03-02">f6-03-02</option>
+    </select>
   </div>
 </script>
 

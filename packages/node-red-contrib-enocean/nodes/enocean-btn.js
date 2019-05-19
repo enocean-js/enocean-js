@@ -4,11 +4,11 @@ module.exports = RED => {
   function EnOceanButtonNode (config) {
     RED.nodes.createNode(this, config)
     // this.serialport = RED.nodes.getNode(config.serialport)
-
+    this.encoding = config.encoding
     var node = this
     node.payload = {
       'meta': {
-        'eep': 'f6-03-01',
+        'eep': node.encoding,
         'channel': 22,
         'type': 'data'
       },
@@ -37,7 +37,12 @@ async function btnClick (node, btn) {
 
 async function release (node) {
   node.payload.data = { R1: 0, EB: 0 }
-  node.payload.meta.status = 0b00000000 // 0b00xy0000 x=T21, y=NU
+  node.payload.meta.eep = node.encoding
+  if(node.payload.meta.eep.split("-")[1] === "02"){
+    node.payload.meta.status = 0b00100000
+  }else{
+    node.payload.meta.status = 0b00000000
+  }
   node.send({ payload: node.payload })
   // node.btn.payload = node.btn.encode({ R1: 0, EB: 0 }, { eep: 'f6-03-01', status: 0x0 })
   // await node.serialport.sender.send(node.btn.toString())
@@ -45,7 +50,12 @@ async function release (node) {
 
 async function btnDown (node, btn) {
   node.payload.data = { R1: btn, EB: 1 }
-  node.payload.meta.status = 0b00010000 // 0b00xy0000 x=T21, y=NU
+  node.payload.meta.eep = node.encoding
+  if(node.payload.meta.eep.split("-")[1] === "02"){
+    node.payload.meta.status = 0b00110000
+  }else{
+    node.payload.meta.status = 0b00010000
+  }
   node.send({ payload: node.payload })
   // node.btn.payload = node.btn.encode({ R1: btn, EB: 1 }, { eep: 'f6-03-01', status: 0b00010000 })
   // await node.serialport.sender.send(node.btn.toString())
