@@ -38,9 +38,9 @@ async function btnClick (node, btn) {
 async function release (node) {
   node.payload.data = { R1: 0, EB: 0 }
   node.payload.meta.eep = node.encoding
-  if(node.payload.meta.eep.split("-")[1] === "02"){
+  if (node.payload.meta.eep.split('-')[1] === '02') {
     node.payload.meta.status = 0b00100000
-  }else{
+  } else {
     node.payload.meta.status = 0b00000000
   }
   node.send({ payload: node.payload })
@@ -51,9 +51,9 @@ async function release (node) {
 async function btnDown (node, btn) {
   node.payload.data = { R1: btn, EB: 1 }
   node.payload.meta.eep = node.encoding
-  if(node.payload.meta.eep.split("-")[1] === "02"){
+  if (node.payload.meta.eep.split('-')[1] === '02') {
     node.payload.meta.status = 0b00110000
-  }else{
+  } else {
     node.payload.meta.status = 0b00010000
   }
   node.send({ payload: node.payload })
