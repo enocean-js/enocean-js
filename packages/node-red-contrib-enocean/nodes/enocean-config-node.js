@@ -73,7 +73,15 @@ async function openPort (node) {
   })
   node.port.on('error', errorHandler.bind(node))
   makeCommander(node)
-  node.port.pipe(node.parser).pipe(node.transformer)
+  node.port.pipe(node.parser).on('error', err => {
+    if (err) {
+      console.log(err)
+    }
+  }).pipe(node.transformer).on('error', err => {
+    if (err) {
+      console.log(err)
+    }
+  })
 }
 
 function makeTP (node) {
