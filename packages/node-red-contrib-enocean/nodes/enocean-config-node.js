@@ -97,6 +97,8 @@ function makeCommander (node) {
       if (node.port.isOpen) {
         var res = await node.commander.getIdBase()
         node.baseId = parseInt(res.baseId.toString(), 16)
+        var globalContext = node.context().global
+        globalContext.set('enocean-base-id', node.baseId)
         if (x) {
           x.refreshState()
         }
