@@ -134,9 +134,9 @@ describe('RadioERP1 packets', () => {
       assert.equal(decoded.SV.value, 5)
     })
     it('eep bitmask enum', () => {
-      radio = RadioERP1.from({ payload: 240, status: 0x20, RORG: 0xf6 })
+      radio = RadioERP1.from({ payload: 0xd0, status: 0x20, RORG: 0xf6 })
       decoded = radio.decode('f6-10-00')
-      assert.equal(decoded.WIN.description, 'left/right')
+      assert.equal(decoded.WIN.description, 'up')
       radio = RadioERP1.from({ payload: 192, status: 0x20 })
       decoded = radio.decode('f6-10-00')
       assert.equal(decoded.WIN.description, 'left/right')
