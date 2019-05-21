@@ -32,7 +32,7 @@ module.exports = RED => {
       }
       if (msg.payload.meta.type === 'teach-in') {
         // send teach-in
-        var te = RadioERP1.makeTeachIn({ type: msg.payload['teach-in'].type, eep: msg.payload.meta.eep, senderId: senderId })
+        var te = RadioERP1.makeTeachIn({ ...msg.payload['teach-in'], ...{ senderId: senderId, eep: msg.payload.meta.eep } })
         await enoSend(node, te.toString())
         // followed by a data telegram
         var tel0 = RadioERP1.from({ rorg: parseInt(msg.payload.meta.eep.split('-')[0], 16), eep: msg.payload.meta.eep, payload: [0], id: senderId, direction: msg.payload.meta.direction || 1, data: msg.payload.meta.data || 0, status: msg.payload.meta.status || 0 })
