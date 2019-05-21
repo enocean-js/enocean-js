@@ -20,7 +20,8 @@ module.exports = RED => {
             destinationId: data.destinationId,
             subTelNum: data.subTelNum,
             rssi: data.RSSI,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            status: data.status
           }
         })
       }
