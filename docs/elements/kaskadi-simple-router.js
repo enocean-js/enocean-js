@@ -1,4 +1,4 @@
-import { html, LitElement } from 'https://unpkg.com/@polymer/lit-element?module'
+import { html, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 export class KaskadiSimpleRouter extends LitElement {
   constructor () {
     super()

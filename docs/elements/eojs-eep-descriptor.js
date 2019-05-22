@@ -1,11 +1,38 @@
 /* eslint-disable no-undef  */
-import { html, LitElement } from 'https://unpkg.com/@polymer/lit-element?module'
+import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 import { getEEP } from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.1-beta.23/packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
 
 class EEPDescriptor extends LitElement {
   constructor () {
     super()
     this.eep = 'f6-02-03'
+  }
+  static get styles () {
+    return css`
+    :host{
+      font-family: 'Roboto Mono'
+    }
+    .eep-line{
+      display:flex;
+      align-items:center
+    }
+    .eep-line div{
+      padding:5px;
+      font-size: 12px;
+      margin:2px;
+      border-radius: var(--border-radius);
+      border: var(--border-style);
+      background:white;
+    }
+    .type div:nth-child(2){
+      background: var(--type-color);
+    }
+    .func div:nth-child(2){
+      background: var(--func-color);
+    }
+    .rorg div:nth-child(2){
+      background: var(--rorg-color);
+    }`
   }
   static get properties () {
     return {
@@ -17,31 +44,6 @@ class EEPDescriptor extends LitElement {
     if (eep) {
       return html`
       <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Roboto+Slab&display=swap" rel="stylesheet">
-      <style>
-        :host{
-          font-family: 'Roboto Mono'
-        }
-        .eep-line{
-          display:flex;
-          align-items:center
-        }
-        .eep-line div{
-          padding:5px;
-          font-size: 12px;
-          margin:2px;
-          border-radius: 5px;
-          border: 2px solid #ddd
-        }
-        .type div:nth-child(2){
-          background: #99ff99;
-        }
-        .func div:nth-child(2){
-          background: #ffff99;
-        }
-        .rorg div:nth-child(2){
-          background: #99ccff;
-        }
-      </style>
       <div class="eep-line rorg">
         <div>${parseInt(eep.rorg_number).toString(16)}</div>
         <div>rorg</div>
