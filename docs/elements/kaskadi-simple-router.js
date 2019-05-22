@@ -3,7 +3,6 @@ export class KaskadiSimpleRouter extends LitElement {
   constructor () {
     super()
     window.onpopstate = e => {
-      console.log(this)
       this.requestUpdate()
     }
     this.addEventListener('click', function (e) {
