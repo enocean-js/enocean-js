@@ -96,8 +96,8 @@ module.exports = RED => {
         if (!msg.payload.teachIn || msg.payload.RORG === 0xf6) {
           // not compatible with multible USB Sticks
           if (msg.payload.constructor.name === 'RadioERP1') {
-            var listenerId= parseInt(this.context().global.get("enocean-base-id")) + parseInt(node.channel)
-            if(node.adt && !(msg.payload.destinationId===listenerId.toString(16))){
+            var listenerId = parseInt(this.context().global.get('enocean-base-id')) + parseInt(node.channel)
+            if (node.adt && !(msg.payload.destinationId === listenerId.toString(16))) {
               return
             }
             this.sensors.filter(item => item.senderId === msg.payload.senderId).forEach(item => {
