@@ -1,7 +1,9 @@
 /* eslint-disable no-undef  */
 import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
-import { getEEP } from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.1-beta.23/packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
-
+import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js?module'
+import { getEEP } from '../../packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
+import './eojs-eep-desc-header.js'
+import './eojs-eep-case.js'
 class EEPDescriptor extends LitElement {
   constructor () {
     super()
@@ -10,29 +12,14 @@ class EEPDescriptor extends LitElement {
   static get styles () {
     return css`
     :host{
-      font-family: 'Roboto Mono'
+      font-family: 'Roboto';
+      font-size:12px;
+      display:block;
+      height:100vh;overflow: scroll;flex-grow:1
     }
-    .eep-line{
-      display:flex;
-      align-items:center
-    }
-    .eep-line div{
-      padding:5px;
-      font-size: 12px;
-      margin:2px;
-      border-radius: var(--border-radius);
-      border: var(--border-style);
-      background:white;
-    }
-    .type div:nth-child(2){
-      background: var(--type-color);
-    }
-    .func div:nth-child(2){
-      background: var(--func-color);
-    }
-    .rorg div:nth-child(2){
-      background: var(--rorg-color);
-    }`
+    #desc{padding:5px;max-width:500px}
+    #main{}
+  `
   }
   static get properties () {
     return {
@@ -43,23 +30,19 @@ class EEPDescriptor extends LitElement {
     let eep = this.getEEP(this.eep)
     if (eep) {
       return html`
-      <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Roboto+Slab&display=swap" rel="stylesheet">
-      <div class="eep-line rorg">
-        <div>${parseInt(eep.rorg_number).toString(16)}</div>
-        <div>rorg</div>
-        <div>${eep.rorg_title}</div>
+      <div id="main">
+        <eojs-eep-desc-header eep="${eep.eep}" rorg="${eep.rorg_title}" func="${eep.func_title}" type="${eep.title}"></eojs-eep-desc-header>
+        ${eep.description !== '' ? html`
+          <h2>Description</h2>
+          <div id="desc">${unsafeHTML(eep.description)}</div>
+        ` : ''}
+        ${eep.case.map(item => {
+          return html`
+            <eojs-eep-case eep="${eep.eep}" case="${JSON.stringify(item)}"></eojs-eep-case>
+          `
+        })}
+        <pre style="color: #bbb;font-size:10px">${JSON.stringify(eep, null, 2)}</pre>
       </div>
-      <div class="eep-line func">
-        <div>${parseInt(eep.func_number).toString(16).padStart(2, '0')}</div>
-        <div>func</div>
-        <div>${eep.func_title}</div>
-      </div>
-      <div class="eep-line type">
-        <div>${parseInt(eep.number).toString(16).padStart(2, '0')}</div>
-        <div>type</div>
-        <div>${eep.title}</div>
-      </div>
-      <div style="color: #bbb;font-size:10px">${JSON.stringify(eep)}</div>
       `
     } else {
       return html`

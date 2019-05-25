@@ -42,13 +42,13 @@ class EOJSEEPList extends LitElement {
         margin:2px; 
         background: white;
         padding:5px;
-        transition: all 0.3s;
+        transition: all 0.5s;
       }
       kaskadi-list-item.hidden{
         height:0;
-        padding:0;
+        padding-top:0;
+        padding-bottom:0;
         margin:0;
-        opacity:0;
         border-width: 0
       }
       a{color:black;text-decoration:none}
