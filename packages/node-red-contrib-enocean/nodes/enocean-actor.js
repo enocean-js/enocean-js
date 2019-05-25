@@ -8,6 +8,7 @@ module.exports = RED => {
     this.duration = config.teachInDuration
     this.name = config.name
     this.channel = config.channel
+    this.adt = config.adt
     this.teachInStatus = false
     this.teachOutStatus = false
     this.status({ fill: 'grey', shape: 'ring', text: 'data' })
@@ -28,7 +29,7 @@ module.exports = RED => {
         node.startTeachIn(msg.payload.duration)
         return
       }
-      if (msg.payload.type && (msg.payload.type === 'LRN') && msg.payload.senderId && msg.payload.eep) {
+      if (msg.payload.type && msg.payload.type === 'LRN' && msg.payload.senderId && msg.payload.eep) {
         let known = this.sensors.filter(item => (item.senderId === msg.payload.senderId && item.eep === msg.payload.eep))
         if (known.length > 0) {
           known[0].name = msg.payload.name
@@ -43,7 +44,7 @@ module.exports = RED => {
         node.startTeachOut(msg.payload.duration)
         return
       }
-      if (msg.payload.type && (msg.payload.type === 'DEL') && msg.payload.senderId) {
+      if (msg.payload.type && msg.payload.type === 'DEL' && msg.payload.senderId) {
         if (msg.payload.eep) {
           node.sensors = this.sensors.filter(item => !(item.senderId === msg.payload.senderId && item.eep === msg.payload.eep))
         } else {
@@ -93,7 +94,12 @@ module.exports = RED => {
         }
       } else {
         if (!msg.payload.teachIn || msg.payload.RORG === 0xf6) {
+          // not compatible with multible USB Sticks
           if (msg.payload.constructor.name === 'RadioERP1') {
+            var listenerId= parseInt(this.context().global.get("enocean-base-id")) + parseInt(node.channel)
+            if(node.adt && !(msg.payload.destinationId===listenerId.toString(16))){
+              return
+            }
             this.sensors.filter(item => item.senderId === msg.payload.senderId).forEach(item => {
               if (item.eep.split('-')[0] === msg.payload.RORG.toString(16)) {
                 node.status({ fill: 'green', shape: 'dot', text: 'data' })
@@ -196,5 +202,6 @@ function makeMeta (sender, eep, data, name, group, msg) {
   msg.raw = data.toString()
   msg.meta.name = name
   msg.meta.actorName = group
+  msg.meta.raw = data.toString()
   return msg.meta
 }
