@@ -1,17 +1,9 @@
-import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
+/* eslint-disable no-undef  */
+import { html, css } from 'https://unpkg.com/lit-element@^2.1.0?module'
 import { KaskadiSimpleRouter } from './kaskadi-simple-router.js'
 import './eojs-eep-descriptor.js'
 import './eojs-eep-list.js'
 class EOJSWebApp extends KaskadiSimpleRouter {
-  constructor () {
-    super()
-    var host = this
-    // setTimeout(() => {
-    //   var url = new URL(window.location.href)
-    //   var eep = url.searchParams.get('eep')
-    //   host.shadowRoot.querySelector('eojs-eep-list').find(eep)
-    // }, 1000)
-  }
   static get styles () {
     return css`
       div{display:flex}

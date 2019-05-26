@@ -1,3 +1,4 @@
+/* eslint-disable no-undef  */
 import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 export class EEPDescHeader extends LitElement {
   constructor () {

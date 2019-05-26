@@ -1,3 +1,4 @@
+/* eslint-disable no-undef  */
 import { html, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 export class KaskadiListItem extends LitElement {
   constructor () {
@@ -7,7 +8,7 @@ export class KaskadiListItem extends LitElement {
   static get properties () {
     return {
       data: { type: Array },
-      selected: {type: Boolean}
+      selected: { type: Boolean }
     }
   }
   render () {

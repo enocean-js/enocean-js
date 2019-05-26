@@ -37,10 +37,10 @@ class EEPDescriptor extends LitElement {
           <div id="desc">${unsafeHTML(eep.description)}</div>
         ` : ''}
         ${eep.case.map(item => {
-          return html`
+    return html`
             <eojs-eep-case eep="${eep.eep}" case="${JSON.stringify(item)}"></eojs-eep-case>
           `
-        })}
+  })}
         <pre style="color: #bbb;font-size:10px">${JSON.stringify(eep, null, 2)}</pre>
       </div>
       `

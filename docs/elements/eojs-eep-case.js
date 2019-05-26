@@ -1,3 +1,4 @@
+/* eslint-disable no-undef  */
 import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js?module'
 export class EEPCase extends LitElement {
@@ -97,8 +98,8 @@ export class EEPCase extends LitElement {
         <div class="main">
         <div>
           ${this.case.datafield.map(item => {
-            if (!item.reserved) {
-              return html`
+    if (!item.reserved) {
+      return html`
 
                 <div class="field">
                   <div class="head">
@@ -114,16 +115,16 @@ export class EEPCase extends LitElement {
                     ${getType(item) === 'enum' ? html`
                       <ul>
                         ${Array.isArray(item.enum.item) ? item.enum.item.map(e => {
-                          return html`<li>${e.value}: ${unsafeHTML(e.description)}</li>`
-                        }) : ''}
+    return html`<li>${e.value}: ${unsafeHTML(e.description)}</li>`
+  }) : ''}
                       </ul>
                     ` : ''}
                     ${item.unit ? html`<div>Unit: ${item.unit}</div>` : ''}
                   </div>
                 </div>
               `
-            }
-          })}
+    }
+  })}
         </div>
         <div class="json">
           <pre>${unsafeHTML(syntaxHighlight(eep2JSON(this.case, this.eep)))}</pre>
@@ -138,7 +139,7 @@ function syntaxHighlight (json) {
     json = JSON.stringify(json, undefined, 2)
   }
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function (match) {
     var cls = 'number'
     if (/^"/.test(match)) {
       if (/:$/.test(match)) {
