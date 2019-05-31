@@ -52,9 +52,13 @@ module.exports = RED => {
         node.context().set('sensorList', node.sensors)
         return
       }
+      if (typeof msg.payload === 'string' && msg.payload.substr(0, 2) === '55' && msg.payload.substr(8, 2) === '01') {
+        msg.meta = { type: 'radio-erp1' }
+      }
       if (msg.meta.type && msg.meta.type === 'radio-erp1') {
         msg.payload = RadioERP1.from(m.payload)
       }
+
       if (node.teachOutStatus === true) {
         if (msg.payload.teachIn) {
           let tei = msg.payload.teachInInfo
@@ -193,7 +197,8 @@ function startTeachOut (dur) {
 function makeMeta (sender, eep, data, name, group, msg) {
   msg.meta.eep = eep
   msg.meta.payload = data.payload.toString()
-  msg.raw = data.toString()
+  msg.meta.senderId = sender
+  msg.meta.raw = data.toString()
   msg.meta.name = name
   msg.meta.actorName = group
   return msg.meta
