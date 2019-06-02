@@ -1,7 +1,7 @@
 /* eslint-disable no-undef  */
 import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js?module'
-// import { RadioERP1 } from 'https://cdn.jsdelivr.net/npm/enocean-js/packages/enocean.js'
+import { RadioERP1 } from 'https://cdn.jsdelivr.net/npm/enocean-js/packages/enocean.js'
 import './eojs-eep-case-head.js'
 import './eojs-eep-field.js'
 export class EEPCase extends LitElement {
@@ -89,10 +89,10 @@ export class EEPCase extends LitElement {
         <div class="main">
           <div>
             ${this.case.datafield.map(item => {
-    if (!item.reserved) {
-      return html`<eojs-eep-field @valueselect="${this.valueChange}" field="${JSON.stringify(item)}"></eojs-eep-field>`
-    }
-  })}
+              if (!item.reserved) {
+                return html`<eojs-eep-field @valueselect="${this.valueChange}" field="${JSON.stringify(item)}"></eojs-eep-field>`
+              }
+            })}
           </div>
           <div class="right">
             <div class="json">

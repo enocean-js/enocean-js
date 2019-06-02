@@ -38,7 +38,7 @@ export class EEPDescHeader extends LitElement {
     return html`
     <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Roboto+Slab&display=swap" rel="stylesheet">
     <h1>EEP ${this.eep.toUpperCase()}</h1>
-    <h2>${this.rorg}·${this.func}·${this.type}</h2>  
+    <h2>${this.rorg}·${this.func}·${this.type}</h2>
       `
   }
 }

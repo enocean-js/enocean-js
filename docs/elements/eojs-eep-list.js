@@ -47,7 +47,7 @@ class EOJSEEPList extends LitElement {
         text-overflow: ellipsis;
         border-radius: var(--border-radius);
         border: var(--border-style);
-        margin-top:var(--size-space); 
+        margin-top:var(--size-space);
         background: white;
         padding:var(--size-space);
         transition: all 0.5s;
