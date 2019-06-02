@@ -1,6 +1,10 @@
 .git/*
 .nyc_output/*
 .coverage/*
+coverage/*
+bin/*
+resources/*
+docs/*
 .docs/*
 node_modules/*
 !packages/node_modules/@enocean-js
@@ -11,3 +15,6 @@ packages/node-red-contrib-enocean/*
 packages/playground/*
 test/*
 test_html/*
+node-red-contrib-enocean/*
+enocean-ip-gateway/*
+octopus-view/*
