@@ -1,7 +1,7 @@
 /* eslint-disable no-undef  */
 import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js?module'
-import { RadioERP1 } from 'https://cdn.jsdelivr.net/npm/enocean-js/packages/enocean.js'
+import { RadioERP1 } from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.3/packages/enocean.js'
 import './eojs-eep-case-head.js'
 import './eojs-eep-field.js'
 export class EEPCase extends LitElement {
@@ -9,6 +9,7 @@ export class EEPCase extends LitElement {
     super()
     this.case = {}
     this.eep = ''
+    this.radio = new RadioERP1()
   }
   static get styles () {
     return css`
@@ -45,6 +46,10 @@ export class EEPCase extends LitElement {
     .boolean { color: blue; }
     .null { color: magenta; }
     .key { color: var(--color3-dark50); }
+    .tel{
+      font-family: "Roboto Mono"
+    }
+    .small{color:#aaa;font-size:0.7em}
     `
   }
   static get properties () {
@@ -74,6 +79,7 @@ export class EEPCase extends LitElement {
     fields.forEach(item => {
       msg.data[item.field.shortcut] = item.value
     })
+
     if (c.condition && c.condition.statusfield) {
       msg.meta.status = parseInt(`00${c.condition.statusfield[0].value}${c.condition.statusfield[1].value}0000`, 2)
     }
@@ -83,29 +89,36 @@ export class EEPCase extends LitElement {
     return msg
   }
   render () {
+    var json = this.eep2JSON(this.case, this.eep)
+    this.radio = RadioERP1.from({ rorg: this.eep.split('-')[0], payload: '00', id: 'aabbccdd' })
+    this.radio.encode(json.data, json.meta)
     return html`
     ${this.case.condition && this.case.condition.statusfield ? html`<eojs-eep-case-head type="Status" field="Statusfield" value="${parseInt(`00${this.case.condition.statusfield[0].value}${this.case.condition.statusfield[1].value}0000`, 2)}" title="${this.case.title}" desc="${this.case.description}"></eojs-eep-case-head>` : ''}
     ${this.case.condition && this.case.condition.datafield ? html`<eojs-eep-case-head type="Datafield" field="${getShortcutFromOffset(this.case, this.case.condition.datafield.bitoffs).shortcut}" value="${this.case.condition.datafield.value}" title="${this.case.title}" desc="${this.case.description}"></eojs-eep-case-head>` : ''}
         <div class="main">
           <div>
             ${this.case.datafield.map(item => {
-              if (!item.reserved) {
-                return html`<eojs-eep-field @valueselect="${this.valueChange}" field="${JSON.stringify(item)}"></eojs-eep-field>`
-              }
-            })}
+    if (!item.reserved) {
+      return html`<eojs-eep-field @valueselect="${this.valueChange}" field="${JSON.stringify(item)}"></eojs-eep-field>`
+    }
+  })}
           </div>
           <div class="right">
             <div class="json">
               msg.payload for the node-red-contrib-enocean output node
-              <pre>${unsafeHTML(syntaxHighlight(this.eep2JSON(this.case, this.eep)))}</pre>
+              <pre>${unsafeHTML(syntaxHighlight(json))}</pre>
             </div>
-            <div class="tel">5500070701xxa500000000aabbccdd00ffffffff4800xx</div>
+            <div class="tel">
+              55<span class="small">${this.radio.header.toString()}</span><span>${this.radio.data.toString()}</span><span class="small">${this.radio.optionalData.toString()}</span><span class="small">${toHex(this.radio.crc8Data)}</span>
+            </div>
           </div>
       </div>
     `
   }
 }
-
+function toHex (val, len = 2) {
+  return val.toString(16).padStart(len, '0')
+}
 function syntaxHighlight (json) {
   if (typeof json !== 'string') {
     json = JSON.stringify(json, undefined, 2)
