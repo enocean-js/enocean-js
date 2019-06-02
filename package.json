@@ -53,7 +53,7 @@
     "@enocean-js/esp3-packets": "0.0.1-beta.23",
     "@enocean-js/pretty-printer": "0.0.1-beta.23",
     "@enocean-js/radio-erp1": "0.0.1-beta.23",
-    "@enocean-js/serialport-parser": "0.0.1-beta.23",
+    "@enocean-js/serialport-parser": "0.0.2",
     "@enocean-js/serialport-sender": "0.0.1-beta.23",
     "esm": "^3.2.25"
   }
