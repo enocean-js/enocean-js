@@ -12,6 +12,7 @@ class EOJSEEPList extends LitElement {
       var desc = EEP[eepDesc]
       var kli = document.createElement('kaskadi-list-item')
       kli.data = desc
+      kli.setAttribute('eep', desc.eep)
       kli.innerHTML = `<a href="./?eep=${desc.eep}">
           <header>${desc.eep}</header>
           <div class="sub">${desc.title}</div>
@@ -19,6 +20,11 @@ class EOJSEEPList extends LitElement {
       tmp.push(kli)
     }
     this.items = tmp
+  }
+  static get properties () {
+    return {
+      eep: { type: String }
+    }
   }
   filterList (e) {
     this.shadowRoot.querySelector('kaskadi-link-list').filter('eep', e.target.value)
@@ -29,20 +35,21 @@ class EOJSEEPList extends LitElement {
   render () {
     return html`
     <style>
-      kaskadi-link-list{padding:0;margin:0;height: calc(100vh - 50px); overflow: scroll;width:250px}
+      kaskadi-link-list{padding:0;margin:0;height: calc(100vh - 100px); overflow: scroll;width:250px}
       kaskadi-link-list::-webkit-scrollbar{width:0 !important}
       kaskadi-link-list {overflow: -moz-scrollbars-none;}
       kaskadi-list-item {
-        width:210px;
-        height:30px;
+        width:calc(100% - calc(var(--size-space) * 2));
+        box-sizing: border-box;
+        height:var(--size-cell1);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         border-radius: var(--border-radius);
         border: var(--border-style);
-        margin:2px; 
+        margin-top:var(--size-space); 
         background: white;
-        padding:5px;
+        padding:var(--size-space);
         transition: all 0.5s;
       }
       kaskadi-list-item.hidden{
@@ -51,6 +58,9 @@ class EOJSEEPList extends LitElement {
         padding-bottom:0;
         margin:0;
         border-width: 0
+      }
+      kaskadi-list-item[selected]{
+        background:#ffff99
       }
       a{color:black;text-decoration:none}
       .sub{font-size: 8px;padding:0;margin:0}
@@ -64,7 +74,14 @@ class EOJSEEPList extends LitElement {
         <input id="filter-input" type="text" placeholder="filter" @keyup="${this.filterList}"/>
       </div>
       <kaskadi-link-list>
-        ${this.items.map(item => item)}
+        ${this.items.map(item => {
+    if (item.data.eep === this.eep) {
+      item.setAttribute('selected', true)
+    } else {
+      item.removeAttribute('selected')
+    }
+    return item
+  })}
       </kaskadi-link-list>
     </div>
     `

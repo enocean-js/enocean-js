@@ -1,6 +1,6 @@
 const ESP3Parser = require('@enocean-js/serialport-parser').ESP3Parser
 const SerialPort = require('serialport')
-const ESP3Transfomer = require('@enocean-js/esp3-packets').ESP3Transformer
+const ESP3Transfomer = require('@enocean-js/esp3-transformer').ESP3Transformer
 const SerialportSender = require('@enocean-js/serialport-sender').SerialportSender
 const Commander = require('@enocean-js/common-command').Commander
 const getEEP = require('@enocean-js/eep-transcoder').getEEP

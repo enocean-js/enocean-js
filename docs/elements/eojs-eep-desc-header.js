@@ -8,29 +8,23 @@ export class EEPDescHeader extends LitElement {
   static get styles () {
     return css`
     :host{
-      font-family: 'Roboto Mono'
+      font-family: 'Roboto Mono';
     }
-    .eep-line{
-      display:flex;
-      align-items:center
+    h1{
+      margin:0;
+      padding:5px 0 0 0;
+      color: white;
+      text-align:center;
+      font-family: 'Roboto';
     }
-    .eep-line div{
-      padding:5px;
-      font-size: 12px;
-      margin:2px;
-      border-radius: var(--border-radius);
-      border: var(--border-style);
-      background:white;
+    h2{
+      font-size:14px;
+      margin:0;
+      padding:0 0 5px 0;
+      color: white;
+      text-align:center;
     }
-    .type div:nth-child(2){
-      background: var(--type-color);
-    }
-    .func div:nth-child(2){
-      background: var(--func-color);
-    }
-    .rorg div:nth-child(2){
-      background: var(--rorg-color);
-    }`
+    `
   }
   static get properties () {
     return {
@@ -42,22 +36,9 @@ export class EEPDescHeader extends LitElement {
   }
   render () {
     return html`
-        <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Roboto+Slab&display=swap" rel="stylesheet">
-        <div class="eep-line rorg">
-          <div>${this.eep.split('-')[0]}</div>
-          <div>rorg</div>
-          <div>${this.rorg}</div>
-        </div>
-        <div class="eep-line func">
-          <div>${this.eep.split('-')[1]}</div>
-          <div>func</div>
-          <div>${this.func}</div>
-        </div>
-        <div class="eep-line type">
-          <div>${this.eep.split('-')[2]}</div>
-          <div>type</div>
-          <div>${this.type}</div>
-        </div>
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Roboto+Slab&display=swap" rel="stylesheet">
+    <h1>EEP ${this.eep.toUpperCase()}</h1>
+    <h2>${this.rorg}·${this.func}·${this.type}</h2>  
       `
   }
 }

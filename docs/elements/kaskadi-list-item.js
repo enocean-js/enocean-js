@@ -4,6 +4,7 @@ export class KaskadiListItem extends LitElement {
   constructor () {
     super()
     this.data = {}
+    this.selected = false
   }
   static get properties () {
     return {

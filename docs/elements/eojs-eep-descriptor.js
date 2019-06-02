@@ -4,6 +4,7 @@ import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js
 import { getEEP } from '../../packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
 import './eojs-eep-desc-header.js'
 import './eojs-eep-case.js'
+import './kaskadi-collapse.js'
 class EEPDescriptor extends LitElement {
   constructor () {
     super()
@@ -15,9 +16,36 @@ class EEPDescriptor extends LitElement {
       font-family: 'Roboto';
       font-size:12px;
       display:block;
-      height:100vh;overflow: scroll;flex-grow:1
+      height:calc(100vh - var(--size-cell1));overflow: scroll;flex-grow:1;
+      padding-left: calc(var(--size-cell1));
+      padding-right: calc(var(--size-cell1));
     }
-    #desc{padding:5px;max-width:500px}
+    #head{
+      background:var(--color3-dark75);
+      margin-bottom:var(--size-cell1);
+      padding:var(--size-space);
+      margin:var(--size-space);
+      border-radius: var(--border-radius);
+    }
+    eojs-eep-case{
+      margin-bottom: var(--size-cell1)
+    }
+    kaskadi-collapse{
+      --collapsed-height: 75px;
+      padding:var(--size-space);
+      margin:var(--size-space);
+      background:white;
+      border-radius: var(--border-radius);
+      border-style: none;
+    }
+    #raw-json{
+      box-sizing: border-box;
+      border: var(--border);
+      border-color: var(--color2-dark50);
+      padding:var(--size-space);
+      margin:var(--size-space);
+      --collapsed-height: 48px;
+    }
     #main{}
   `
   }
@@ -31,17 +59,18 @@ class EEPDescriptor extends LitElement {
     if (eep) {
       return html`
       <div id="main">
-        <eojs-eep-desc-header eep="${eep.eep}" rorg="${eep.rorg_title}" func="${eep.func_title}" type="${eep.title}"></eojs-eep-desc-header>
-        ${eep.description !== '' ? html`
-          <h2>Description</h2>
-          <div id="desc">${unsafeHTML(eep.description)}</div>
-        ` : ''}
+        <div id="head">
+            <eojs-eep-desc-header eep="${eep.eep}" rorg="${eep.rorg_title}" func="${eep.func_title}" type="${eep.title}"></eojs-eep-desc-header>
+            ${eep.description !== '' ? html`<kaskadi-collapse title="Description"><div id="desc">${unsafeHTML(eep.description)}</div></kaskadi-collapse>` : ''}
+        </div>
         ${eep.case.map(item => {
     return html`
             <eojs-eep-case eep="${eep.eep}" case="${JSON.stringify(item)}"></eojs-eep-case>
           `
   })}
-        <pre style="color: #bbb;font-size:10px">${JSON.stringify(eep, null, 2)}</pre>
+        <kaskadi-collapse id="raw-json" title="JSON Specification">
+          <pre style="color: #bbb;font-size:10px">${JSON.stringify(eep, null, 2)}</pre>
+        </kaskadi-collapse>
       </div>
       `
     } else {

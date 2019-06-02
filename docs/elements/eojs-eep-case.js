@@ -1,6 +1,9 @@
 /* eslint-disable no-undef  */
 import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js?module'
+// import { RadioERP1 } from 'https://cdn.jsdelivr.net/npm/enocean-js/packages/enocean.js'
+import './eojs-eep-case-head.js'
+import './eojs-eep-field.js'
 export class EEPCase extends LitElement {
   constructor () {
     super()
@@ -10,58 +13,19 @@ export class EEPCase extends LitElement {
   static get styles () {
     return css`
     :host{
-      display:block;
+      display: block;
       font-family: 'Roboto';
       font-size:14px;
     }
-    .field{
-      background:white;
-      margin:5px;
-      padding:5px;
-      border-radius: 5px;
-      width:500px;
-      border-radius: var(--border-radius);
-      border: var(--border-style);
-    }
-    .case {
-      display:flex
-    }
-    .case-item{
+    .right div{
       background:white;
       margin:5px;
       padding:5px;
       border-radius: var(--border-radius);
       border: var(--border-style);
     }
-    .json{
+    .right{
       flex-grow:1;
-      background:white;
-      margin:5px;
-      padding:5px;
-      border-radius: var(--border-radius);
-      border: var(--border-style);
-    }
-    .case-desc{
-      width: 600px
-    }
-    .case-title{
-      width: 600px
-    }
-    .field{position: relative}
-    .field h3{
-      margin:0; padding:0
-    }
-    .field .head{
-      display:flex
-    }
-    .field .type{
-      color:red
-    }
-    .field .desc{
-      font-size:10px
-    }
-    .field .info{
-      padding-top: 5px
     }
     .spacer{
       flex-grow: 1
@@ -69,12 +33,18 @@ export class EEPCase extends LitElement {
     .main{
       display: flex
     }
-
-.string { color: green; }
-.number { color: darkorange; }
-.boolean { color: blue; }
-.null { color: magenta; }
-.key { color: red; }
+    pre{
+      color:#ddd;
+      margin:5px;
+      padding:5px;
+      border-radius: var(--border-radius);
+      background: #333;
+    }
+    .string { color: var(--color1-dark50); }
+    .number { color: var(--color2-dark50); }
+    .boolean { color: blue; }
+    .null { color: magenta; }
+    .key { color: var(--color3-dark50); }
     `
   }
   static get properties () {
@@ -83,52 +53,54 @@ export class EEPCase extends LitElement {
       eep: { type: String }
     }
   }
+  valueChange () {
+    this.requestUpdate()
+  }
+  eep2JSON (c, eep, channel = 1) {
+    var msg = {
+      'data': {},
+      'meta': {
+        'eep': eep,
+        'channel': channel
+      }
+    }
+
+    c.datafield.forEach(item => {
+      if (!item.reserved) {
+        msg.data[item.shortcut] = ''
+      }
+    })
+    var fields = this.shadowRoot.querySelectorAll('eojs-eep-field')
+    fields.forEach(item => {
+      msg.data[item.field.shortcut] = item.value
+    })
+    if (c.condition && c.condition.statusfield) {
+      msg.meta.status = parseInt(`00${c.condition.statusfield[0].value}${c.condition.statusfield[1].value}0000`, 2)
+    }
+    if (c.condition && c.condition.datafield) {
+      msg.meta.data = parseInt(c.condition.datafield.value)
+    }
+    return msg
+  }
   render () {
     return html`
-        ${this.case.condition && this.case.condition.statusfield ? html`<div>status ${parseInt(`00${this.case.condition.statusfield[0].value}${this.case.condition.statusfield[1].value}0000`, 2)}</div>` : ''}
-        ${this.case.condition && this.case.condition.datafield ? html`
-          <div class="case">
-            <div class="case-item">Case</div>
-            <div class="case-item">${getShortcutFromOffset(this.case, this.case.condition.datafield.bitoffs).shortcut}</div>
-            <div class="case-item">${this.case.condition.datafield.value}</div>
-          </div>
-          <div class="case-title">${this.case.title}</div>
-          <div class="case-desc">${unsafeHTML(this.case.description)}</div>
-        ` : ''}
+    ${this.case.condition && this.case.condition.statusfield ? html`<eojs-eep-case-head type="Status" field="Statusfield" value="${parseInt(`00${this.case.condition.statusfield[0].value}${this.case.condition.statusfield[1].value}0000`, 2)}" title="${this.case.title}" desc="${this.case.description}"></eojs-eep-case-head>` : ''}
+    ${this.case.condition && this.case.condition.datafield ? html`<eojs-eep-case-head type="Datafield" field="${getShortcutFromOffset(this.case, this.case.condition.datafield.bitoffs).shortcut}" value="${this.case.condition.datafield.value}" title="${this.case.title}" desc="${this.case.description}"></eojs-eep-case-head>` : ''}
         <div class="main">
-        <div>
-          ${this.case.datafield.map(item => {
+          <div>
+            ${this.case.datafield.map(item => {
     if (!item.reserved) {
-      return html`
-
-                <div class="field">
-                  <div class="head">
-                    <h3>${item.shortcut} (${typeof item.data === 'string' ? unsafeHTML(item.data) : ''})</h3>
-                    <div class="spacer"></div>
-                    <div class="type">[${getType(item)}]</div>
-                  </div>
-                  <div class="desc">${typeof item.description === 'string' ? unsafeHTML(item.description) : ''}</div>
-                  <!--<div class="info">${typeof item.info === 'string' ? unsafeHTML(item.info) : ''}</div>-->
-                  <div class="info">
-                    ${getType(item) === 'scale' ? html`Scale: <span>${parseInt(item.scale.min)} - ${parseInt(item.scale.max)}</span>` : ''}
-                    ${getType(item) === 'range' ? html`Range: <span>${parseInt(item.range.min)} - ${parseInt(item.range.max)}</span>` : ''}
-                    ${getType(item) === 'enum' ? html`
-                      <ul>
-                        ${Array.isArray(item.enum.item) ? item.enum.item.map(e => {
-    return html`<li>${e.value}: ${unsafeHTML(e.description)}</li>`
-  }) : ''}
-                      </ul>
-                    ` : ''}
-                    ${item.unit ? html`<div>Unit: ${item.unit}</div>` : ''}
-                  </div>
-                </div>
-              `
+      return html`<eojs-eep-field @valueselect="${this.valueChange}" field="${JSON.stringify(item)}"></eojs-eep-field>`
     }
   })}
-        </div>
-        <div class="json">
-          <pre>${unsafeHTML(syntaxHighlight(eep2JSON(this.case, this.eep)))}</pre>
-        </div>
+          </div>
+          <div class="right">
+            <div class="json">
+              msg.payload for the node-red-contrib-enocean output node
+              <pre>${unsafeHTML(syntaxHighlight(this.eep2JSON(this.case, this.eep)))}</pre>
+            </div>
+            <div class="tel">5500070701xxa500000000aabbccdd00ffffffff4800xx</div>
+          </div>
       </div>
     `
   }
@@ -156,34 +128,6 @@ function syntaxHighlight (json) {
   })
 }
 
-function eep2JSON (c, eep, channel = 1) {
-  var msg = {
-    'data': {},
-    'meta': {
-      'eep': eep,
-      'channel': channel
-    }
-  }
-  c.datafield.forEach(item => {
-    if (!item.reserved) {
-      msg.data[item.shortcut] = ''
-    }
-  })
-  if (c.condition && c.condition.statusfield) {
-    msg.meta.status = parseInt(`00${c.condition.statusfield[0].value}${c.condition.statusfield[1].value}0000`, 2)
-  }
-  if (c.condition && c.condition.datafield) {
-    msg.meta.data = c.condition.datafield.value
-  }
-  return msg
-}
-
-function getType (item) {
-  if (item.enum) return 'enum'
-  if (item.range && item.scale) return 'scale'
-  if (item.range) return 'range'
-  if (item.bitmask) return 'bitmsk'
-}
 function getShortcutFromOffset (c, offset) {
   var res = c.datafield.find(item => item.bitoffs === offset)
   return res

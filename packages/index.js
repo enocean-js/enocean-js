@@ -10,8 +10,9 @@ requireAll("@enocean-js/common-command")
 requireAll("@enocean-js/pretty-printer")
 requireAll("@enocean-js/serialport-parser")
 requireAll("@enocean-js/serialport-sender")
-requireAll("@enocean-js/serialport-sender")
+requireAll("@enocean-js/websocket-sender")
 requireAll("@enocean-js/eep-transcoder")
+requireAll("@enocean-js/esp3-transformer")
 
 function requireAll(st){
   var tmp = {}
