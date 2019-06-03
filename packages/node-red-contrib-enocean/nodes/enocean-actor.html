@@ -8,6 +8,9 @@
           },
           channel:{
             value: 1
+          },
+          adt:{
+            value: false
           }
         },
         outputs: 2,
@@ -35,6 +38,10 @@
   <div class="form-row">
     <label for="node-input-channel">Channel</label>
     <input type="text" id="node-input-channel">
+  </div>
+  <div class="form-row">
+    <label for="node-input-channel">listen on this channel only</label>
+    <input type="checkbox" id="node-input-adt"  style="display:inline-block; width:15px; vertical-align:baseline;">
   </div>
   <div class="form-row">
     <sensor-list id="enocean-sensorlist"></sensor-list>

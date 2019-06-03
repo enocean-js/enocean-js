@@ -25,6 +25,7 @@ module.exports = RED => {
       console.log(err)
     }
   }
+  // not compatible with multible USB Sticks
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
   RED.httpAdmin.get('/enocean-js/info/:node/baseid/', function (req, res) {
     try {
