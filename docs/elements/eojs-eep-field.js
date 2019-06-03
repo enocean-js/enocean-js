@@ -121,16 +121,16 @@ export class EEPField extends LitElement {
           ${getType(this.field) === 'enum' ? html`
             <ul>
               ${Array.isArray(this.field.enum.item) ? this.field.enum.item.map(e => {
-                if (e.description === 'not used' || e.description === 'Not used') {
-                  return
-                }
-                if (e.min && e.max) {
-                  return html`<li class="slider">${parseValue(e.min)} - ${parseValue(e.max)}: ${unsafeHTML(e.description)} <kaskadi-slider value="${parseValue(e.min)}" @slide="${this.sliderChange}" min="${parseValue(e.min)}" max="${parseValue(e.max)}"></kaskadi-slider></li>`
-                }
-                if (e.value) {
-                  return html`<li @click=${this.click} data-value="${parseValue(e.value)}" ?selected="${parseValue(this.value) === parseValue(e.value ? e.value.toString() : '')}" >${parseValue(e.value)}: ${unsafeHTML(e.description)}</li>`
-                }
-              }) : html`
+    if (e.description === 'not used' || e.description === 'Not used') {
+      return
+    }
+    if (e.min && e.max) {
+      return html`<li class="slider">${parseValue(e.min)} - ${parseValue(e.max)}: ${unsafeHTML(e.description)} <kaskadi-slider value="${parseValue(e.min)}" @slide="${this.sliderChange}" min="${parseValue(e.min)}" max="${parseValue(e.max)}"></kaskadi-slider></li>`
+    }
+    if (e.value) {
+      return html`<li @click=${this.click} data-value="${parseValue(e.value)}" ?selected="${parseValue(this.value) === parseValue(e.value ? e.value.toString() : '')}" >${parseValue(e.value)}: ${unsafeHTML(e.description)}</li>`
+    }
+  }) : html`
                 <!-- ${this.value = parseValue(this.field.enum.item.value)} -->
                 <li>${parseValue(this.field.enum.item.value)}: ${unsafeHTML(this.field.enum.item.description)}</li>
               `}
@@ -147,7 +147,7 @@ function parseValue (v) {
     var radix = v.toString().substr(0, 2)
   } catch (err) {
     console.log(v)
-    var v = 0
+    v = 0
   }
   switch (radix) {
     case '0b':
