@@ -110,7 +110,8 @@ module.exports = RED => {
                 setTimeout(() => node.status({ fill: 'grey', shape: 'ring', text: 'data' }), 100)
                 node.send([{
                   payload: msg.payload.decode(item.eep, item.direction),
-                  meta: makeMeta(item.senderId, item.eep, msg.payload, item.name, node.name, msg)
+                  meta: makeMeta(item.senderId, item.eep, msg.payload, item.name, node.name, msg),
+                  topic: msg.topic
                 }, null])
               } else {
                 node.status({ fill: 'red', shape: 'dot', text: 'data' })
