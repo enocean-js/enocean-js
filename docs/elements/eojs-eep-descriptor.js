@@ -1,7 +1,8 @@
 /* eslint-disable no-undef  */
 import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
 import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js?module'
-import { getEEP } from '../../packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
+// import { getEEP } from '../../packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
+import { getEEP } from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.3/packages/enocean.js'
 import './eojs-eep-desc-header.js'
 import './eojs-eep-case.js'
 import './kaskadi-collapse.js'
@@ -64,10 +65,10 @@ class EEPDescriptor extends LitElement {
             ${eep.description !== '' ? html`<kaskadi-collapse title="Description"><div id="desc">${unsafeHTML(eep.description)}</div></kaskadi-collapse>` : ''}
         </div>
         ${eep.case.map(item => {
-    return html`
+          return html`
             <eojs-eep-case eep="${eep.eep}" case="${JSON.stringify(item)}"></eojs-eep-case>
           `
-  })}
+        })}
         <kaskadi-collapse id="raw-json" title="JSON Specification">
           <pre style="color: #bbb;font-size:10px">${JSON.stringify(eep, null, 2)}</pre>
         </kaskadi-collapse>
