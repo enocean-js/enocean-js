@@ -55,6 +55,7 @@
     "@enocean-js/radio-erp1": "0.0.3",
     "@enocean-js/serialport-parser": "0.0.3",
     "@enocean-js/serialport-sender": "0.0.3",
+    "@enocean-js/esp3-transformer": "0.0.3",
     "esm": "^3.2.25"
   }
 }
