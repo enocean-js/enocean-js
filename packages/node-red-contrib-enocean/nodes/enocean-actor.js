@@ -57,12 +57,11 @@ module.exports = RED => {
         msg.meta = { type: 'radio-erp1' }
       }
       if (msg.meta.type && msg.meta.type === 'radio-erp1') {
-        try{
+        try {
           msg.payload = RadioERP1.from(m.payload)
-        }catch(err){
-          node.warn("not an ERP1 telegram")
+        } catch (err) {
+          node.warn('not an ERP1 telegram')
         }
-
       }
 
       if (node.teachOutStatus === true) {
@@ -207,11 +206,11 @@ function startTeachOut (dur) {
 }
 
 function makeMeta (sender, eep, data, name, group, msg) {
-  msg.meta.destinationId= data.destinationId
-  msg.meta.subTelNum= data.subTelNum
-  msg.meta.rssi= data.RSSI
-  msg.meta.timestamp= Date.now()
-  msg.meta.status= data.status
+  msg.meta.destinationId = data.destinationId
+  msg.meta.subTelNum = data.subTelNum
+  msg.meta.rssi = data.RSSI
+  msg.meta.timestamp = Date.now()
+  msg.meta.status = data.status
   msg.meta.type = 'radio-erp1'
   msg.meta.rorg = data.RORG
   msg.meta.eep = eep
