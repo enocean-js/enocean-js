@@ -55,7 +55,9 @@ export class EEPCase extends LitElement {
   static get properties () {
     return {
       case: { type: Object },
-      eep: { type: String }
+      eep: { type: String },
+      baseid: { type: String },
+      channel: { type: String }
     }
   }
   valueChange () {
@@ -66,7 +68,7 @@ export class EEPCase extends LitElement {
       'data': {},
       'meta': {
         'eep': eep,
-        'channel': channel
+        'channel': parseInt(this.channel)
       }
     }
 
@@ -91,7 +93,8 @@ export class EEPCase extends LitElement {
   }
   render () {
     var json = this.eep2JSON(this.case, this.eep)
-    this.radio = RadioERP1.from({ rorg: this.eep.split('-')[0], payload: '00', id: 'aabbccdd' })
+    console.log(this.baseid)
+    this.radio = RadioERP1.from({ rorg: this.eep.split('-')[0], payload: '00', id: parseInt(this.baseid, 16) + parseInt(this.channel) })
     this.radio.encode(json.data, json.meta)
     return html`
     ${this.case.condition && this.case.condition.statusfield ? html`<eojs-eep-case-head type="Status" field="Statusfield" value="${parseInt(`00${this.case.condition.statusfield[0].value}${this.case.condition.statusfield[1].value}0000`, 2)}" title="${this.case.title}" desc="${this.case.description}"></eojs-eep-case-head>` : ''}

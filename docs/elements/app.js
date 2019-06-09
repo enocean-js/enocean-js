@@ -39,18 +39,42 @@ class EOJSWebApp extends KaskadiSimpleRouter {
       eojs-eep-list{
         min-width:250px;
       }
-      div{background:var(--color4);display:flex}
-      #head{background:#333;color: var(--color4);height:var(--size-cell1)}
+      #main{background:var(--color4);display:flex}
+      #head{
+        background:#333;
+        color: var(--color4);
+        height:var(--size-cell1);
+        display:flex
+      }
+      input{margin:2px}
+      #input{text-align:right}
+      .spacer{flex-grow:1}
     `
+  }
+  static get properties () {
+    return {
+      baseId: { type: String },
+      channel: { type: String }
+    }
+  }
+  changeBaseId (evt) {
+    this.shadowRoot.querySelector('eojs-eep-descriptor').baseid = evt.target.value
+  }
+  changeChannel (evt) {
+    this.shadowRoot.querySelector('eojs-eep-descriptor').channel = evt.target.value
   }
   render () {
     var url = new URL(window.location.href)
     var eep = url.searchParams.get('eep')
     return html`
-      <div id="head">eonocean-js eep-info browser</div>
-      <div>
+      <div id="head">
+        <div>eonocean-js eep-info browser</div>
+        <div class="spacer"></div>
+        <div id="input">base ID <input type ="text" value="aabbccdd" @keyup="${this.changeBaseId}"></input><br/>channel <input type ="text" value="0" @keyup="${this.changeChannel}"></input></div>
+      </div>
+      <div id="main">
         <eojs-eep-list eep="${eep}"></eojs-eep-list>
-        <eojs-eep-descriptor eep="${eep}"></eojs-eep-descriptor>
+        <eojs-eep-descriptor eep="${eep}" baseid="aabbccdd" channel="0"></eojs-eep-descriptor>
       </div>`
   }
 }

@@ -52,7 +52,9 @@ class EEPDescriptor extends LitElement {
   }
   static get properties () {
     return {
-      eep: { type: String }
+      eep: { type: String },
+      baseid: { type: String },
+      channel: { type: String }
     }
   }
   render () {
@@ -66,7 +68,7 @@ class EEPDescriptor extends LitElement {
         </div>
         ${eep.case.map(item => {
     return html`
-            <eojs-eep-case eep="${eep.eep}" case="${JSON.stringify(item)}"></eojs-eep-case>
+            <eojs-eep-case eep="${eep.eep}" case="${JSON.stringify(item)}" baseid="${this.baseid}" channel="${this.channel}"></eojs-eep-case>
           `
   })}
         <kaskadi-collapse id="raw-json" title="JSON Specification">
