@@ -65,10 +65,10 @@ class EEPDescriptor extends LitElement {
             ${eep.description !== '' ? html`<kaskadi-collapse title="Description"><div id="desc">${unsafeHTML(eep.description)}</div></kaskadi-collapse>` : ''}
         </div>
         ${eep.case.map(item => {
-          return html`
+    return html`
             <eojs-eep-case eep="${eep.eep}" case="${JSON.stringify(item)}"></eojs-eep-case>
           `
-        })}
+  })}
         <kaskadi-collapse id="raw-json" title="JSON Specification">
           <pre style="color: #bbb;font-size:10px">${JSON.stringify(eep, null, 2)}</pre>
         </kaskadi-collapse>
