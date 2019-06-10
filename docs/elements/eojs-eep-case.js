@@ -93,7 +93,6 @@ export class EEPCase extends LitElement {
   }
   render () {
     var json = this.eep2JSON(this.case, this.eep)
-    console.log(this.baseid)
     this.radio = RadioERP1.from({ rorg: this.eep.split('-')[0], payload: '00', id: parseInt(this.baseid, 16) + parseInt(this.channel) })
     this.radio.encode(json.data, json.meta)
     return html`
@@ -102,10 +101,10 @@ export class EEPCase extends LitElement {
         <div class="main">
           <div>
             ${this.case.datafield.map(item => {
-    if (!item.reserved) {
-      return html`<eojs-eep-field @valueselect="${this.valueChange}" field="${JSON.stringify(item)}"></eojs-eep-field>`
-    }
-  })}
+              if (!item.reserved) {
+                return html`<eojs-eep-field @valueselect="${this.valueChange}" field="${JSON.stringify(item)}"></eojs-eep-field>`
+              }
+            })}
           </div>
           <div class="right">
             <div class="json">
