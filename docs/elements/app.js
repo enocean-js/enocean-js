@@ -44,9 +44,10 @@ class EOJSWebApp extends KaskadiSimpleRouter {
         background:#333;
         color: var(--color4);
         height:var(--size-cell1);
-        display:flex
+        display:flex;
+        align-items: center
       }
-      input{margin:2px}
+      input{height:20px}
       #input{text-align:right}
       .spacer{flex-grow:1}
     `
@@ -70,7 +71,8 @@ class EOJSWebApp extends KaskadiSimpleRouter {
       <div id="head">
         <div>eonocean-js eep-info browser</div>
         <div class="spacer"></div>
-        <div id="input">base ID <input type ="text" value="aabbccdd" @keyup="${this.changeBaseId}"></input><br/>channel <input type ="text" value="0" @keyup="${this.changeChannel}"></input></div>
+        Base ID: <input type ="text" value="aabbccdd" @keyup="${this.changeBaseId}"></input>
+        Channel: <input type ="text" value="0" @keyup="${this.changeChannel}"></input>
       </div>
       <div id="main">
         <eojs-eep-list eep="${eep}"></eojs-eep-list>
