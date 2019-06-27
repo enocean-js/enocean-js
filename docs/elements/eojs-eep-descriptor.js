@@ -1,6 +1,6 @@
 /* eslint-disable no-undef  */
-import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
-import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js?module'
+import { html, css, LitElement } from '../node_modules/lit-element/lit-element.js'
+import { unsafeHTML } from '../node_modules/lit-html/directives/unsafe-html.js'
 // import { getEEP } from '../../packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
 import { getEEP } from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.3/packages/enocean.js'
 import './eojs-eep-desc-header.js'

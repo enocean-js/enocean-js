@@ -1,5 +1,5 @@
 /* eslint-disable no-undef  */
-import { html, css } from 'https://unpkg.com/lit-element@^2.1.0?module'
+import { html, css } from '../node_modules/lit-element/lit-element.js'
 import { KaskadiSimpleRouter } from './kaskadi-simple-router.js'
 import './eojs-eep-descriptor.js'
 import './eojs-eep-list.js'

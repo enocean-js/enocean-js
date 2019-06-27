@@ -10,6 +10,11 @@
       "packages/**/*.js"
     ]
   },
+  "standard": {
+    "ignore": [
+      "/docs/*"
+    ]
+  },
   "scripts": {
     "test": "standard && nyc --reporter=lcov --reporter=text-summary mocha --recursive test",
     "test_only": "mocha --recursive test",
@@ -51,11 +56,12 @@
     "@enocean-js/crc8": "0.0.4",
     "@enocean-js/eep-transcoder": "0.0.4",
     "@enocean-js/esp3-packets": "0.0.4",
+    "@enocean-js/esp3-transformer": "0.0.4",
     "@enocean-js/pretty-printer": "0.0.4",
     "@enocean-js/radio-erp1": "0.0.4",
     "@enocean-js/serialport-parser": "0.0.4",
     "@enocean-js/serialport-sender": "0.0.4",
-    "@enocean-js/esp3-transformer": "0.0.4",
-    "esm": "^3.2.25"
+    "esm": "^3.2.25",
+    "lit-html": "^1.1.0"
   }
 }

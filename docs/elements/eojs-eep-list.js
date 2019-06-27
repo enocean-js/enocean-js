@@ -1,6 +1,6 @@
 /* eslint-disable no-undef  */
 /* eslint-disable no-unused-vars */
-import { html, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
+import { html, css, LitElement } from '../node_modules/lit-element/lit-element.js'
 import * as EEP from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.3/packages/node_modules/@enocean-js/eep-transcoder/src/eep.js'
 import { KaskadiLinkList } from './kaskadi-link-list.js'
 import { KaskadiListItem } from './kaskadi-list-item.js'

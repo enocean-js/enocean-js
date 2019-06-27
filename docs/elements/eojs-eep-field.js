@@ -1,7 +1,7 @@
 /* eslint-disable no-undef  */
 /* eslint-disable no-return-assign */
-import { html, css, LitElement } from 'https://unpkg.com/lit-element@^2.1.0?module'
-import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js?module'
+import { html, css, LitElement } from '../node_modules/lit-element/lit-element.js'
+import { unsafeHTML } from '../node_modules/lit-html/directives/unsafe-html.js'
 import './kaskadi-slider.js'
 export class EEPField extends LitElement {
   constructor () {
