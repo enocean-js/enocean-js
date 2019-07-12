@@ -17,12 +17,14 @@ class ServerConnector extends LitElement {
     this._rssi_total = 100
     // this.socket.open()
   }
+
   static get properties () {
     return {
       url: { type: String },
       connected: { type: Boolean }
     }
   }
+
   render () {
     return html`
     <style>
@@ -59,16 +61,19 @@ class ServerConnector extends LitElement {
       </div>
     </div>`
   }
+
   connectHandler () {
     console.log('connected')
     this.connected = true
     this.requestUpdate()
   }
+
   disconnectHandler () {
     console.log('lost connection')
     this.connected = false
     this.requestUpdate()
   }
+
   connect () {
     this.socket = io.connect(this.url, { reconnection: false })
     this.socket.on('connect_error', () => { console.warn('connection failed') })
@@ -81,15 +86,18 @@ class ServerConnector extends LitElement {
     })
     this.socket.on('disconnect', this.disconnectHandler.bind(this))
   }
+
   disconnect () {
     this.socket.close()
   }
+
   urlchange (e) {
     this.socket.close()
     console.log('url changed')
     this.url = e.target.value
     this.connect()
   }
+
   toggle () {
     this.edit = !this.edit
     this.requestUpdate()

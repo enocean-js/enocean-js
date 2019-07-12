@@ -9,6 +9,7 @@ class SensorListItem extends LitElement {
     this.name = undefined
     this.rssi = 0
   }
+
   static get properties () {
     return {
       senderId: { type: String },
@@ -17,9 +18,11 @@ class SensorListItem extends LitElement {
       rssi: { type: Number }
     }
   }
+
   async firstUpdated (changedProperties) {
     await this.getInfo()
   }
+
   updated (changedProperties) {
     changedProperties.forEach(async (oldVal, name) => {
       if (name === 'eep') {
@@ -27,8 +30,9 @@ class SensorListItem extends LitElement {
       }
     })
   }
+
   deleteSelf () {
-    let event = new CustomEvent('request_delete', {
+    const event = new CustomEvent('request_delete', {
       detail: {
         message: `please delete me`,
         id: `${this.senderId}_${this.eep}`
@@ -36,12 +40,13 @@ class SensorListItem extends LitElement {
     })
     this.dispatchEvent(event)
   }
+
   async changeValue (evt) {
-    let att = evt.target.getAttribute('data-att')
+    const att = evt.target.getAttribute('data-att')
     var oldValue = this[att]
     var newValue = evt.target.value
     this[att] = newValue
-    let event = new CustomEvent('updated', {
+    const event = new CustomEvent('updated', {
       detail: {
         message: `this.${att} changed it's value`,
         attribute: att,
@@ -51,6 +56,7 @@ class SensorListItem extends LitElement {
     })
     this.dispatchEvent(event)
   }
+
   async getInfo () {
     try {
       var info = await fetch('enocean-js/eep/' + this.eep)
@@ -60,6 +66,7 @@ class SensorListItem extends LitElement {
     }
     this.requestUpdate()
   }
+
   render () {
     return html`
     <style>

@@ -4,7 +4,7 @@ const ESP3Parser = Enocean.ESP3Parser
 const RadioERP1 = Enocean.RadioERP1
 const ESP3Transformer = Enocean.ESP3Transformer
 // change the serial port to fit your device
-const port = new SerialPort('/dev/tty.usbserial-AI05WNGK', { baudRate: 57600 })
+const port = new SerialPort('/dev/ttyUSB0', { baudRate: 57600 })
 const parser = new ESP3Parser()
 const transformer = new ESP3Transformer()
 const sender = Enocean.SerialportSender({ port: port, parser: new ESP3Parser() })
@@ -44,7 +44,7 @@ transformer.on('data', async data => {
       console.log('TeachIn')
       var teachInInfo = data.teachInInfo
       console.log('TeachIn telegram')
-      if (!known.hasOwnProperty(teachInInfo.senderId)) {
+      if (!(teachInInfo.senderId in known)) {
         if (baseId === '') await init()
         known[data.senderId] = teachInInfo
         //* ****************************************************************************
@@ -63,7 +63,7 @@ transformer.on('data', async data => {
       }
     } else {
       console.log('Data telegram')
-      if (known.hasOwnProperty(data.senderId)) {
+      if (data.senderId in known) {
         console.log('Known sender: ' + data.senderId)
         console.log(data.decode(known[data.senderId].eep.toString()))
       }

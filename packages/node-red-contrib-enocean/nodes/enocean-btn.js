@@ -7,12 +7,12 @@ module.exports = RED => {
     this.encoding = config.encoding
     var node = this
     node.payload = {
-      'meta': {
-        'eep': node.encoding,
-        'channel': 22,
-        'type': 'data'
+      meta: {
+        eep: node.encoding,
+        channel: 22,
+        type: 'data'
       },
-      'data': {}
+      data: {}
     }
 
     node.on('input', async function (msg) {
@@ -25,9 +25,9 @@ module.exports = RED => {
 }
 
 var func = {
-  'click': btnClick,
-  'down': btnDown,
-  'release': release
+  click: btnClick,
+  down: btnDown,
+  release: release
 }
 
 async function btnClick (node, btn) {

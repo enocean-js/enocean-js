@@ -170,17 +170,17 @@ describe('RadioERP1 packets', () => {
     it('RPS with different status codes', () => {
       radio = RadioERP1.from({ payload: 0, status: 0x30 })
       decoded = radio.decode('f6-02-01')
-      assert.equal(decoded.hasOwnProperty('SA'), true)
+      assert.equal('SA' in decoded, true)
       radio = RadioERP1.from({ payload: 0, status: 0x20 })
       decoded = radio.decode('f6-02-01')
-      assert.equal(decoded.hasOwnProperty('SA'), false)
+      assert.equal('SA' in decoded, false)
     })
     it('4BS with direction', () => {
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
       decoded = radio.decode('a5-11-05', 1)
-      assert.equal(decoded.hasOwnProperty('WM'), false)
+      assert.equal('WM' in decoded, false)
       decoded = radio.decode('a5-11-05', 2)
-      assert.equal(decoded.hasOwnProperty('WM'), true)
+      assert.equal('WM' in decoded, true)
     })
     it('a5-12-10', () => {
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
