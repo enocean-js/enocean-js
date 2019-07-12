@@ -10,6 +10,7 @@ class SensorListItem extends LitElement {
     this.friendlyId = undefined
     this.rssi = 0
   }
+
   static get properties () {
     return {
       senderId: { type: String },
@@ -19,6 +20,7 @@ class SensorListItem extends LitElement {
       rorg: { type: Number }
     }
   }
+
   render () {
     return html`
     <style>

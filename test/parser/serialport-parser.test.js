@@ -20,8 +20,8 @@ describe('serialport enocean parser', function () {
         it('can fetch all ESP3 packets', function () {
           const spy = sinon.spy()
           esp3SimpleParser.on('data', spy)
-          for (let key in telegrams) {
-            let telegramm = Buffer.from(telegrams[key], 'hex')
+          for (const key in telegrams) {
+            const telegramm = Buffer.from(telegrams[key], 'hex')
             esp3SimpleParser.write(telegramm)
             assert.deepEqual(spy.getCall(key).args[0].toString('hex'), telegramm.toString('hex'))
           }

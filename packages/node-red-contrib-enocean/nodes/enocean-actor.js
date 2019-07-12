@@ -30,7 +30,7 @@ module.exports = RED => {
         return
       }
       if (msg.payload.type && msg.payload.type === 'LRN' && msg.payload.senderId && msg.payload.eep) {
-        let known = this.sensors.filter(item => (item.senderId === msg.payload.senderId && item.eep === msg.payload.eep))
+        const known = this.sensors.filter(item => (item.senderId === msg.payload.senderId && item.eep === msg.payload.eep))
         if (known.length > 0) {
           known[0].name = msg.payload.name
           known[0].direction = msg.payload.direction
@@ -66,7 +66,7 @@ module.exports = RED => {
 
       if (node.teachOutStatus === true) {
         if (msg.payload.teachIn) {
-          let tei = msg.payload.teachInInfo
+          const tei = msg.payload.teachInInfo
           node.sensors = this.sensors.filter(item => !(item.senderId === tei.senderId))
           node.context().set('sensorList', node.sensors)
           node.stopTeachOut()
@@ -75,7 +75,7 @@ module.exports = RED => {
       }
       if (node.teachInStatus === true) {
         if (msg.payload.teachIn) {
-          let tei = msg.payload.teachInInfo
+          const tei = msg.payload.teachInInfo
           if (tei.responseExpected === 0) {
             // var ret = RadioERP1.makeTeachIn()
             node.send([null, {
@@ -89,8 +89,8 @@ module.exports = RED => {
                   destinationId: tei.senderId
                 },
                 meta: {
-                  'type': 'teach-in-response',
-                  'channel': node.channel
+                  type: 'teach-in-response',
+                  channel: node.channel
                 }
               }
             }])
@@ -136,7 +136,7 @@ module.exports = RED => {
 }
 
 function saveSensor (node, id, eep, rssi = 0, name = '', direction = 1) {
-  let newSensor = {
+  const newSensor = {
     senderId: id,
     eep: eep,
     rssi: rssi,
@@ -148,7 +148,7 @@ function saveSensor (node, id, eep, rssi = 0, name = '', direction = 1) {
 }
 
 function stopTeachIn () {
-  let node = this
+  const node = this
   node.teachInStatus = false
   clearTimeout(node.teachInInterval)
   clearInterval(node.blink)
@@ -156,7 +156,7 @@ function stopTeachIn () {
 }
 
 function startTeachIn (dur) {
-  let node = this
+  const node = this
   if (node.teachInStatus === true || node.teachOutStatus === true) {
     node.stopTeachIn()
     node.stopTeachOut()
@@ -177,7 +177,7 @@ function startTeachIn (dur) {
 }
 
 function stopTeachOut () {
-  let node = this
+  const node = this
   node.teachOutStatus = false
   clearTimeout(node.teachOutInterval)
   clearInterval(node.blink)
@@ -185,7 +185,7 @@ function stopTeachOut () {
 }
 
 function startTeachOut (dur) {
-  let node = this
+  const node = this
   if (node.teachInStatus === true || node.teachOutStatus === true) {
     node.stopTeachIn()
     node.stopTeachOut()

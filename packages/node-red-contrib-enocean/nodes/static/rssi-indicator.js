@@ -6,11 +6,13 @@ class RSSIIndicator extends LitElement {
     super()
     this.value = 20
   }
+
   static get properties () {
     return {
       value: { type: Number }
     }
   }
+
   render () {
     return html`
     <style>

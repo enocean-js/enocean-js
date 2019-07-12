@@ -6,9 +6,11 @@ class SensorList extends LitElement {
     super()
     this._items = {}
   }
+
   static get properties () {
     return {}
   }
+
   render () {
     return html`
     <style>
@@ -23,8 +25,9 @@ class SensorList extends LitElement {
   })}
     </div>`
   }
+
   addItem (item) {
-    if (!this._items.hasOwnProperty(item.senderId)) {
+    if (!(item.senderId in this._items)) {
       this._items[item.senderId] = item
       this.requestUpdate()
     }

@@ -6,20 +6,24 @@ class SensorList extends LitElement {
     super()
     this._items = {}
   }
+
   static get properties () {
     return {}
   }
+
   listchanged (e) {
     this._items[`${e.target.senderId}_${e.target.eep}`][e.detail.attribute] = e.detail.newValue
-    let event = new Event('change')
+    const event = new Event('change')
     this.dispatchEvent(event)
   }
+
   deleteItem (e) {
     delete this._items[e.detail.id]
-    let event = new Event('change')
+    const event = new Event('change')
     this.dispatchEvent(event)
     this.requestUpdate()
   }
+
   render () {
     return html`
     <style>
@@ -34,14 +38,16 @@ class SensorList extends LitElement {
   })}
     </div>`
   }
+
   addItem (item) {
     this._items[`${item.senderId}_${item.eep}`] = item
     this.requestUpdate()
   }
+
   getList () {
     var ret = []
     for (var id in this._items) {
-      let item = this._items[id]
+      const item = this._items[id]
       ret.push({
         senderId: item.senderId,
         eep: item.eep,
