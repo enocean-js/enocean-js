@@ -66,3 +66,7 @@ and then...
     port.pipe(parser)
 
     parser.on('data', pretty.logESP3)
+
+## documentation
+
+the documentation is still lacking, sorry... the only thing i can offer for now is the description of the [content of enocean telegrams (EEP specification)](https://enocean-js.github.io/enocean-js/?eep=a5-02-01). It's not yet fully functional :-(
