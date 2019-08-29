@@ -4,7 +4,7 @@ const assert = require('chai').assert
 
 describe('ByteArray', () => {
   it('SHOULD behave like an Array', () => {
-    assert.equal((new ByteArray()).length, 0, `empty constructor results in non empty array`)
+    assert.equal((new ByteArray()).length, 0, 'empty constructor results in non empty array')
     assert.equal((new ByteArray(42)).length, 42, 'wrong array length')
     assert.equal((new ByteArray(1, 2, 3, 4))[2], 3, '...')
     var a = new ByteArray()
