@@ -1,5 +1,6 @@
 // const getEEP = require('@enocean-js/eep-transcoder').getEEP
 const RadioERP1 = require('@enocean-js/radio-erp1').RadioERP1
+const RadioERP2 = require('@enocean-js/esp3-packets').RadioERP2
 const EO = require('@enocean-js/radio-erp1')
 
 module.exports = RED => {
@@ -63,7 +64,13 @@ module.exports = RED => {
           node.warn('not an ERP1 telegram')
         }
       }
-
+      if (msg.meta.type && msg.meta.type === 'radio-erp2') {
+        try {
+          msg.payload = RadioERP2.from(m.payload)
+        } catch (err) {
+          node.warn('not an ERP1 telegram')
+        }
+      }
       if (node.teachOutStatus === true) {
         if (msg.payload.teachIn) {
           const tei = msg.payload.teachInInfo
@@ -103,12 +110,12 @@ module.exports = RED => {
       } else {
         if (!msg.payload.teachIn || msg.payload.RORG === 0xf6) {
           // not compatible with multible USB Sticks
-          if (msg.payload.constructor.name === 'RadioERP1') {
+          if (msg.payload.constructor.name === 'RadioERP1' || msg.payload.constructor.name === 'RadioERP2') {
             var listenerId = parseInt(this.context().global.get('enocean-base-id')) + parseInt(node.channel)
             if (node.adt && !(msg.payload.destinationId === listenerId.toString(16))) {
               return
             }
-            this.sensors.filter(item => item.senderId === msg.payload.senderId).forEach(item => {
+            this.sensors.filter(item => parseInt(item.senderId,16) === parseInt(msg.payload.senderId,16)).forEach(item => {
               if (item.eep.split('-')[0] === msg.payload.RORG.toString(16)) {
                 node.status({ fill: 'green', shape: 'dot', text: 'data' })
                 setTimeout(() => node.status({ fill: 'grey', shape: 'ring', text: 'data' }), 100)
