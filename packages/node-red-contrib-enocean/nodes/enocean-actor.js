@@ -115,7 +115,7 @@ module.exports = RED => {
             if (node.adt && !(msg.payload.destinationId === listenerId.toString(16))) {
               return
             }
-            this.sensors.filter(item => parseInt(item.senderId,16) === parseInt(msg.payload.senderId,16)).forEach(item => {
+            this.sensors.filter(item => parseInt(item.senderId, 16) === parseInt(msg.payload.senderId, 16)).forEach(item => {
               if (item.eep.split('-')[0] === msg.payload.RORG.toString(16)) {
                 node.status({ fill: 'green', shape: 'dot', text: 'data' })
                 setTimeout(() => node.status({ fill: 'grey', shape: 'ring', text: 'data' }), 100)

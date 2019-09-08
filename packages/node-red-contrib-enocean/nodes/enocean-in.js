@@ -9,7 +9,7 @@ module.exports = RED => {
     EnoceanListener(node, data => {
       node.status({ fill: 'green', shape: 'dot', text: 'data' })
       setTimeout(() => node.status({ fill: 'green', shape: 'ring', text: 'data' }), 100)
-      if (data.constructor.name === 'RadioERP1' ) {
+      if (data.constructor.name === 'RadioERP1') {
         // TODO: cast to concrete types on receivers end
         node.send({
           payload: data.toString(),
@@ -25,7 +25,7 @@ module.exports = RED => {
           }
         })
       }
-      if (data.constructor.name === 'RadioERP2' ) {
+      if (data.constructor.name === 'RadioERP2') {
         // TODO: cast to concrete types on receivers end
         node.send({
           payload: data.toString(),
