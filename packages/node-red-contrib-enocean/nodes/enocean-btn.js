@@ -63,9 +63,9 @@ async function btnDown (node, btn) {
   // await node.serialport.sender.send(node.btn.toString())
 }
 
-function delay(x){
-  return new Promise((resolve,reject)=>{
-    let iv = setTimeout(resolve,x)
+function delay (x) {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, x)
   })
 }
 // {
