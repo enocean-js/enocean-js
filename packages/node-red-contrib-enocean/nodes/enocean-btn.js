@@ -5,6 +5,7 @@ module.exports = RED => {
     RED.nodes.createNode(this, config)
     // this.serialport = RED.nodes.getNode(config.serialport)
     this.encoding = config.encoding
+    this.delay = config.delay
     var node = this
     node.payload = {
       meta: {
@@ -32,6 +33,7 @@ var func = {
 
 async function btnClick (node, btn) {
   await btnDown(node, btn)
+  await delay(node.delay)
   await release(node)
 }
 
@@ -61,6 +63,11 @@ async function btnDown (node, btn) {
   // await node.serialport.sender.send(node.btn.toString())
 }
 
+function delay(x){
+  return new Promise((resolve,reject)=>{
+    let iv = setTimeout(resolve,x)
+  })
+}
 // {
 //   "meta": {
 //     "eep": "a5-12-04",
