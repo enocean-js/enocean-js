@@ -195,7 +195,7 @@ describe('RadioERP1 packets', () => {
     })
     it('MSB-LSB splited fields', () => {
       radio = RadioERP1.from({ payload: [0x00, 0x00, 0x00, 0x08] })
-      radio.encode({ LOT: 90, LAT: 0 }, { eep: 'a5-13-06' })
+      radio.encode({ LOT: 90, LAT: 0, ID: 6 }, { eep: 'a5-13-06', data: 6 })
       decoded = radio.decode('a5-13-06')
       assert.equal(decoded.LOT.value.toFixed(0), 90)
       assert.equal(decoded.LAT.value.toFixed(0), 0)
