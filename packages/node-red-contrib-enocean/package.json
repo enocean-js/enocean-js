@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "serialport": "^7.1.5",
-    "enocean-js": ">=0.0.9",
-    "@enocean-js/radio-erp1": ">=0.0.9",
-    "@enocean-js/eep-transcoder": ">=0.0.9"
+    "enocean-js": ">=0.0.10",
+    "@enocean-js/radio-erp1": ">=0.0.10",
+    "@enocean-js/eep-transcoder": ">=0.0.10"
   },
   "node-red": {
     "nodes": {
