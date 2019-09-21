@@ -89,6 +89,9 @@ export class EEPCase extends LitElement {
     if (c.condition && c.condition.datafield) {
       msg.meta.data = parseInt(c.condition.datafield.value)
     }
+    if (c.condition && c.condition.direction) {
+      msg.meta.direction = parseInt(c.condition.direction)
+    }
     return msg
   }
   render () {
@@ -98,6 +101,7 @@ export class EEPCase extends LitElement {
     return html`
     ${this.case.condition && this.case.condition.statusfield ? html`<eojs-eep-case-head type="Status" field="Statusfield" value="${parseInt(`00${this.case.condition.statusfield[0].value}${this.case.condition.statusfield[1].value}0000`, 2)}" title="${this.case.title}" desc="${this.case.description}"></eojs-eep-case-head>` : ''}
     ${this.case.condition && this.case.condition.datafield ? html`<eojs-eep-case-head type="Datafield" field="${getShortcutFromOffset(this.case, this.case.condition.datafield.bitoffs).shortcut}" value="${this.case.condition.datafield.value}" title="${this.case.title}" desc="${this.case.description}"></eojs-eep-case-head>` : ''}
+    ${this.case.condition && this.case.condition.direction ? html`<eojs-eep-case-head type="Direction" field="" value="${this.case.condition.direction}" title="${this.case.title}" desc="${this.case.description}"></eojs-eep-case-head>` : ''}
         <div class="main">
           <div>
             ${this.case.datafield.map(item => {
