@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@enocean-js/byte-array": "0.0.9",
-    "@enocean-js/crc8": "0.0.9",
+    "@enocean-js/crc8": "0.0.10",
     "@enocean-js/eep-transcoder": "0.0.9",
     "@enocean-js/esp3-packets": "0.0.9",
     "@enocean-js/esp3-transformer": "0.0.9",
