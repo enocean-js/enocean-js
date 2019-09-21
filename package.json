@@ -1,6 +1,6 @@
 {
   "name": "enocean-js",
-  "version": "0.0.10",
+  "version": "0.0.9",
   "description": "open source java script implementation of the enocean protocol",
   "main": "packages/index.js",
   "jsdelivr": "packages/enocean.js",
@@ -52,15 +52,15 @@
     "standard": "^14.1.0"
   },
   "dependencies": {
-    "@enocean-js/byte-array": "0.0.10",
-    "@enocean-js/crc8": "0.0.10",
-    "@enocean-js/eep-transcoder": "0.0.10",
+    "@enocean-js/byte-array": "0.0.9",
+    "@enocean-js/crc8": "0.0.9",
+    "@enocean-js/eep-transcoder": "0.0.9",
     "@enocean-js/esp3-packets": "0.0.10",
-    "@enocean-js/esp3-transformer": "0.0.10",
-    "@enocean-js/pretty-printer": "0.0.10",
-    "@enocean-js/radio-erp1": "0.0.10",
-    "@enocean-js/serialport-parser": "0.0.10",
-    "@enocean-js/serialport-sender": "0.0.10",
+    "@enocean-js/esp3-transformer": "0.0.9",
+    "@enocean-js/pretty-printer": "0.0.9",
+    "@enocean-js/radio-erp1": "0.0.9",
+    "@enocean-js/serialport-parser": "0.0.9",
+    "@enocean-js/serialport-sender": "0.0.9",
     "esm": "^3.2.25",
     "lit-html": "^1.1.2"
   }
