@@ -2,7 +2,7 @@
 import { html, css, LitElement } from './lit-element/lit-element.js'
 import { unsafeHTML } from './lit-html/directives/unsafe-html.js'
 // import { getEEP } from '../../packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
-import { getEEP } from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.3/packages/enocean.js'
+import { getEEP } from 'https://cdn.jsdelivr.net/npm/packages/enocean.js'
 import './eojs-eep-desc-header.js'
 import './eojs-eep-case.js'
 import './kaskadi-collapse.js'
