@@ -55,7 +55,7 @@
     "@enocean-js/byte-array": "0.0.12",
     "@enocean-js/crc8": "0.0.12",
     "@enocean-js/eep-transcoder": "0.0.12",
-    "@enocean-js/esp3-packets": "0.0.12",
+    "@enocean-js/esp3-packets": "0.0.13",
     "@enocean-js/esp3-transformer": "0.0.12",
     "@enocean-js/pretty-printer": "0.0.12",
     "@enocean-js/radio-erp1": "0.0.12",
