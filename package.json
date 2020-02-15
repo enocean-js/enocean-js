@@ -57,7 +57,7 @@
     "@enocean-js/eep-transcoder": "0.0.11",
     "@enocean-js/esp3-packets": "0.0.11",
     "@enocean-js/esp3-transformer": "0.0.11",
-    "@enocean-js/pretty-printer": "0.0.11",
+    "@enocean-js/pretty-printer": "0.0.12",
     "@enocean-js/radio-erp1": "0.0.11",
     "@enocean-js/serialport-parser": "0.0.11",
     "@enocean-js/serialport-sender": "0.0.11",
