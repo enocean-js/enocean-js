@@ -43,13 +43,13 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "express": "^4.17.1",
-    "express-rate-limit": "^5.0.0",
+    "express-rate-limit": "^5.1.1",
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
     "serialport": "^8.0.7",
     "sinon": "^8.1.1",
     "socket.io": "^2.2.0",
-    "standard": "^14.1.0"
+    "standard": "^14.3.1"
   },
   "dependencies": {
     "@enocean-js/byte-array": "0.0.10",
