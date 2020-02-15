@@ -52,15 +52,15 @@
     "standard": "^14.3.1"
   },
   "dependencies": {
-    "@enocean-js/byte-array": "0.0.11",
-    "@enocean-js/crc8": "0.0.11",
-    "@enocean-js/eep-transcoder": "0.0.11",
-    "@enocean-js/esp3-packets": "0.0.11",
-    "@enocean-js/esp3-transformer": "0.0.11",
-    "@enocean-js/pretty-printer": "0.0.11",
-    "@enocean-js/radio-erp1": "0.0.11",
-    "@enocean-js/serialport-parser": "0.0.11",
-    "@enocean-js/serialport-sender": "0.0.11",
+    "@enocean-js/byte-array": "0.0.12",
+    "@enocean-js/crc8": "0.0.12",
+    "@enocean-js/eep-transcoder": "0.0.12",
+    "@enocean-js/esp3-packets": "0.0.12",
+    "@enocean-js/esp3-transformer": "0.0.12",
+    "@enocean-js/pretty-printer": "0.0.12",
+    "@enocean-js/radio-erp1": "0.0.12",
+    "@enocean-js/serialport-parser": "0.0.12",
+    "@enocean-js/serialport-sender": "0.0.12",
     "esm": "^3.2.25",
     "lit-html": "^1.1.2"
   }
