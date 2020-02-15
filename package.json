@@ -52,7 +52,7 @@
     "standard": "^14.3.1"
   },
   "dependencies": {
-    "@enocean-js/byte-array": "0.0.10",
+    "@enocean-js/byte-array": "0.0.11",
     "@enocean-js/crc8": "0.0.10",
     "@enocean-js/eep-transcoder": "0.0.10",
     "@enocean-js/esp3-packets": "0.0.10",
