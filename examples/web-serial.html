@@ -14,7 +14,25 @@
       const RadioERP1 = Enocean.RadioERP1
       const ESP3Parser = Enocean.ESP3WebSerialParser
       const parser = new ESP3Parser()
+
+      const requestSerial = async ()=>{
+        navigator.serial.addEventListener("connect",e=>{console.log("connected")})
+        let ports = await navigator.serial.getPorts()
+        if(ports.length > 0){
+          await ports[0].open({baudrate: 57600})
+          const reader = ports[0].readable.getReader();
+          console.log("listening")
+          await parser.read(reader)
+        }else{
+          const port = await navigator.serial.requestPort();
+
+        }
+      }
+      window.addEventListener("load", requestSerial)
+      btn1.addEventListener("load", requestSerial)
+      
       let known = []
+
       parser.addEventListener("data",evt=>{
         Enocean.pretty.logESP3(evt.detail)
         const data = evt.detail
@@ -32,22 +50,7 @@
       })
 
 
-      const requestSerial = async ()=>{
-        navigator.serial.addEventListener("connect",e=>{console.log("connected")})
-        let ports = await navigator.serial.getPorts()
-        if(ports.length > 0){
-          await ports[0].open({baudrate: 57600})
-          const reader = ports[0].readable.getReader();
-          await parser.read(reader)
-          console.log("listening")
-        }else{
-          const port = await navigator.serial.requestPort();
-          console.log(port)
-        }
-      }
 
-      window.addEventListener("load", requestSerial)
-      btn1.addEventListener("load", requestSerial)
     </script>
     <div>
     </div>
