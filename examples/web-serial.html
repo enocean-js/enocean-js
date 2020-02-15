@@ -3,9 +3,6 @@
   <head>
     <meta charset="utf-8">
     <title></title>
-    <style>
-      div{background: url(tilegroup.svg);width:100vw;height:100vh}
-    </style>
   </head>
   <body>
     <button id="btn1">click</button>
@@ -16,21 +13,23 @@
       const parser = new ESP3Parser()
 
       const requestSerial = async ()=>{
-        navigator.serial.addEventListener("connect",e=>{console.log("connected")})
+        let port
         let ports = await navigator.serial.getPorts()
         if(ports.length > 0){
-          await ports[0].open({baudrate: 57600})
-          const reader = ports[0].readable.getReader();
+          port = ports[0]
+        }else{
+          port = await navigator.serial.requestPort();
+        }
+        if(port){
+          await port.open({baudrate: 57600})
+          const reader = port.readable.getReader();
           console.log("listening")
           await parser.read(reader)
-        }else{
-          const port = await navigator.serial.requestPort();
-
         }
       }
       window.addEventListener("load", requestSerial)
       btn1.addEventListener("load", requestSerial)
-      
+
       let known = []
 
       parser.addEventListener("data",evt=>{
@@ -48,9 +47,6 @@
           }
         }
       })
-
-
-
     </script>
     <div>
     </div>
