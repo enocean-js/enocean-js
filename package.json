@@ -16,7 +16,7 @@
     ]
   },
   "scripts": {
-    "test": "standard && nyc --reporter=lcov --reporter=text-summary mocha --recursive test",
+    "test": "standard --fix && nyc --reporter=lcov --reporter=text-summary mocha --recursive test",
     "test_only": "mocha --recursive test",
     "coverage": "nyc --reporter=lcov mocha --recursive test && xdg-open ./coverage/lcov-report/index.html",
     "fix": "standard --fix"
