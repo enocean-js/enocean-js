@@ -1,6 +1,6 @@
 /* eslint-disable no-undef  */
-import { html, css, LitElement } from './lit-element/lit-element.js'
-import { unsafeHTML } from './lit-html/directives/unsafe-html.js'
+import { html, css, LitElement } from 'https://cdn.klimapartner.net/modules/lit-element/lit-element.js'
+import { unsafeHTML } from 'https://cdn.klimapartner.net/modules/lit-html/directives/unsafe-html.js'
 // import { getEEP } from '../../packages/node_modules/@enocean-js/eep-transcoder/src/eep-transcoder.js'
 import { getEEP } from 'https://cdn.jsdelivr.net/npm/enocean-js/packages/enocean.js'
 import './eojs-eep-desc-header.js'

@@ -1,5 +1,5 @@
 /* eslint-disable no-undef  */
-import { html, css } from './lit-element/lit-element.js'
+import { html, css } from 'https://cdn.klimapartner.net/modules/lit-element/lit-element.js'
 import { KaskadiSimpleRouter } from './kaskadi-simple-router.js'
 import './eojs-eep-descriptor.js'
 import './eojs-eep-list.js'

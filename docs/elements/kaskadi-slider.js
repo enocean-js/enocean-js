@@ -1,5 +1,5 @@
 /* eslint-disable no-undef  */
-import { html, css, LitElement } from './lit-element/lit-element.js'
+import { html, css, LitElement } from 'https://cdn.klimapartner.net/modules/lit-element/lit-element.js'
 export class KaskadiSlider extends LitElement {
   constructor () {
     super()

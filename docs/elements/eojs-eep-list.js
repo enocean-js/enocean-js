@@ -1,7 +1,7 @@
 /* eslint-disable no-undef  */
 /* eslint-disable no-unused-vars */
-import { html, css, LitElement } from './lit-element/lit-element.js'
-import * as EEP from 'https://cdn.jsdelivr.net/npm/enocean-js@0.0.3/packages/node_modules/@enocean-js/eep-transcoder/src/eep.js'
+import { html, css, LitElement } from 'https://cdn.klimapartner.net/modules/lit-element/lit-element.js'
+import * as EEP from 'https://cdn.jsdelivr.net/npm/enocean-js/packages/node_modules/@enocean-js/eep-transcoder/src/eep.js'
 import { KaskadiLinkList } from './kaskadi-link-list.js'
 import { KaskadiListItem } from './kaskadi-list-item.js'
 class EOJSEEPList extends LitElement {
