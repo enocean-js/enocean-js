@@ -60,7 +60,7 @@
     "@enocean-js/pretty-printer": "0.0.13",
     "@enocean-js/radio-erp1": "0.0.13",
     "@enocean-js/serialport-parser": "0.0.13",
-    "@enocean-js/serialport-sender": "0.0.13",
+    "@enocean-js/serialport-sender": "0.0.14",
     "esm": "^3.2.25",
     "lit-html": "^1.1.2",
     "t-readable": "^0.1.0"
