@@ -4,49 +4,52 @@
     <meta charset="utf-8">
     <title></title>
   </head>
+  <script type="module" src="elements/web-serial-connector.js"></script>
   <body>
-    <button id="btn1">click</button>
+    <web-serial-connector></web-serial-connector>
     <script type="module">
       import * as Enocean from '../packages/enocean.js'
-      const RadioERP1 = Enocean.RadioERP1
-      const ESP3Parser = Enocean.ESP3WebSerialParser
-      const parser = new ESP3Parser()
-
-      const requestSerial = async ()=>{
-        let port
-        let ports = await navigator.serial.getPorts()
-        if(ports.length > 0){
-          port = ports[0]
-        }else{
-          port = await navigator.serial.requestPort();
-        }
-        if(port){
-          await port.open({baudrate: 57600})
-          const reader = port.readable.getReader();
-          console.log("listening")
-          await parser.read(reader)
-        }
-      }
-      window.addEventListener("load", requestSerial)
-      btn1.addEventListener("load", requestSerial)
-
-      let known = []
-
-      parser.addEventListener("data",evt=>{
-        Enocean.pretty.logESP3(evt.detail)
-        const data = evt.detail
-        if(data.senderId in known){
-          console.log("found",known[data.senderId])
-          let decoded = data.decode(known[data.senderId].eep.toString())
-          console.log(decoded)
-        }else{
-          console.log("unknown")
-          if(data.teachIn){
-            known[data.senderId] = data.teachInInfo
-            console.log("learned", data.teachInInfo)
-          }
-        }
-      })
+      let cc = Enocean.CommonCommand.encode(8)
+      console.log(cc)
+      // const RadioERP1 = Enocean.RadioERP1
+      // const ESP3Parser = Enocean.ESP3WebSerialParser
+      // const parser = new ESP3Parser()
+      //
+      // const requestSerial = async ()=>{
+      //   let port
+      //   let ports = await navigator.serial.getPorts()
+      //   if(ports.length > 0){
+      //     port = ports[0]
+      //   }else{
+      //     port = await navigator.serial.requestPort();
+      //   }
+      //   if(port){
+      //     await port.open({baudrate: 57600})
+      //     const reader = port.readable.getReader();
+      //     console.log("listening")
+      //     await parser.read(reader)
+      //   }
+      // }
+      // window.addEventListener("load", requestSerial)
+      // btn1.addEventListener("load", requestSerial)
+      //
+      // let known = []
+      //
+      // parser.addEventListener("data",evt=>{
+      //   Enocean.pretty.logESP3(evt.detail)
+      //   const data = evt.detail
+      //   if(data.senderId in known){
+      //     console.log("found",known[data.senderId])
+      //     let decoded = data.decode(known[data.senderId].eep.toString())
+      //     console.log(decoded)
+      //   }else{
+      //     console.log("unknown")
+      //     if(data.teachIn){
+      //       known[data.senderId] = data.teachInInfo
+      //       console.log("learned", data.teachInInfo)
+      //     }
+      //   }
+      // })
     </script>
     <div>
     </div>
