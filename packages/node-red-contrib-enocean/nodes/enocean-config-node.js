@@ -78,15 +78,10 @@ async function openPort (node) {
     if (err) {
       console.log(err)
     }
-  }).pipe(node.transformer).on('error', err => {
-    if (err) {
-      console.log(err)
-    }
   })
 }
 
 function makeTP (node) {
-  node.transformer = new ESP3Transfomer()
   node.parser = new ESP3Parser()
 }
 
