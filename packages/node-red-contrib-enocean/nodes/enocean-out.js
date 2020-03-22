@@ -1,5 +1,5 @@
 const RadioERP1 = require('@enocean-js/radio-erp1').RadioERP1
-const Response = require('@enocean-js/esp3-packets').Response
+// const Response = require('@enocean-js/esp3-packets').Response
 module.exports = RED => {
   function EnOceanOutputNode (config) {
     RED.nodes.createNode(this, config)
