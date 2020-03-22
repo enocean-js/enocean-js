@@ -56,8 +56,8 @@ module.exports = RED => {
 }
 
 async function enoSend (node, data) {
-  var ret = await node.serialport.sender.send(data)
-  var res = Response.from(ret)
+  var res = await node.serialport.sender.send(data)
+  // var res = Response.from(ret)
   if (res.responseType !== 'RET_OK') {
     node.warn(res.responseType)
   }
