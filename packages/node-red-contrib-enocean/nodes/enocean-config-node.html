@@ -13,7 +13,7 @@
       portList.map(item=>{
         var option = document.createElement("option")
         option.setAttribute("value",item.path || item.comName)
-        option.appendChild(document.createTextNode(`${item.path || item.comName} (${item.manufacturer})`))
+        option.appendChild(document.createTextNode(`${item.manufacturer}`))
         document.querySelector("#eno-serialports").appendChild(option)
       })
     }
