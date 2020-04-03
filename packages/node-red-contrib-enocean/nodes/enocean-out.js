@@ -21,6 +21,7 @@ module.exports = RED => {
       if (msg.payload.meta.type === 'teach-in-response') {
         msg.payload.data.senderId = senderId
         var ret = RadioERP1.makeTeachIn(msg.payload.data)
+        ret.status = 0
         await enoSend(node, ret.toString())
         return
       }
