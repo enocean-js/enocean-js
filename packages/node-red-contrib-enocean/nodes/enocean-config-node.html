@@ -10,11 +10,10 @@
     oneditprepare: async function(){
       var portListResponse = await fetch("/enocean-js/port/list")
       var portList = await portListResponse.json()
-      console.log(portList)
       portList.map(item=>{
         var option = document.createElement("option")
-        option.setAttribute("value",item.path)
-        option.appendChild(document.createTextNode(`${item.path} (${item.manufacturer})`))
+        option.setAttribute("value",item.path || item.comName)
+        option.appendChild(document.createTextNode(`${item.path || item.comName} (${item.manufacturer})`))
         document.querySelector("#eno-serialports").appendChild(option)
       })
     }
