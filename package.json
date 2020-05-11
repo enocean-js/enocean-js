@@ -49,7 +49,7 @@
     "serialport": "^8.0.7",
     "sinon": "^9.0.0",
     "socket.io": "^2.2.0",
-    "standard": "^14.3.1"
+    "standard": "^14.3.4"
   },
   "dependencies": {
     "@enocean-js/byte-array": "0.0.16",
