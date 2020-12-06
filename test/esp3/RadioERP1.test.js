@@ -237,6 +237,11 @@ describe('RadioERP1 packets', () => {
       radio.senderId = 'ff00ff00'
       decoded = radio.decode('d2-50-00')
 
+      radio = RadioERP1.from({ payload: [0], id: 'ff00ff00' })
+      radio.encode({ POS: 31, ANG: 47, REPO: 0, LOCK: 0, CHN: 0, CMD: 1 }, { eep: 'd2-05-00', channel: 3, data: 1 })
+      radio.senderId = 'ff00ff00'
+      decoded = radio.decode('d2-05-00')
+
       radio = RadioERP1.from('55000c070196d240009005012001a03d790001ffffffff5600d5')
       decoded = radio.decode('d2-32-02')
       assert.equal(decoded.CH1.value, 0.9)
