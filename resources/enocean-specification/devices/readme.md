@@ -21,3 +21,5 @@
 * SRG02 - window handle
 * radio remote keys
 * STC DO8
+
+...
