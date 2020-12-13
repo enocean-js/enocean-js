@@ -31,7 +31,7 @@ class SensorListItem extends LitElement {
         display: flex;
         flex-direction: row;
         padding:3px;
-        background:royalblue ; 
+        background:royalblue ;
         color:white;
         align-items:center;
         justify-content:space-between;
@@ -61,7 +61,7 @@ class SensorListItem extends LitElement {
       .c5 {background: #69a5e7; color: white}
       .c6 {background: #5dd65d; color: black}
       .c7 {background: #505762; color: white}
-      
+
     </style>
     <div class="${this.eep ? 'known' : 'unknown'}">
       <div id="blender"></div>
@@ -74,10 +74,12 @@ class SensorListItem extends LitElement {
       </header>
       <div id="body">
         <div id="rorg" class="eep ${this.rorg.toString(16)}">${this.rorg.toString(16)}</div>
-        ${this.eep ? html`
-          <div id="func" class="eep c${(parseInt(this.eep.split('-')[1], 16)) % 8}">${this.eep.split('-')[1]}</div>
-          <div id="type" class="eep c${(parseInt(this.eep.split('-')[2], 16)) % 8}">${this.eep.split('-')[2]}</div>
-        ` : ''}
+        ${this.eep
+          ? html`
+            <div id="func" class="eep c${(parseInt(this.eep.split('-')[1], 16)) % 8}">${this.eep.split('-')[1]}</div>
+            <div id="type" class="eep c${(parseInt(this.eep.split('-')[2], 16)) % 8}">${this.eep.split('-')[2]}</div>
+          `
+           : ''}
       </div>
     </div>`
   }

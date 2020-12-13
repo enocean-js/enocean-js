@@ -17,9 +17,9 @@ module.exports = RED => {
       this.context().set('sensorList', [])
     }
     this.sensors = this.context().get('sensorList')
-    var node = this
+    const node = this
     this.on('input', async function (m) {
-      var msg = m
+      const msg = m
       if (msg.payload.eep) {
         msg.payload.eep = msg.payload.eep.toLowerCase()
       }
@@ -111,7 +111,7 @@ module.exports = RED => {
         if (!msg.payload.teachIn || msg.payload.RORG === 0xf6) {
           // not compatible with multible USB Sticks
           if (msg.payload.constructor.name === 'RadioERP1' || msg.payload.constructor.name === 'RadioERP2') {
-            var listenerId = parseInt(this.context().global.get('enocean-base-id')) + parseInt(node.channel)
+            const listenerId = parseInt(this.context().global.get('enocean-base-id')) + parseInt(node.channel)
             if (node.adt && !(msg.payload.destinationId === listenerId.toString(16))) {
               return
             }

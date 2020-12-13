@@ -43,8 +43,8 @@ class SensorListItem extends LitElement {
 
   async changeValue (evt) {
     const att = evt.target.getAttribute('data-att')
-    var oldValue = this[att]
-    var newValue = evt.target.value
+    const oldValue = this[att]
+    const newValue = evt.target.value
     this[att] = newValue
     const event = new CustomEvent('updated', {
       detail: {
@@ -59,7 +59,7 @@ class SensorListItem extends LitElement {
 
   async getInfo () {
     try {
-      var info = await fetch('enocean-js/eep/' + this.eep)
+      const info = await fetch('enocean-js/eep/' + this.eep)
       this.info = (await info.json()).title
     } catch (err) {
       this.info = 'unknown EEP'

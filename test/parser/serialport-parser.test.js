@@ -14,7 +14,7 @@ const telegrams = [
 
 describe('serialport enocean parser', function () {
   parsers.forEach(currentParser => {
-    var esp3SimpleParser = new currentParser.Parser()
+    const esp3SimpleParser = new currentParser.Parser()
     describe(`${currentParser.name}`, function () {
       describe('from proper byte stream:', function () {
         it('can fetch all ESP3 packets', function () {
@@ -54,7 +54,8 @@ describe('serialport enocean parser', function () {
             '55a010001a03',
             '55af600ffd9b7812001f',
             '55707017af600ffd9b7812001ffc',
-            '550707017ad509ffdba5ed0001ffffffdf'
+            '550707017ad509ffdba5ed0001ffffffdf',
+            'a52f05601204ad01604293001641419800132bc053c0534617d813c1459600164143d8001644c053c053c056cf013fa855002c020a'
           ]
           const messyBytesBetweenTelegramsAsBuffer = telegrams.slice(0).map(
             telegramAsString => Buffer.from(
@@ -103,8 +104,8 @@ describe('serialport enocean parser', function () {
         it('an Error SHOULD be thrown if the packet exeeds 1000 Bytes', function () {
           const spy = sinon.spy()
           esp3SimpleParser.on('error', spy)
-          var buf = [0x55, 0xff, 0xff, 0xff, 0x01, 0x3d]
-          for (var i = 0; i < 1001; i++) {
+          const buf = [0x55, 0xff, 0xff, 0xff, 0x01, 0x3d]
+          for (let i = 0; i < 1001; i++) {
             buf.push(0)
           }
           esp3SimpleParser.write(Buffer.from(buf))
@@ -121,12 +122,12 @@ describe('serialport enocean parser', function () {
         it('under siege', function () {
           const spy = sinon.spy()
           const parser = new currentParser.Parser({ maxBufferSize: 32 })
-          var ec = [0, 0, 0, 0, 0]
+          const ec = [0, 0, 0, 0, 0]
           parser.on('data', spy)
           parser.on('error', err => ec[err.code]++)
-          for (var t = 1; t <= 1000; t++) {
-            var buf = []
-            for (var i = 0; i < 500; i++) {
+          for (let t = 1; t <= 1000; t++) {
+            const buf = []
+            for (let i = 0; i < 500; i++) {
               buf.push(Math.floor(Math.random() * 255))
             }
             parser.write(Buffer.from(buf))

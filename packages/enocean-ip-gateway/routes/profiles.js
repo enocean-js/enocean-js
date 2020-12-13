@@ -10,7 +10,7 @@ router.get('/*-*-*', async (ctx, next) => {
     message: 'OK'
   })
 
-  var eep = ctx.path.replace('/profiles/', '')
+  const eep = ctx.path.replace('/profiles/', '')
   ctx.eoi_return_object.profile = eep2IP(eep)
 
   ctx.body = ctx.eoi_return_object

@@ -33,7 +33,7 @@ class SensorList extends LitElement {
     </style>
     <div>
       ${Object.keys(this._items).map(key => {
-    var item = this._items[key]
+    const item = this._items[key]
     return html`<sensor-list-item @request_delete="${this.deleteItem}" @updated="${this.listchanged}" name="${item.name ? item.name : ''}" senderId="${item.senderId}" eep="${item.eep}" rssi="${item.rssi}" info="${item.info}"></sensor-list-item>`
   })}
     </div>`
@@ -45,8 +45,8 @@ class SensorList extends LitElement {
   }
 
   getList () {
-    var ret = []
-    for (var id in this._items) {
+    const ret = []
+    for (const id in this._items) {
       const item = this._items[id]
       ret.push({
         senderId: item.senderId,

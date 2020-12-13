@@ -7,7 +7,7 @@ const RadioERP1 = require('../../').RadioERP1
 const assert = require('chai').assert
 describe('RadioERP1 packets', () => {
   it('SHOULD be creatable from ESP3Packets', () => {
-    var radio = RadioERP1.from({ data: 'f630aabbccdd30', optionalData: '03ffffffffff00', packetType: 1 })
+    const radio = RadioERP1.from({ data: 'f630aabbccdd30', optionalData: '03ffffffffff00', packetType: 1 })
     assert.equal(radio.packetType, 1)
     assert.equal(radio.RORG, 0xf6, 'RORG')
     assert.equal(radio.payload[0], 0x30)
@@ -23,7 +23,7 @@ describe('RadioERP1 packets', () => {
     assert.equal(radio.decode('f6-02-03').RA.value, 0x30)
   })
   it('SHOULD be manipulable with interface methods', () => {
-    var radio = RadioERP1.from({ payload: '00000000' })
+    let radio = RadioERP1.from({ payload: '00000000' })
     radio.RORG = 0xa5
     radio.payload = 0xaabbccdd
     assert.equal(radio.payload.toString(), 'aabbccdd')
@@ -50,14 +50,14 @@ describe('RadioERP1 packets', () => {
     assert.equal(radio.RORG, 0xd2, 'VLD')
   })
   it('SHOULD allow to create learn telegrams (UTE)', () => {
-    var radio = RadioERP1.from('55000d0701fdd480ff61000050d2050e0ed10001ffffffff360051')
-    var decoded = radio.decode()
+    const radio = RadioERP1.from('55000d0701fdd480ff61000050d2050e0ed10001ffffffff360051')
+    const decoded = radio.decode()
     assert.equal(decoded.eep.toString(), 'd2-50-00')
     assert.equal(decoded.senderId, '050e0ed1')
   })
   it('SHOULD allow to create learn telegrams (4BS)', () => {
-    var radio = RadioERP1.makeTeachIn({ eep: 'a5-02-0a' })
-    var decoded = radio.decode()
+    const radio = RadioERP1.makeTeachIn({ eep: 'a5-02-0a' })
+    const decoded = radio.decode()
     assert.equal(decoded.eep.func, 0x02)
     assert.equal(decoded.eep.type, 0x0a)
     assert.equal(decoded.manufacturer.id, 0x7ff)
@@ -65,8 +65,8 @@ describe('RadioERP1 packets', () => {
     assert.equal(decoded.teachInType, '4BS')
   })
   it('SHOULD allow to create learn telegrams (1BS)', () => {
-    var radio = RadioERP1.makeTeachIn({ eep: 'd5-00-01', senderId: 'aabbccdd' })
-    var decoded = radio.decode()
+    const radio = RadioERP1.makeTeachIn({ eep: 'd5-00-01', senderId: 'aabbccdd' })
+    const decoded = radio.decode()
     assert.equal(decoded.senderId, 'aabbccdd')
     assert.equal(decoded.eep.toString(), 'd5-00-01')
     assert.equal(decoded.teachInType, '1BS')
@@ -78,8 +78,8 @@ describe('RadioERP1 packets', () => {
     assert.equal(decoded.teachInType, '1BS')
   })
   it('SHOULD allow to create learn telegrams (RPS)', () => {
-    var radio = RadioERP1.makeTeachIn({ eep: 'f6-02-01', senderId: 'aabbccdd' })
-    var decoded = radio.teachInInfo
+    let radio = RadioERP1.makeTeachIn({ eep: 'f6-02-01', senderId: 'aabbccdd' })
+    let decoded = radio.teachInInfo
     assert.equal(decoded.senderId, 'aabbccdd')
     assert.equal(decoded.eep.toString(), 'f6-02-01')
     assert.equal(decoded.teachInType, 'RPS')

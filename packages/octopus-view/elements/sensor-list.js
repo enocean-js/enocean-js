@@ -20,7 +20,7 @@ class SensorList extends LitElement {
     </style>
     <div>
       ${Object.keys(this._items).map(key => {
-    var item = this._items[key]
+    const item = this._items[key]
     return html`<sensor-list-item senderid="${item.senderId}" rorg="${item.RORG}" rssi="${item.RSSI}"></sensor-list-item>`
   })}
     </div>`

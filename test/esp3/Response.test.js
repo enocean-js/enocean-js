@@ -5,8 +5,8 @@ const EO = require('../../')
 const assert = require('chai').assert
 describe('Response packets', () => {
   it('...', () => {
-    var packet = Response.encode(EO.RET_OK, 'ffa08700', 9)
-    var desc = {
+    const packet = Response.encode(EO.RET_OK, 'ffa08700', 9)
+    const desc = {
       0: [
         {
           name: 'baseId',
@@ -30,7 +30,7 @@ describe('Response packets', () => {
         }
       ]
     }
-    var res = packet.decode(desc)
+    const res = packet.decode(desc)
     assert.equal(res.baseId, 'ffa08700')
     assert.equal(res.remainingWriteCycles, 9)
     assert.equal(res.test2[0], 9)

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // var fc = 0
 
-var Enocean = require('../')
-for (var item in Enocean.EEP) {
+const Enocean = require('../')
+for (const item in Enocean.EEP) {
   delete Enocean.EEP[item].description
   delete Enocean.EEP[item].title
   delete Enocean.EEP[item].rorg_title

@@ -6,7 +6,7 @@ module.exports = RED => {
     // this.serialport = RED.nodes.getNode(config.serialport)
     this.encoding = config.encoding
     this.delay = config.delay
-    var node = this
+    const node = this
     node.payload = {
       meta: {
         eep: node.encoding,
@@ -25,7 +25,7 @@ module.exports = RED => {
   RED.nodes.registerType('enocean-btn', EnOceanButtonNode)
 }
 
-var func = {
+const func = {
   click: btnClick,
   down: btnDown,
   release: release

@@ -9,14 +9,14 @@ port.pipe(parser)
 
 const sender = Enocean.SerialportSender({ port: port, parser: new ESP3Parser() })
 const Commander = new Enocean.Commander(sender)
-var baseId
+let baseId
 
 const init = async () => {
-  var res = await Commander.getIdBase()
+  const res = await Commander.getIdBase()
   baseId = parseInt(res.baseId.toString(), 16)
   console.log(res.baseId.toString())
 
-  var btn = Enocean.RadioERP1.from({ rorg: 'f6', payload: [0], id: baseId + 1 })
+  const btn = Enocean.RadioERP1.from({ rorg: 'f6', payload: [0], id: baseId + 1 })
 
   // Button A1 Down: LIGHT ON
   btn.payload = btn.encode({ R1: 0, EB: 1 }, { eep: 'f6-02-01', status: 0x30 })

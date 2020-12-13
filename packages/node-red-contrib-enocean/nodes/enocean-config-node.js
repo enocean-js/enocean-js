@@ -13,7 +13,7 @@ module.exports = RED => {
     this.port = null
     this.baseId = ''
     makeTP(this)
-    var node = this
+    const node = this
     node.on('close', function (done) {
       node.port.removeListener('error', errorHandler)
       node.port.close(done)
@@ -29,7 +29,7 @@ module.exports = RED => {
   RED.nodes.registerType('enocean-config-node', EnOceanConfigNode)
   RED.httpAdmin.get('/enocean-js/info/:node/baseid/', function (req, res) {
     try {
-      var node = RED.nodes.getNode(req.params.node)
+      const node = RED.nodes.getNode(req.params.node)
       res.send({ baseId: node.serialport.baseId })
     } catch (err) {
       res.send({ baseId: 'unknown' })
@@ -42,12 +42,12 @@ module.exports = RED => {
     res.send(getEEP(req.params.eep))
   })
   RED.httpAdmin.get('/enocean-js/context/:node/set/:name/:value', function (req, res) {
-    var n = RED.nodes.getNode(req.params.node)
+    const n = RED.nodes.getNode(req.params.node)
     n.context().set(req.params.name, JSON.parse(req.params.value))
     n.sensors = n.context().get(req.params.name)
   })
   RED.httpAdmin.get('/enocean-js/:filename', function (req, res) {
-    var options = {
+    const options = {
       root: path.join(__dirname, '/static/'),
       dotfiles: 'deny'
     }
@@ -91,9 +91,9 @@ function makeCommander (node) {
   node.getBaseId = async function (x) {
     try {
       if (node.port.isOpen) {
-        var res = await node.commander.getIdBase()
+        const res = await node.commander.getIdBase()
         node.baseId = parseInt(res.baseId.toString(), 16)
-        var globalContext = node.context().global
+        const globalContext = node.context().global
         globalContext.set('enocean-base-id', node.baseId)
         if (x) {
           x.refreshState()

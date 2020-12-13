@@ -1,8 +1,8 @@
 /* eslint no-undef: "off" */
 /* eslint no-unused-vars: "off" */
 async function getContext (nodeID) {
-  var res = await fetch('/context/node/' + nodeID)
-  var json = await res.json()
+  const res = await fetch('/context/node/' + nodeID)
+  const json = await res.json()
   json.default.get = function (name) {
     return JSON.parse(this[name].msg)
   }.bind(json.default)
@@ -10,9 +10,9 @@ async function getContext (nodeID) {
 }
 
 async function editprepare () {
-  var node = this
-  var ctx = await getContext(node.id)
-  var objSensorList = document.querySelector('#enocean-sensorlist')
+  const node = this
+  const ctx = await getContext(node.id)
+  const objSensorList = document.querySelector('#enocean-sensorlist')
   ctx.get('sensorList').forEach(item => {
     objSensorList.addItem(item)
   })

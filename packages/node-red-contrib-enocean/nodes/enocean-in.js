@@ -4,7 +4,7 @@ module.exports = RED => {
     this.name = config.name
     this.serialport = config.serialport
     this.status({ fill: 'grey', shape: 'ring', text: 'not initialized' })
-    var node = this
+    const node = this
     makeStateRefreshable(node, RED)
     EnoceanListener(node, data => {
       node.status({ fill: 'green', shape: 'dot', text: 'data' })

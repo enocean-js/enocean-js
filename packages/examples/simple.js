@@ -11,10 +11,10 @@ const port = new SerialPort('/dev/ttyUSB0', { baudRate: 57600 })
 
 const parser = new ESP3Parser({ maxBufferSize: 2000 })
 port.pipe(parser)
-var sender = SerialportSender({ port: port, parser: new ESP3Parser({ maxBufferSize: 2000 }) })
+const sender = SerialportSender({ port: port, parser: new ESP3Parser({ maxBufferSize: 2000 }) })
 
-var commander = CommonCommand.connect(sender)
-var erp = RadioERP1.connect(sender)
+const commander = CommonCommand.connect(sender)
+const erp = RadioERP1.connect(sender)
 
 parser.on('data', pretty.logESP3)
 
@@ -24,7 +24,7 @@ async function main () {
   // const A0_DOWN = 0x10
   const A1_DOWN = 0x30
   const RELEASE = 0x00
-  var id = parseInt(base.baseId, 16) + 1
+  const id = parseInt(base.baseId, 16) + 1
   await erp.send(0xf6, A1_DOWN, id, 0x20)
   await erp.send(0xf6, RELEASE, id, 0x20)
   // console.log(await commander.setBaseId(0xffaaaa00))
