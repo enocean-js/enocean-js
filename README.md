@@ -70,3 +70,9 @@ and then...
 ## documentation
 
 the documentation is still lacking, sorry... the only thing i can offer for now is the description of the [content of enocean telegrams (EEP specification)](https://enocean-js.github.io/enocean-js/?eep=a5-02-01). It's not yet fully functional :-(
+
+## donate
+
+if you want to support this project, consider donating something to this address:
+
+Bitcoin: 1MKAPeq2gY57TwUR1bMSrCGZKYsfiVGKM4
