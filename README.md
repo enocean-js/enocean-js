@@ -19,7 +19,7 @@
 
 ![npm](https://img.shields.io/npm/dt/enocean-js.svg)
 
-![Donate to this Bitcoin address: 1MKAPeq2gY57TwUR1bMSrCGZKYsfiVGKM4](https://img.shields.io/static/v1?label=donate&message=1MKAPeq2gY57TwUR1bMSrCGZKYsfiVGKM4&color=orange&logo=bitcoin)
+![Donate to this Bitcoin address: 1MKAPeq2gY57TwUR1bMSrCGZKYsfiVGKM4](https://img.shields.io/static/v1?label=donate&message=1FLXyLHPn3N1KLznUp39uTfHqPBfoM63t4&color=orange&logo=bitcoin)
 
 This is the monorepo for all things enocean in javascript. It is home to a library of tools to work with enocean telegrams in javascript.
 some of the features are:
@@ -77,4 +77,4 @@ the documentation is still lacking, sorry... the only thing i can offer for now 
 
 if you want to support this project, consider donating something to this address:
 
-Bitcoin: 1MKAPeq2gY57TwUR1bMSrCGZKYsfiVGKM4
+Bitcoin: 1FLXyLHPn3N1KLznUp39uTfHqPBfoM63t4
