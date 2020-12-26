@@ -46,7 +46,7 @@
     "express-rate-limit": "^5.1.1",
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
-    "serialport": "^8.0.7",
+    "serialport": "^9.0.0",
     "sinon": "^9.0.0",
     "socket.io": "^2.2.0",
     "standard": "^14.3.1"
