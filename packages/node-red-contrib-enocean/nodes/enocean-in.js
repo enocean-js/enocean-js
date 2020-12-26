@@ -51,7 +51,7 @@ module.exports = RED => {
 
   async function EnoceanListener (node, cb) {
     const usb = RED.nodes.getNode(node.serialport)
-    usb.parser.on('data', cb)
+    usb.parser.on('data', cb).on('error', err => { console.warn(err) })
   }
   RED.nodes.registerType('enocean-in', EnoceanInNode)
 }
