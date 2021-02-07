@@ -42,15 +42,15 @@
   },
   "homepage": "https://github.com/enocean-js/enocean-js#readme",
   "devDependencies": {
-    "chai": "^4.2.0",
+    "chai": "^4.3.0",
     "express": "^4.17.1",
-    "express-rate-limit": "^5.1.1",
-    "mocha": "^7.0.1",
-    "nyc": "^15.0.0",
-    "serialport": "^8.0.7",
-    "sinon": "^9.0.0",
-    "socket.io": "^2.2.0",
-    "standard": "^14.3.1",
+    "express-rate-limit": "^5.2.3",
+    "mocha": "^7.2.0",
+    "nyc": "^15.1.0",
+    "serialport": "^8.0.8",
+    "sinon": "^9.2.4",
+    "socket.io": "^2.4.1",
+    "standard": "^14.3.4",
     "xml2js": "^0.4.23"
   },
   "dependencies": {
@@ -64,7 +64,7 @@
     "@enocean-js/serialport-parser": "0.0.16",
     "@enocean-js/serialport-sender": "0.0.16",
     "esm": "^3.2.25",
-    "lit-html": "^1.1.2",
+    "lit-html": "^1.3.0",
     "t-readable": "^0.1.0"
   }
 }
