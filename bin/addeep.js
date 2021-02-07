@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 var xml2js = require('xml2js')
 var parseString = xml2js.parseString
-var builder = new xml2js.Builder({headless: true, explicitRoot:false});
+var builder = new xml2js.Builder({ headless: true, explicitRoot: false })
 var fs = require('fs')
-var util = require('util')
+// var util = require('util')
 var path = require('path')
 var xml = fs.readFileSync(path.join(__dirname, process.argv[2]))
-parseString(xml,{trim: true, explicitArray: false}, function (err, result) {
+parseString(xml, { trim: true, explicitArray: false }, function (err, result) {
   if (err) {
     console.log(err)
   }
@@ -16,8 +16,8 @@ parseString(xml,{trim: true, explicitArray: false}, function (err, result) {
   result.eep.profile.rorg.func.type.rorg_number = result.eep.profile.rorg.number
   result.eep.profile.rorg.func.type.func_title = result.eep.profile.rorg.func.title
   result.eep.profile.rorg.func.type.func_number = result.eep.profile.rorg.func.number
-  fs.writeFileSync(path.join(__dirname, process.argv[2]+".json"), JSON.stringify(result.eep.profile.rorg.func.type, null,2))
-  //console.log(util.inspect(result.eep.profile.rorg.func.type, false, null))
+  fs.writeFileSync(path.join(__dirname, process.argv[2] + '.json'), JSON.stringify(result.eep.profile.rorg.func.type, null, 2))
+  // console.log(util.inspect(result.eep.profile.rorg.func.type, false, null))
 })
 
 function fixField (field) {
@@ -25,8 +25,8 @@ function fixField (field) {
     return
   }
   for (const child in field) {
-    if(child==="description"){
-      field[child] = builder.buildObject( field[child]  ).replace("<root>","").replace("</root>","")
+    if (child === 'description') {
+      field[child] = builder.buildObject(field[child]).replace('<root>', '').replace('</root>', '')
     }
     if (typeof field[child] === 'string') {
       if (!isNaN(field[child])) {
