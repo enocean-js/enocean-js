@@ -12,7 +12,8 @@
   },
   "standard": {
     "ignore": [
-      "/docs/*"
+      "/docs/*",
+      "/node_modules/*"
     ]
   },
   "scripts": {
