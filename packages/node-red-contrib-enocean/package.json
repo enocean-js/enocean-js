@@ -13,7 +13,8 @@
     "serialport": "^8.0.0",
     "enocean-js": "0.0.16",
     "@enocean-js/radio-erp1": "0.0.16",
-    "@enocean-js/eep-transcoder": "0.0.16"
+    "@enocean-js/eep-transcoder": "0.0.16",
+    "@enocean-js/esp3-packet": "0.1.0"
   },
   "node-red": {
     "nodes": {
