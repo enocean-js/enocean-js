@@ -1,0 +1,157 @@
+/* eslint-disable no-extend-native */
+function toHex(val, len = 2) {
+  return val.toString(16).padStart(len, "0");
+}
+
+String.prototype.color = function (r, g, b) {
+  // if g is undefined, assume r is a hex value
+  if (g === undefined) {
+    r = r.replace("#", "");
+    const hex = parseInt(r, 16);
+    r = hex >> 16;
+    g = (hex >> 8) & 0xff;
+    b = hex & 0xff;
+  }
+
+  return "\x1B[38;2;" + r + ";" + g + ";" + b + "m" + this + "\x1B[39m";
+};
+
+String.prototype.bgcolor = function (r, g, b) {
+  // if g is undefined, assume r is a hex value
+  if (g === undefined) {
+    const hex = parseInt(r, 16);
+    r = hex >> 16;
+    g = (hex >> 8) & 0xff;
+    b = hex & 0xff;
+  }
+  return "\x1B[48;2;" + r + ";" + g + ";" + b + "m" + this + "\x1B[49m";
+};
+
+const DATA_COLOR = "#69a5e7";
+const OPTIONAL_DATA_COLOR = "#5dd65d";
+const CRC8_COLOR = "#505762";
+
+const packetTypeColors = {
+  0x01: "#875fff",
+  0x02: "#6B8E23",
+  0x03: "#00CED1",
+  0x04: "#FFFF00",
+  0x05: "#FFA500",
+};
+
+// const returnCodeColors = {
+//   0x00: 83,
+//   0x01: 203,
+//   0x02: 203,
+//   0x03: 203,
+//   0x04: 203,
+//   0x05: 203,
+//   0x06: 203,
+//   0x07: 203,
+//   0x82: 203,
+//   0x90: 203,
+//   0x91: 203
+// }
+
+export const pretty = Object.create({});
+
+if (typeof window !== "undefined") {
+  const style = document.createElement("style");
+  style.setAttribute("id", "enocean-js-pretty-printer-styles");
+  style.appendChild(
+    document.createTextNode(`
+    .telegram{margin:8px;font-family:monospace;display:flex;flex-direction: row;align-items:center}
+    .telegram div{padding:3px;border-radius:3px;margin:3px}
+    .telegram div.dim{padding:3px;border-radius:3px;background:none;border:1px solid grey}
+    .dim {color:grey}
+    .type1{background:${packetTypeColors[1]}}
+    .type2{background:${packetTypeColors[2]}}
+    .type3{background:${packetTypeColors[3]}}
+    .type4{background:${packetTypeColors[4]}}
+    .type5{background:${packetTypeColors[5]}}
+    .data_length{background:${DATA_COLOR} }
+    .optional_length{background:${OPTIONAL_DATA_COLOR}}
+    .data{background: ${DATA_COLOR} }
+    .optional_data{background:${OPTIONAL_DATA_COLOR}}
+    .telegram div.spacer{background:none;border-style:none;margin:0;padding:0}
+    .spacer:before{content:'•';}
+    `)
+  );
+  document.head.appendChild(style);
+}
+
+function makeStyle(col, dim) {
+  if (dim) {
+    return `color:${col};background:none;padding:3px;border-radius:3px;border:1px solid #333`;
+  } else {
+    return `color:${col};background:#333;padding:3px;border-radius:3px;`;
+  }
+}
+pretty.toString = function (packet) {
+  return `<div class="telegram"><div class="sync_byte dim" title="Sync Byte">${55}</div><div class="spacer"></div>
+  <div class="data_length" title="length of data part (${
+    packet.dataLength
+  } Bytes)">${toHex(packet.dataLength, 4)}</div><div class="spacer"></div>
+  <div class="optional_length" title="length of optional data part (${
+    packet.optionalLength
+  } Bytes)">${toHex(packet.optionalLength)}</div><div class="spacer"></div>
+  <div class="packet_type type${packet.packetType}">${toHex(
+    packet.packetType
+  )}</div>
+  <div class="spacer"></div><div class="header_crc crc dim">${toHex(
+    packet.crc8Header
+  )}</div><div class="spacer"></div>
+  <div class="data">${toHex(packet.data)}</div><div class="spacer"></div>
+  ${
+    packet.optionalLength === 0
+      ? ""
+      : '<div class="optional_data">' +
+        toHex(packet.optionalData) +
+        '</div><div class="spacer"></div>'
+  }
+  <div class="body_crc crc dim">${toHex(packet.crc8Data)}</div>`;
+};
+pretty.logESP3 = function (packet) {
+  if (typeof window === "undefined") {
+    console.log(
+      `${"55".color(CRC8_COLOR)}.${toHex(packet.dataLength, 4).color(
+        DATA_COLOR
+      )}.${toHex(packet.optionalLength).color(OPTIONAL_DATA_COLOR)}.${toHex(
+        packet.packetType
+      ).color(packetTypeColors[packet.packetType])}.${toHex(
+        packet.crc8Header
+      ).color(CRC8_COLOR)}.${toHex(packet.data).color(DATA_COLOR)}${
+        packet.optionalLength === 0
+          ? ""
+          : "." + toHex(packet.optionalData).color(OPTIONAL_DATA_COLOR)
+      }.${toHex(packet.crc8Data).color(CRC8_COLOR)}`
+    );
+  } else {
+    console.log();
+    console.log(
+      `%c55%c.%c${toHex(packet.dataLength, 4)}%c.%c${toHex(
+        packet.optionalLength
+      )}%c.%c${toHex(packet.packetType)}%c.%c${toHex(packet.crc8Header)}%c.%c${
+        packet.data
+      }${
+        packet.optionalLength === 0 ? "" : "%c.%c" + toHex(packet.optionalData)
+      }%c.%c${toHex(packet.crc8Data)}`,
+      makeStyle(CRC8_COLOR, true),
+      "color:black;",
+      makeStyle(DATA_COLOR),
+      "color:black;",
+      makeStyle(OPTIONAL_DATA_COLOR),
+      "color:black;",
+      makeStyle(packetTypeColors[packet.packetType]),
+      "color:black;",
+      makeStyle(CRC8_COLOR, true),
+      "color:black;",
+      makeStyle(DATA_COLOR),
+      "color:black;",
+      makeStyle(OPTIONAL_DATA_COLOR),
+      "color:black;",
+      makeStyle(CRC8_COLOR, true)
+    );
+    // return `<div class="telegram"><span class="sync_byte dim">${55}</span>.<span class="data_length">${toHex(packet.dataLength, 4)}</span>.<span class="optional_length">${toHex(packet.optionalLength)}</span>.<span class="packet_type type${packet.packetType}">${toHex(packet.packetType)}</span>.<span class="header_crc crc dim">${toHex(packet.crc8Header)}</span>.<span class="data">${toHex(packet.data)}</span>.${packet.optionalLength === 0 ? '' : '<span class="optional_data">' + toHex(packet.optionalData) + '</span>.'}<span class="body_crc crc dim">${toHex(packet.crc8Data)}</div>`
+  }
+};

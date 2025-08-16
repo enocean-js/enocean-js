@@ -1,0 +1,29 @@
+{
+  "name": "@enocean-js/enocean-js",
+  "version": "0.1.0",
+  "description": "Main package for the enocean-js monorepo.",
+  "main": "enocean.js",
+  "exports": {
+    ".": "./enocean.js"
+  },
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/"
+  },
+  "dependencies": {
+    "@enocean-js/byte-array": "workspace:*",
+    "@enocean-js/crc8": "workspace:*",
+    "@enocean-js/eep-transcoder": "workspace:*",
+    "@enocean-js/esp3-packet": "workspace:*",
+    "@enocean-js/esp3-packets": "workspace:*",
+    "@enocean-js/esp3-transformer": "workspace:*",
+    "@enocean-js/pretty-printer": "workspace:*",
+    "@enocean-js/radio-erp1": "workspace:*",
+    "@enocean-js/serialport-parser": "workspace:*",
+    "@enocean-js/serialport-sender": "workspace:*",
+    "@enocean-js/common-command": "workspace:*"
+  }
+}

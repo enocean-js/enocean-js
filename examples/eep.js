@@ -22,8 +22,10 @@ async function init(){
 var known = {}
 //const ESP3Packet = Enocean.ESP3Packet
 transformer.on('data', async data => {
+console.log(data)
   //console.log(data.decode("d2-50-00"))
   if (data && data.constructor.name === "RadioERP1") {
+console.log(data.raw)
     if(data.teachIn){
       var teachInInfo = data.teachInInfo
       console.log(teachInInfo,data.RSSI)

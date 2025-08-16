@@ -1,0 +1,17 @@
+{
+  "name": "@enocean-js/pretty-printer",
+  "version": "0.1.0",
+  "description": "...",
+  "main": "pretty-printer.js",
+  "exports": {
+    ".": "./pretty-printer.js"
+  },
+  "type": "module",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/enocean-js"
+  },
+  "dependencies": {}
+}
