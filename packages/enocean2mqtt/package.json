@@ -1,8 +1,11 @@
 {
-  "name": "@enocean-js/examples",
+  "name": "@enocean-js/enocean2mqtt",
   "version": "0.1.0",
   "description": "Main package for the enocean-js monorepo.",
-  "main": "logger.js",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
   "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
   "license": "CC0-1.0",
   "type": "module",
@@ -11,7 +14,6 @@
     "url": "https://github.com/enocean-js/"
   },
   "dependencies": {
-    "serialport": "^12.0.0",
     "@enocean-js/enocean": "workspace:*"
   }
 }

@@ -208,7 +208,7 @@ function decodeCase(tel, c) {
     const ret = c.datafield.reduce(makeFieldExtractor(tel), {});
     return ret;
   } catch (err) {
-    console.log(tel.toString(), c);
+    console.error("ERROR", tel.toString(), c);
   }
 }
 
@@ -512,7 +512,7 @@ export function getTeachInInfo(telegram) {
   if (p.RORG === 0xf6) {
     const rorg1 = 0xf6;
     let func1 = 0x02;
-    let type1 = 0x01;
+    let type1 = 0x03;
     if (p.status === 16) {
       func1 = 0x03;
       type1 = 0x01;

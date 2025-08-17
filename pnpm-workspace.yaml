@@ -3,3 +3,4 @@ packages:
 
 onlyBuiltDependencies:
   - '@serialport/bindings-cpp'
+  - classic-level

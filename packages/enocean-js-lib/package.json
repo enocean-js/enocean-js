@@ -1,10 +1,10 @@
 {
-  "name": "@enocean-js/enocean-js",
+  "name": "@enocean-js/enocean-js-lib",
   "version": "0.1.0",
   "description": "Main package for the enocean-js monorepo.",
   "main": "enocean.js",
   "exports": {
-    ".": "./enocean.js"
+    ".": "./enocean-js.js"
   },
   "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
   "license": "CC0-1.0",
