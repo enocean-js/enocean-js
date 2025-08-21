@@ -1,5 +1,5 @@
 /* eslint-disable no-extend-native */
-function toHex(val, len = 2) {
+export function toHex(val, len = 2) {
   return val.toString(16).padStart(len, "0");
 }
 
@@ -87,7 +87,7 @@ function makeStyle(col, dim) {
     return `color:${col};background:#333;padding:3px;border-radius:3px;`;
   }
 }
-pretty.toString = function (packet) {
+pretty.html = function (packet) {
   return `<div class="telegram"><div class="sync_byte dim" title="Sync Byte">${55}</div><div class="spacer"></div>
   <div class="data_length" title="length of data part (${
     packet.dataLength
@@ -101,7 +101,10 @@ pretty.toString = function (packet) {
   <div class="spacer"></div><div class="header_crc crc dim">${toHex(
     packet.crc8Header
   )}</div><div class="spacer"></div>
-  <div class="data">${toHex(packet.data)}</div><div class="spacer"></div>
+  <div class="data">${toHex(
+    packet.data,
+    packet.dataLength * 2
+  )}</div><div class="spacer"></div>
   ${
     packet.optionalLength === 0
       ? ""

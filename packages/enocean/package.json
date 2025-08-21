@@ -16,6 +16,7 @@
   "dependencies": {
     "level": "^10.0.0",
     "@enocean-js/enocean-js-lib": "workspace:*",
+    "better-sqlite3": "^12.2.0",
     "serialport": "^12.0.0"
   }
 }

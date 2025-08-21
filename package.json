@@ -43,6 +43,7 @@
   "homepage": "https://github.com/enocean-js/enocean-js#readme",
   "devDependencies": {
     "chai": "^4.3.0",
+    "esbuild": "^0.25.9",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.3",
     "mocha": "^7.2.0",

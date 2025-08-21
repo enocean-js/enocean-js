@@ -2,18 +2,18 @@ import { ByteArray } from "@enocean-js/byte-array";
 import { ESP3Packet } from "@enocean-js/esp3-packet";
 import { decode, getTeachInInfo, encodeData } from "@enocean-js/eep-transcoder";
 
-export const UTE_BIDIRECTIONAL = 0x01;
-export const UTE_UNIDIRECTIONAL = 0x00;
-export const UTE_TEACH_IN_SUCCESSFULL = 0x01;
-export const UTE_DELETION_SUCCESSFULL = 0x10;
-export const UTE_EEP_NOT_SUPPORTED = 0x11;
-export const UTE_TEACH_IN_NOT_ACCEPTED = 0x00;
-export const UTE_QUERY_TEACH_IN_REQUEST = 0x00;
-export const UTE_QUERY_DELETION_REQUEST = 0x01;
-export const UTE_QUERY_TEACH_IN_OR_DELETION = 0x10;
-export const UTE_QUERY_NOT_USED = 0x11;
-export const UTE_CMD_QUERY = 0x00;
-export const UTE_CMD_RESPONSE = 0x01;
+export const UTE_BIDIRECTIONAL = 0;
+export const UTE_UNIDIRECTIONAL = 1;
+export const UTE_TEACH_IN_SUCCESSFULL = 1;
+export const UTE_DELETION_SUCCESSFULL = 2;
+export const UTE_EEP_NOT_SUPPORTED = 3;
+export const UTE_TEACH_IN_NOT_ACCEPTED = 0;
+export const UTE_QUERY_TEACH_IN_REQUEST = 0;
+export const UTE_QUERY_DELETION_REQUEST = 1;
+export const UTE_QUERY_TEACH_IN_OR_DELETION = 2;
+export const UTE_QUERY_NOT_USED = 3;
+export const UTE_CMD_QUERY = 0;
+export const UTE_CMD_RESPONSE = 1;
 
 class RadioERP1 extends ESP3Packet {
   get packetType() {

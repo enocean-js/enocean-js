@@ -1,12 +1,7 @@
 import { SerialPort } from "serialport";
 import * as EnoceanLib from "@enocean-js/enocean-js-lib";
 import { EventEmitter } from "node:events";
-import { Level } from "level";
-import os from "os";
-import path from "path";
-
-const dbPath = path.join(os.homedir(), ".enocean-js/memory");
-const db = new Level(dbPath);
+import Memory from "./database.js";
 
 const pretty = EnoceanLib.pretty;
 const ESP3Parser = EnoceanLib.ESP3Parser;
@@ -15,12 +10,15 @@ const defaults = {
   timeout: 30, // seconds
   port: "/dev/ttyUSB0",
 };
+
 class Enocean extends EventEmitter {
   constructor(options) {
     super();
     this.options = { ...defaults, ...options };
     this.teachInMode = false;
     this.teachOutMode = false;
+    this.memory = new Memory();
+
     if (!this.options.port) {
       this.emit("error", {
         code: 1,
@@ -35,12 +33,12 @@ class Enocean extends EventEmitter {
         });
         this.port.pipe(this.parser);
         this.parser.on("data", this.onPacket.bind(this));
-        this.parser.on("error", (err) => {
+        this.parser.on("error", (err) =>
           this.emit("error", {
             code: 1000 + err.code,
             message: `Parser Error: ${err.name} (${err.desc})`,
-          });
-        });
+          })
+        );
         this.sender = EnoceanLib.SerialportSender({
           port: this.port,
           parser: new ESP3Parser(),
@@ -62,75 +60,139 @@ class Enocean extends EventEmitter {
       }
     }
   }
+
   async onPacket(packet) {
-    if (packet.constructor.name === "RadioERP1") {
-      this.emit("packet", packet);
-      const id = packet.senderId;
-      const value = await db.get(id);
-      if (value !== undefined) {
-        const device = JSON.parse(value);
-        device.rssi = packet.RSSI;
-        device.lastSeen = new Date().toISOString();
-        device.lastData = packet.decode(device.eep);
-        await db.put(id, JSON.stringify(device));
-        this.emit("known-device-data", device);
-      }
-      if (this.teachInMode && packet.teachIn && value === undefined) {
-        const eep = packet.teachInInfo.eep.toString();
-        await this.setDevice(id, eep);
-        this.emit("teach-in-device", {
-          id: id,
-          eep: eep,
-          rssi: packet.RSSI,
-          lastSeen: new Date().toISOString(),
+    if (packet.constructor.name !== "RadioERP1") return;
+
+    this.emit("packet", packet);
+
+    // Handle Teach-In: This is a primary way to learn an EEP
+    if (this.teachInMode && packet.teachIn) {
+      const { eep } = packet.teachInInfo;
+      const eepString = eep.toString();
+
+      // For UTE, we must ensure a virtual device can be created BEFORE we learn the EEP.
+      if (
+        packet.teachInInfo.teachInType === "UTE" &&
+        packet.teachInInfo.responseExpected === EnoceanLib.UTE_BIDIRECTIONAL
+      ) {
+        // Pre-flight check: try to reserve a virtual device ID.
+        // We create it here and pass it to the response function.
+        const partnerId = packet.senderId;
+        const uteTwin = await this.createVirtualDevice(
+          `UTE Twin for ${partnerId}`,
+          eepString,
+          { partnerId: partnerId }
+        );
+
+        if (!uteTwin) {
+          this.emit("error", {
+            code: 500,
+            message: `Could not create a virtual device for UTE response to ${partnerId}. ID pool may be full. Pairing aborted.`,
+          });
+          return; // Abort before learning
+        }
+        // If successful, proceed with learning and responding.
+        this.memory.learnEep(packet.senderId, eepString);
+        this.emit("eep-learned", {
+          id: packet.senderId,
+          rorg: eepString.substring(0, 2),
+          eep: eepString,
+        });
+        this.sendUteTeachInResponse(packet, uteTwin); // Pass the created twin
+      } else {
+        // For non-UTE teach-ins, just learn it directly.
+        this.memory.learnEep(packet.senderId, eepString);
+        this.emit("eep-learned", {
+          id: packet.senderId,
+          rorg: eepString.substring(0, 2),
+          eep: eepString,
         });
       }
-      if (this.teachOutMode && packet.teachIn && value !== undefined) {
-        const eep = packet.teachInInfo.eep.toString();
-        await this.removeDevice(id);
-        this.emit("teach-out-device", {
-          id: id,
-          eep: eep,
-          rssi: packet.RSSI,
-          lastSeen: new Date().toISOString(),
-        });
-      }
+      return;
     }
+
+    // Handle Teach-Out
+    if (this.teachOutMode && packet.teachIn) {
+      this.memory.removeDevice(packet.senderId);
+      this.emit("removed-device", { id: packet.senderId });
+      return;
+    }
+
+    const events = this.memory.processPacket(packet);
+    events.forEach((event) => this.emit(event.name, event.payload));
   }
+
+  async sendUteTeachInResponse(packet, uteTwin) {
+    const partnerId = packet.senderId;
+
+    const ret = EnoceanLib.RadioERP1.from({
+      rorg: 0xd4,
+      payload: packet.payload,
+    });
+    ret.senderId = uteTwin.senderId; // Use the passed virtual device's ID
+    ret.destinationId = partnerId;
+    ret.payload = ret.payload.setValue(1, 0, 1); // bidi
+    ret.payload = ret.payload.setValue(1, 2, 2); // teach in successful
+    ret.payload = ret.payload.setValue(1, 4, 4); // this is a teach in response
+    await this.sender.send(ret.toString());
+    this.emit("ute-response-sent", {
+      to: partnerId,
+      from: uteTwin.senderId,
+    });
+  }
+
+  async learnEep(deviceId, eep) {
+    this.memory.learnEep(deviceId, eep);
+    this.emit("eep-learned", {
+      id: deviceId,
+      rorg: eep.substring(0, 2),
+      eep: eep,
+    });
+  }
+
   async getDevice(id) {
-    const knownKey = await db.get(id);
-    if (knownKey !== undefined) {
-      return JSON.parse(knownKey);
-    }
-    return undefined;
+    return this.memory.getDevice(id);
   }
-  async setDevice(id, eep, data = {}) {
-    await db.put(
-      id,
-      JSON.stringify({
-        eep: eep,
-        rssi: 0,
-        lastSeen: new Date().toISOString(),
-        lastData: data,
-      })
-    );
+
+  async setDeviceName(id, name) {
+    this.memory.setDeviceName(id, name);
   }
+
   async removeDevice(id) {
-    await db.del(id);
+    this.memory.removeDevice(id);
   }
+
   async getAllDevices() {
-    const devices = [];
-    for await (const [key, value] of db.iterator()) {
-      devices.push({
-        id: key,
-        ...JSON.parse(value),
-      });
+    return this.memory.getAllDevices();
+  }
+
+  async clearAllData() {
+    this.memory.clearAllData();
+  }
+
+  // Virtual Device Management
+  async createVirtualDevice(name, eep, profile) {
+    if (!this.baseId) {
+      throw new Error(
+        "Base ID not yet available. Cannot create virtual device."
+      );
     }
-    return devices;
+    return this.memory.createVirtualDevice(this.baseId, name, eep, profile);
   }
-  async clearDevices() {
-    await db.clear();
+
+  async removeVirtualDevice(senderId) {
+    return this.memory.removeVirtualDevice(senderId);
   }
+
+  async getVirtualDevice(senderId) {
+    return this.memory.getVirtualDevice(senderId);
+  }
+
+  async getAllVirtualDevices() {
+    return this.memory.getAllVirtualDevices();
+  }
+
   startTeachInMode() {
     let startTime = new Date();
     let endTime = new Date();

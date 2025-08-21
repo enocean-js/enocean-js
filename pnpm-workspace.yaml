@@ -2,5 +2,9 @@ packages:
   - packages/*
 
 onlyBuiltDependencies:
+  - '@serialport/bindings'
   - '@serialport/bindings-cpp'
+  - better-sqlite3
   - classic-level
+  - esbuild
+  - serialport

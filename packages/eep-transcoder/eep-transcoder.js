@@ -512,7 +512,7 @@ export function getTeachInInfo(telegram) {
   if (p.RORG === 0xf6) {
     const rorg1 = 0xf6;
     let func1 = 0x02;
-    let type1 = 0x03;
+    let type1 = 0x01;
     if (p.status === 16) {
       func1 = 0x03;
       type1 = 0x01;
