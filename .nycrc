@@ -1,8 +1,0 @@
-{
-"exclude":[
-  "!**/node_modules/@enocean-js**",
-  "./main.js",
-  "**/*/callback-parser.js",
-  "packages/node_modules/@enocean-js/serialport-parser/src/callback-parser.js"
-]
-}

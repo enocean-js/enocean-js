@@ -1,0 +1,56 @@
+{
+  "name": "t-readable",
+  "version": "0.1.0",
+  "description": "Split a readable-stream into 2 or more readable-streams",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib/**/*.js",
+    "lib/**/*.d.ts"
+  ],
+  "scripts": {
+    "clean": "del-cli lib/**/*.js lib/**/*.js.map lib/**/*.d.ts test/**/*.js test/**/*.js.map",
+    "compile-src": "tsc -p lib",
+    "compile-test": "tsc -p test",
+    "compile": "npm run compile-src && npm run compile-test",
+    "build": "npm run clean && npm run compile",
+    "eslint": "eslint lib test --ext .ts --ignore-pattern *.d.ts",
+    "lint": "npm run eslint",
+    "test": "mocha --require ts-node/register --require source-map-support/register --full-trace test/test.ts"
+  },
+  "keywords": [
+    "readable",
+    "stream",
+    "teeing",
+    "tee",
+    "split",
+    "duplicate"
+  ],
+  "author": {
+    "name": "Borewit",
+    "url": "https://github.com/Borewit"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^13.1.2",
+    "@typescript-eslint/eslint-plugin": "^2.14.0",
+    "@typescript-eslint/parser": "^2.14.0",
+    "chai": "^4.2.0",
+    "del-cli": "^3.0.0",
+    "eslint": "^6.8.0",
+    "got": "^10.2.0",
+    "mocha": "^6.2.2",
+    "source-map-support": "^0.5.16",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Borewit/t-readable.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Borewit/t-readable/issues"
+  }
+}
