@@ -1,0 +1,20 @@
+export const CO_WR_BIST = {
+  name: 'CO_WR_BIST',
+  commandCode: 6,
+  responsDefinition: {
+    0: [
+      {
+        name: 'returnCode',
+        value: 'RET_OK'
+      }, {
+        name: 'result',
+        location: 'data',
+        offset: 1,
+        length: 1,
+        retFunc: x => {
+          return x === 0 ? 'OK' : 'ERROR'
+        }
+      }
+    ]
+  }
+}

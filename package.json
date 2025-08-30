@@ -1,0 +1,49 @@
+{
+  "name": "enocean-js",
+  "version": "0.1.0",
+  "description": "open source java script implementation of the enocean protocol",
+  "main": "packages/index.js",
+  "jsdelivr": "packages/enocean.js",
+  "module": "packages/main.js",
+  "nyc": {
+    "include": [
+      "packages/**/*.js"
+    ]
+  },
+  "standard": {
+    "ignore": [
+      "/docs/*",
+      "/node_modules/*"
+    ]
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "fix": "standard --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enocean-js/enocean-js.git"
+  },
+  "keywords": [
+    "iot",
+    "enocean",
+    "home",
+    "automation",
+    "facility",
+    "management",
+    "smart",
+    "home"
+  ],
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/enocean-js/enocean-js/issues"
+  },
+  "homepage": "https://github.com/enocean-js/enocean-js#readme",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
+    "esbuild": "^0.25.9",
+    "vitest": "^3.2.4"
+  }
+}

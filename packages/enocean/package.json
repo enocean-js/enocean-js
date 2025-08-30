@@ -1,0 +1,22 @@
+{
+  "name": "@enocean-js/enocean",
+  "version": "0.1.0",
+  "description": "Main package for the enocean-js monorepo.",
+  "main": "enocean.js",
+  "exports": {
+    ".": "./enocean.js"
+  },
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/"
+  },
+  "dependencies": {
+    "level": "^10.0.0",
+    "@enocean-js/enocean-js-lib": "workspace:*",
+    "better-sqlite3": "^12.2.0",
+    "serialport": "^12.0.0"
+  }
+}

@@ -1,0 +1,69 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/custom-elements/1.2.4/custom-elements.min.js"></script>
+<script src="enocean-js/funcs.js"></script>
+<script type="text/javascript" id="ABCDEF23">
+    RED.nodes.registerType('enocean-actor',{
+        category: 'EnOcean',
+        defaults: {
+          name:{
+            value:""
+          },
+          channel:{
+            value: 1
+          },
+          adt:{
+            value: false
+          }
+        },
+        outputs: 2,
+        outputLabels:["data","teachIn Response"],
+        inputs: 1,
+        color: '#99ccff',
+        icon: "enocean-js-white.svg",
+        label: function() {
+            return this.name || "actor";
+        },
+        paletteLabel: 'actor',
+        oneditprepare: editprepare
+    });
+    var st = document.createElement("script")
+    st.setAttribute("type","module")
+    st.setAttribute("src","enocean-js/bundle.js")
+    document.body.appendChild(st)
+</script>
+
+<script type="text/x-red" data-template-name="enocean-actor">
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-channel">Channel</label>
+    <input type="text" id="node-input-channel">
+  </div>
+  <div class="form-row">
+    <label for="node-input-channel">listen on this channel only</label>
+    <input type="checkbox" id="node-input-adt"  style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
+  <div class="form-row">
+    <sensor-list id="enocean-sensorlist"></sensor-list>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="enocean-actor">
+  <p>this node is used to decode incomming telegrams</p>
+  <h3>Output</h3>
+    <dl class="message-properties">
+      <dt>payload
+        <span class="property-type">object</span>
+      </dt>
+      <dd>the decoded content of the telegram. this is dependent on the tought in sensor. for details see the node description after teaching in a sensor</dd>
+    </dl>
+    <dl class="message-properties">
+      <dt>meta
+        <span class="property-type">object</span>
+      </dt>
+      <dd>meta information about the telegram. Here you can find the RSSI, senderId, the raw payload, a timestamp etc.</dd>
+    </dl>
+  <h3>Input</h3>
+    TODO
+</script>

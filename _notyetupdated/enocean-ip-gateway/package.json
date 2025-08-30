@@ -1,0 +1,12 @@
+{
+  "name": "enocean-ip-gateway",
+  "version": "0.0.1-beta.12",
+  "description": "...",
+  "main": "src/main.js",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/enocean-js"
+  }
+}

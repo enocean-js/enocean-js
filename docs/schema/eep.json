@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "new.json",
+  "title" : "EEP",
+  "description" : "Enocean Equipment Profile",
+  "type" : "object",
+  "properties" : {
+    "datafield": {
+      "$ref":"definitions.json#/definitions/datafield"
+    }
+  },
+  "additionalProperties" : false
+}

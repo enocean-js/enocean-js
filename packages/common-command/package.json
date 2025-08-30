@@ -1,0 +1,20 @@
+{
+  "name": "@enocean-js/common-command",
+  "version": "0.1.0",
+  "description": "...",
+  "main": "common-command.js",
+  "exports": {
+    ".": "./common-command.js"
+  },
+  "type": "module",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/enocean-js"
+  },
+  "dependencies": {
+    "@enocean-js/esp3-packet": "workspace:*",
+    "@enocean-js/esp3-packets": "workspace:*"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@enocean-js/enocean-js-browser-lib",
+  "version": "0.1.0",
+  "description": "Main package for the enocean-js monorepo.",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "exports": {
+    ".": {
+      "browser": "./dist/bundle.js",
+      "default": "./src/index.js"
+    }
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/"
+  },
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/enocean.js --platform=browser --format=esm",
+    "prepare": "pnpm run build"
+  },
+  "dependencies": {
+    "@enocean-js/byte-array": "workspace:*",
+    "@enocean-js/crc8": "workspace:*",
+    "@enocean-js/eep-transcoder": "workspace:*",
+    "@enocean-js/esp3-packet": "workspace:*",
+    "@enocean-js/esp3-packets": "workspace:*",
+    "@enocean-js/pretty-printer": "workspace:*",
+    "@enocean-js/radio-erp1": "workspace:*",
+    "@enocean-js/common-command": "workspace:*"
+  }
+}

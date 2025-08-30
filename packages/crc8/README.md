@@ -1,0 +1,3 @@
+## crc8 checksum Calculation
+
+this is part of enocean-js ...

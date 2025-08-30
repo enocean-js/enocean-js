@@ -1,0 +1,74 @@
+<script type="text/javascript">
+    RED.nodes.registerType('enocean-out',{
+        category: 'EnOcean',
+        defaults: {
+          serialport: {
+            value: "",
+            type: "enocean-config-node"
+          },
+          name: {
+            value: ""
+          },
+          logOutput:{
+            value: false
+          }
+        },
+        inputs:1,
+        outputs: 1,
+        color: '#99ff99', // #ffff99 #99ff99 #99ccff
+        icon: "enocean-js-white.svg",
+        align: 'right',
+        label: function() {
+            return this.name || "output";
+        },
+        paletteLabel: 'output',
+        labelStyle: 'enocean-node',
+        oneditprepare : async function(){
+          var res = await fetch(`/enocean-js/info/${this.id}/baseid`)
+          var id = await res.json()
+          $("#enocean-base-id").text(id.baseId.toString(16))
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="enocean-out">
+  <div class="form-row">
+    <label for="node-input-serialport"><i class="fa fa-globe"></i> Serialport</label>
+    <input type="text" id="node-input-serialport">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-logOutput">Log output</label>
+    <input type="checkbox" id="node-input-logOutput"  style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
+  <div class="form-row">
+    <label>Base ID</label>
+    <span id="enocean-base-id"></span>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="enocean-out">
+  <p>this is a node to send out enocean telegrams</p>
+
+  <h3>Details</h3>
+   <p>
+     <pre>
+{
+ "meta": {
+   "eep": "a5-12-04",
+   "channel": 3
+   "type": "data", // "data" or "teach-in"
+ },
+ "teach-in":{ // only required when meta.type == "teach-in"
+   "type": "4BS" // "4BS", "UTE", "RPS", "1BS"
+ },
+ "data": { // allways required also for "teach-in"
+   "TMP": 0
+ }
+}
+     </pre>
+   </p>
+</script>

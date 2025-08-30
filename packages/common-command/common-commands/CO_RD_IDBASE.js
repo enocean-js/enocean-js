@@ -1,0 +1,22 @@
+export const DESC_CO_RD_IDBASE = {
+  name: 'CO_RD_IDBASE',
+  commandCode: 8,
+  fields: [],
+  responseDefinition: {
+    0: [
+      {
+        name: 'baseId',
+        location: 'data',
+        offset: 1,
+        length: 4,
+        retFunc: x => x
+      }, {
+        name: 'remainingWriteCycles',
+        location: 'optionalData',
+        offset: 0,
+        length: 1,
+        retFunc: x => x
+      }
+    ]
+  }
+}

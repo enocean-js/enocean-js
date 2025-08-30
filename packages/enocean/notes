@@ -1,0 +1,99 @@
+# Architectural Plan: An Engine for High-Level Applications
+
+This document outlines the architecture for `enocean-js`, designed to serve as a powerful protocol engine for high-level applications like an ioBroker adapter.
+
+## I. Core Philosophy
+
+The core idea is a clean separation of concerns:
+
+1.  **`enocean-js` (The Engine):** Acts as a robust, low-level **Protocol Engine**. Its sole responsibility is to handle the complexities of the EnOcean protocol: radio communication, packet parsing, teach-in procedures, device database management, and providing declarative device profiles.
+2.  **The Application (e.g., ioBroker Adapter):** Acts as the **Application Brain** or **Orchestrator**. It consumes the simple API provided by the engine, manages application-specific state (like ioBroker states), and implements the user-facing logic.
+
+The key that connects these two layers is the **Declarative EEP Profile**. Each EEP file will contain a machine-readable `profile` block that describes the device's capabilities (events, readable states, writeable actions, data types, and units) in a structured, declarative way.
+
+## II. The Engine's Public API
+
+The engine will expose a clean, high-level API for the application to use:
+
+- `startTeachInMode()`: Initiates learn mode.
+- `getProfileDescription(eep)`: Returns a structured JSON object describing a device's capabilities, derived from its EEP `profile` block.
+- `createVirtualDevice({ eep })`: Creates a new virtual device and returns its `senderId` and profile description.
+- `sendCommand(deviceId, { action, payload })`: Sends a command to a physical or virtual device.
+- `on(eventName, callback)`: The engine will be an `EventEmitter`, emitting high-level semantic events like `device:learned`, `device:event`, and `device:reading`.
+
+## III. Use Case Implementation
+
+This architecture is designed to elegantly handle all standard use cases.
+
+### Case 1: Integrating a Physical Sensor (e.g., a Button)
+
+**Goal:** A user pairs a physical button. The adapter automatically creates the correct read-only states in ioBroker and updates them on each press.
+
+**Flow:**
+
+1.  **Adapter:** Calls `eo.startTeachInMode()`.
+2.  **Engine:** Handles the teach-in telegram and emits a `device:learned` event with `{ id, eep: 'f6-02-01' }`.
+3.  **Adapter:** Calls `eo.getProfileDescription('f6-02-01')`.
+4.  **Engine:** Reads the declarative `profile` from `f6-02-01.js` and returns a structured description:
+    ```json
+    {
+      "type": "rocker",
+      "events": ["button:ai:pressed", "button:ai:released", "..."]
+    }
+    ```
+5.  **Adapter:** Uses this description to create a `boolean` state in ioBroker for each event.
+6.  **Engine:** When a new button press is received, the engine's internal "Event Generator" uses the EEP profile to create and emit a semantic event: `device:event` with payload `{ deviceId, event: 'button:ai:pressed' }`.
+7.  **Adapter:** Listens for this event and updates the corresponding ioBroker state to `true`.
+
+### Case 2: Creating a Virtual Switch (Unidirectional Output)
+
+**Goal:** The user creates a "virtual" switch in ioBroker that can be taught-in to a simple physical wall plug.
+
+**Flow:**
+
+1.  **Adapter:** Calls `eo.createVirtualDevice({ eep: 'f6-02-01' })`.
+2.  **Engine:** Reserves a new `senderId`, creates the virtual device in its database, and returns the `senderId` and the profile description (same as above, but marked as `writeable`).
+3.  **Adapter:** Creates writeable `boolean` states in ioBroker for each action (e.g., `press_button_ai`).
+4.  **Teach-In:** The user puts the physical plug in learn mode. The adapter calls `eo.sendCommand(senderId, { action: 'teachIn' })`. The engine encodes and sends the teach-in telegram.
+5.  **Control:** The user toggles a state in ioBroker. The adapter calls `eo.sendCommand(senderId, { action: 'button:ai:pressed' })`.
+6.  **Engine:** Uses its "Output Path" logic and the EEP profile to encode and transmit the correct radio packet.
+
+### Case 3: Integrating a Bidirectional Actuator (e.g., a Smart Plug)
+
+**Goal:** A user pairs a smart wall plug (`d2-01-0e`). The adapter creates states for both control (a read/write switch) and measurement (a read-only power sensor).
+
+**Flow:**
+
+1.  **Teach-In:** A bidirectional teach-in is completed. The engine emits `device:learned` with `{ id, eep: 'd2-01-0e' }`.
+2.  **Adapter:** Calls `eo.getProfileDescription('d2-01-0e')`.
+3.  **Engine:** Returns a richer profile description declaring both readable states and writeable actions:
+    ```json
+    {
+      "type": "actuator",
+      "readings": [{ "name": "power", "type": "number", "unit": "W" }],
+      "states": [{ "name": "output", "type": "boolean", "writeable": true }]
+    }
+    ```
+4.  **Adapter:** Creates a read-only `power` state and a read/write `output` state in ioBroker.
+5.  **Input Path:** When the plug sends a status update, the engine decodes it and emits a `device:reading` event with `{ deviceId, reading: 'power', value: 15.3 }`. The adapter updates its state.
+6.  **Output Path:** When the user toggles the `output` state, the adapter calls `eo.sendCommand(deviceId, { action: 'setOutput', value: true })`. The engine encodes and sends the command.
+
+### Case 4: Mimicking a Bidirectional Actuator
+
+**Goal:** We pretend to be a wall plug to integrate with another system that expects to talk to one.
+
+**Flow:**
+
+1.  **Adapter:** Calls `eo.createVirtualDevice({ eep: 'd2-01-0e' })`. The engine returns the `senderId` and profile.
+2.  **Adapter:** Creates the corresponding ioBroker states.
+3.  **Teach-In:** The adapter calls `eo.sendCommand(senderId, { action: 'teachIn' })` to initiate pairing with the other system.
+4.  **Receiving Commands:** The external system sends a command _to our virtual device_. The engine receives and decodes it, emitting a `device:event` like `{ deviceId: senderId, event: 'setOutput', value: true }`. The adapter listens and updates the ioBroker state.
+5.  **Sending State:** The user changes a state in ioBroker. The adapter calls `eo.sendCommand(senderId, { action: 'setPower', value: 25.0 })`. The engine encodes and sends the state update _from_ our virtual device.
+
+## IV. Implementation Roadmap
+
+1.  **Finalize Declarative Profiles:** Add the `profile` block to key EEP files (`f6-02-01`, `a5-02-05`, `d2-01-0e`), defining their `events`, `readings`, and `actions`.
+2.  **Implement `getProfileDescription()`:** Create the function that parses an EEP's `profile` block and returns the structured JSON description.
+3.  **Build the "Event Generator":** Implement the generic engine that processes `decoded-data` against the EEP profile to generate high-level semantic events.
+4.  **Build the "Output Path":** Implement the logic within `sendCommand` to use an EEP profile to _encode_ a payload and send it.
+5.  **Build the Virtual Device API:** Implement `createVirtualDevice` and the necessary database and logic to manage the sender ID pool and route commands to/from virtual

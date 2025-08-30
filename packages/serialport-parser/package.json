@@ -1,0 +1,23 @@
+{
+  "name": "@enocean-js/serialport-parser",
+  "version": "0.1.0",
+  "description": "serialport parser for enocean-js",
+  "main": "serialport-parser.js",
+  "exports": {
+    ".": "./serialport-parser.js"
+  },
+  "type": "module",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/enocean-js"
+  },
+  "dependencies": {
+    "@enocean-js/crc8": "workspace:*",
+    "@enocean-js/esp3-packets": "workspace:*",
+    "@enocean-js/esp3-packet": "workspace:*",
+    "@enocean-js/esp3-transformer": "workspace:*",
+    "serialport": "^8.0.8"
+  }
+}

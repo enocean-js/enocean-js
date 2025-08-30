@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "definitions.json",
+  "definitions": {
+    "minmax":{
+      "type" : "object",
+      "properties" : {
+        "min" : { "type" : "number" },
+        "max" : { "type" : "number"},
+        "ref":{ "type" : "string" }
+      },
+      "additionalProperties" : false,
+      "oneOf":[
+        {"required":["ref"]},
+        {"required":["min","max"]}
+      ]
+   },
+   "spread":{
+     "type":"array",
+     "items":{
+       "type":"object",
+       "properties":{
+         "bitoffs":{"type":"number"},
+         "bitsize":{"type":"number"}
+       },
+       "additionalProperties" : false,
+       "required":["bitoffs","bitsize"]
+     }
+   },
+   "minmax_datafield":{
+     "properties":{
+       "scale":{"$ref":"#/definitions/minmax"},
+       "range":{"$ref":"#/definitions/minmax"},
+       "spread":{"$ref":"#/definitions/spread"}
+     },
+     "required":["range"],
+     "oneOf":[
+       {"required":["spread"]},
+       {"required":["bitoffs","bitsize"]}
+      ]
+   },
+   "reserved_datafield" : {
+     "properties": {
+       "reserved": { "type" : "boolean" , "enum" : [true]}
+     },
+     "required":["reserved","bitoffs","bitsize"]
+   },
+   "datafield":{
+     "type":"array",
+     "items":{
+       "properties":{
+         "bitoffs":{"type":"number"},
+         "bitsize":{"type":"number"},
+         "unit":{
+           "oneOf":[
+             { "type":"string" },
+             { "type":"object",
+               "properties": {
+                 "ref":{"type":"string"}
+               },
+               "additionalProperties" : false
+              }
+          ]
+        }
+       },
+       "oneOf":[
+         {"$ref":"#/definitions/minmax_datafield"},
+         {"$ref":"#/definitions/reserved_datafield"}
+       ]
+     }
+   }
+ }
+}

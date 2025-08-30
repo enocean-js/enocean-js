@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+const fs = require('fs')
+const { execSync } = require('child_process')
+const rootPath = 'packages/node_modules/@enocean-js'
+const green = '\x1b[32m'
+const red = '\x1b[31m'
+const blue = '\x1b[34m'
+const reset = '\x1b[0m'
+const dim = '\x1b[2m'
+process.argv.shift()
+process.argv.shift()
+if (process.argv.length > 0) {
+  var argv = process.argv.join(' ')
+  execSync(`npm version ${argv}`, { stdio: 'inherit' })
+}
+
+const main = require('../package.json')
+console.log(`setting version to ${red}${main.version}${reset}`)
+
+var subModules = fs.readdirSync(rootPath)
+subModules.forEach(subModuleFolder => {
+  var subModuleDirectory = `${rootPath}/${subModuleFolder}`
+  var stat = fs.statSync(subModuleDirectory)
+  if (stat.isDirectory()) {
+    var subModulesPacketJSONPath = `${subModuleDirectory}/package.json`
+    if (fs.existsSync(subModulesPacketJSONPath)) {
+      updateVersionInFile(subModulesPacketJSONPath, subModuleFolder)
+    }
+  }
+})
+
+updateVersionInFile('resources/templates/package.json', 'template')
+updateVersionInFile('package.json','main')
+console.log('')
+console.log(`... commiting version update`)
+execSync(`git commit -a -S --allow-empty -m '🎁 ${main.version}'`, { stdio: 'inherit' })
+
+function updateVersionInFile (path, name = path) {
+  var packageJSON = JSON.parse(fs.readFileSync(path, 'utf8'))
+  packageJSON.version = main.version
+  console.log(`${green}✓ ${reset}${dim}${name}${reset}`)
+  if (packageJSON.hasOwnProperty('dependencies')) {
+    for (var dep in packageJSON.dependencies) {
+      if (dep.includes('@enocean-js')) {
+        packageJSON.dependencies[dep] = main.version
+        console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
+      }
+    }
+    for (var dep in packageJSON.dependencies) {
+      if (!dep.includes('@enocean-js')) {
+        if(main.dependencies.hasOwnProperty(dep)){
+          packageJSON.dependencies[dep] = main.dependencies[dep]
+        }else if (main.devDependencies.hasOwnProperty(dep)){
+          packageJSON.dependencies[dep] = main.devDependencies[dep]
+        }else{
+          console.log(` ${red}✘ ${dim}${red}dependency not found in main json ${reset}${dim}${dep}${reset}`)
+        }
+        console.log(` ${green}✓ ${dim}${blue}dependency ${reset}${dim}${dep}${reset}`)
+      }
+    }
+  }
+  fs.writeFileSync(path, JSON.stringify(packageJSON, null, 2))
+}

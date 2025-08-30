@@ -1,0 +1,19 @@
+{
+  "name": "@enocean-js/examples",
+  "version": "0.1.0",
+  "description": "Main package for the enocean-js monorepo.",
+  "main": "logger.js",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/"
+  },
+  "dependencies": {
+    "serialport": "^12.0.0",
+    "@enocean-js/enocean": "workspace:*",
+    "@enocean-js/enocean-js-lib": "workspace:*",
+    "@enocean-js/utils": "workspace:*"
+  }
+}

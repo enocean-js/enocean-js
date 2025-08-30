@@ -1,0 +1,30 @@
+{
+  "datafield": [{
+    "bitoffs":0,
+    "bitsize":9,
+    "scale" : {
+      "ref": "DIV"
+    },
+    "range" : {
+      "min": 1,
+      "max": 2
+    },
+    "unit":{"ref":"DT"}
+  },{
+    "reserved":true,
+    "bitoffs":0,
+    "bitsize":9
+  },{
+    "spread":[{"bitoffs":0,
+    "bitsize":9}],
+    "scale" : {
+      "ref": "DIV"
+    },
+    "range" : {
+      "min": 1,
+      "max": 2
+    },
+    "unit":{"ref":"DT"}
+  }
+  ]
+}

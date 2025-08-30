@@ -1,0 +1,147 @@
+import { ESP3Packet } from "@enocean-js/esp3-packet";
+import { ByteArray } from "@enocean-js/byte-array";
+import { decode, getTeachInInfo } from "@enocean-js/eep-transcoder";
+class RadioERP2 extends ESP3Packet {
+  get addressControl() {
+    const ctrl = [
+      { src: 3, dest: 0 },
+      { src: 4, dest: 0 },
+      { src: 4, dest: 4 },
+      { src: 6, dest: 0 },
+    ];
+    return ctrl[super.data.getValue(0, 3)];
+  }
+
+  get optionalDL() {
+    if (this.extendedHeaderAvailable) {
+      return super.data.getValue(8, 4);
+    }
+    return 0;
+  }
+
+  get payload() {
+    let os = 1;
+    const ac = this.addressControl;
+    if (this.telegramType === 0b1111) {
+      os++;
+    }
+    if (this.extendedHeaderAvailable) {
+      os++;
+    }
+    os += ac.src + ac.dest;
+    const l = this.data.length - (os + this.optionalDL);
+    return super.data.slice(os, os + l - 1);
+  }
+
+  get senderId() {
+    let os = 1;
+    if (this.telegramType === 0b1111) {
+      os++;
+    }
+    if (this.extendedHeaderAvailable) {
+      os++;
+    }
+    return super.data.slice(os, os + this.addressControl.src).toString(16);
+  }
+
+  get extendedHeaderAvailable() {
+    return Boolean(super.data.getValue(3, 1));
+  }
+
+  get telegramType() {
+    return super.data.getValue(4, 4);
+  }
+
+  get RORG() {
+    const rorgs = [
+      0xf6,
+      0xd5,
+      0xa5,
+      0xd0,
+      0xd2,
+      0xd4,
+      0xd1,
+      0x30,
+      0x31,
+      0x35,
+      0xb3,
+      null,
+      null,
+      null,
+      null,
+      "extended",
+    ];
+    const extRorgs = [0xc5, 0xc6, 0xc7, 0x40, 0x32, 0xb0, 0xb1, 0xb2];
+    if (this.telegramType === 0b1111) {
+      return extRorgs[super.data[2]];
+    }
+    return rorgs[this.telegramType];
+  }
+
+  get subTelNum() {
+    return super.optionalData[0];
+  }
+
+  get RSSI() {
+    return super.optionalData[1];
+  }
+
+  get teachIn() {
+    const mask = 1 << 3;
+    if (this.RORG === 0xd5 || this.RORG === 0xa5) {
+      return (this.payload[this.payload.length - 1] & mask) === 0;
+    }
+    if (this.RORG === 0xd4 || this.RORG === 0xf6) return true;
+  }
+
+  get teachInInfo() {
+    const tii = getTeachInInfo(this);
+    if (tii.eep.rorg === 0xf6 && tii.eep.func === 0x02) {
+      tii.eep.type = 0x04;
+    }
+    console.log(tii);
+    return tii;
+  }
+
+  decode(eep, direction) {
+    if (this.teachIn && this.RORG !== 0xf6) return this.teachInInfo;
+    return decode(this, eep, direction);
+  }
+
+  static from(input) {
+    let pl;
+    if (input.constructor.name === "ESP3Packet") {
+      return new RadioERP2(input.toString());
+    }
+    if (Object.prototype.hasOwnProperty.call(input, "payload")) {
+      let rorg;
+      pl = ByteArray.from(input.payload);
+      switch (pl.length) {
+        case 1:
+          rorg = 0xf6;
+          break;
+        case 4:
+          rorg = 0xa5;
+          break;
+        default:
+          rorg = 0xd2;
+      }
+      return RadioERP2.from({
+        data: [
+          input.rorg || rorg,
+          pl,
+          input.id || "00000000",
+          input.status || 0,
+        ],
+        optionalData: [3, "ffffffff", "ff", 0], // always the same for sending ERP1
+        packetType: 1, // always the same for sending ERP1
+      });
+    } else {
+      const res = new RadioERP2(super.from(input).toString());
+      return res;
+    }
+  }
+}
+
+export { RadioERP2 };
+export default RadioERP2;

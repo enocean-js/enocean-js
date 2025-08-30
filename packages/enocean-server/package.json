@@ -1,0 +1,27 @@
+{
+  "name": "@enocean-js/enocean-server",
+  "version": "0.1.0",
+  "description": "Main package for the enocean-js monorepo.",
+  "main": "main.js",
+  "exports": {
+    ".": "./main.js"
+  },
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/"
+  },
+  "dependencies": {
+    "@enocean-js/enocean": "workspace:*",
+    "@enocean-js/enocean-js-browser-lib": "workspace:*",
+    "express": "^4.21.2",
+    "mqtt": "^5.14.0",
+    "yargs": "^18.0.0"
+  },
+  "bin": {
+    "enocean2mqtt": "./main.js",
+    "eo2mqtt": "./main.js"
+  }
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Virtual Device Tester</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 2rem;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+      }
+      .card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      h2 {
+        margin-top: 0;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 0.5rem;
+        box-sizing: border-box;
+      }
+      button {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #2980b9;
+      }
+      #controls {
+        display: none;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      #log {
+        margin-top: 1rem;
+        background: #f4f4f4;
+        border: 1px solid #ddd;
+        height: 200px;
+        overflow-y: auto;
+        padding: 1rem;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Virtual Device Tester</h1>
+
+      <div class="card">
+        <h2>1. Create Virtual Rocker Switch</h2>
+        <div class="form-group">
+          <label for="device-name">Device Name</label>
+          <input type="text" id="device-name" value="My Test Switch" />
+        </div>
+        <div class="form-group">
+          <label for="device-eep">EEP</label>
+          <select id="device-eep">
+            <option value="f6-02-01">f6-02-01 (Rocker Switch)</option>
+            <option value="f6-02-02">f6-02-02 (Rocker Switch)</option>
+            <option value="f6-02-03">f6-02-03 (Rocker Switch)</option>
+            <option value="f6-02-04">f6-02-04 (Rocker Switch)</option>
+          </select>
+        </div>
+        <button id="btn-create">Create Device</button>
+      </div>
+
+      <div class="card">
+        <h2>2. Control Device</h2>
+        <p>Device ID: <b id="device-id">None</b></p>
+        <div id="controls">
+          <button data-button="AI">Button AI (Click)</button>
+          <button data-button="A0">Button A0 (Click)</button>
+          <button data-button="BI">Button BI (Click)</button>
+          <button data-button="B0">Button B0 (Click)</button>
+        </div>
+      </div>
+
+      <div id="log-container">
+        <h3>Log</h3>
+        <div id="log"></div>
+      </div>
+    </div>
+
+    <script>
+      const logDiv = document.getElementById("log");
+      const deviceIdSpan = document.getElementById("device-id");
+      const controlsDiv = document.getElementById("controls");
+      let currentDeviceId = null;
+
+      function log(message) {
+        logDiv.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${message}</div>`;
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
+
+      // --- API Logic ---
+
+      document
+        .getElementById("btn-create")
+        .addEventListener("click", async () => {
+          const name = document.getElementById("device-name").value;
+          const eep = document.getElementById("device-eep").value;
+          log(`Creating virtual device "${name}" with EEP ${eep}...`);
+
+          try {
+            const response = await fetch("/api/virtual-devices", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, eep }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`Server responded with ${response.status}`);
+            }
+
+            const newDevice = await response.json();
+            log(
+              `SUCCESS: Created device with ID: ${newDevice.virtualDeviceId}`
+            );
+            currentDeviceId = newDevice.virtualDeviceId;
+            deviceIdSpan.textContent = currentDeviceId;
+            controlsDiv.style.display = "grid";
+          } catch (e) {
+            log(`ERROR: ${e.message}`);
+          }
+        });
+
+      controlsDiv.addEventListener("click", async (event) => {
+        if (event.target.tagName !== "BUTTON" || !currentDeviceId) return;
+
+        const buttonName = event.target.dataset.button;
+        log(
+          `Sending click for button ${buttonName} to device ${currentDeviceId}...`
+        );
+
+        try {
+          // Note the URL structure: /api/virtual-devices/{profile-name}/{id}/...
+          const response = await fetch(
+            `/api/virtual-devices/rocker-switch/${currentDeviceId}/buttons/${buttonName}/click`,
+            {
+              method: "POST",
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+          }
+
+          const result = await response.json();
+          log(`SUCCESS: ${result.message}`);
+        } catch (e) {
+          log(`ERROR: ${e.message}`);
+        }
+      });
+    </script>
+  </body>
+</html>
