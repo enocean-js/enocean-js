@@ -1,7 +1,7 @@
 /**
  * EEP A5-02-01: Temperature Sensor (-40°C to 0°C)
  */
-import { scale, getValue, setValue } from "@enocean-js/utils";
+import { scale, getValue, setValue, checkAndThrow } from "@enocean-js/utils";
 
 export const a50201 = {
   meta: {
@@ -18,15 +18,16 @@ export const a50201 = {
     ],
   }),
   decode: (payload) => {
-    if (!payload || payload.byteLength !== 4) return null;
+    // check if payload is valid, otherwise throw an Error
+    checkAndThrow(payload, 4);
     const rawTemperature = getValue(payload, 16, 8);
-    const learnBit = getValue(payload, 28, 1) === 0;
+    const isTeachIn = getValue(payload, 28, 1) === 0;
 
     return {
       temperature: parseFloat(
         scale(rawTemperature, [255, 0], [-40, 0]).toFixed(1)
       ),
-      learnBit,
+      isTeachIn,
     };
   },
   encode: (data) => {

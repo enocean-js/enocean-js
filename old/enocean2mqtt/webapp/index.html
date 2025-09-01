@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EnOcean2MQTT Web App</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module">
+      //import mqtt from "https://unpkg.com/mqtt@5.14.0/dist/mqtt.esm.js";
+      import "./elements/logger.js";
+       const es = new EventSource('/packet')
+      es.addEventListener("packet", (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data)
+        //const logger = document.getElementById("logger");
+        //logger.packet(data);
+      });
+    //   const client = mqtt.connect("ws://192.168.178.109:8080");
+    //   client.on("connect", () => {
+    //     client.subscribe("enocean2mqtt/#", { nl: true, rh: false });
+    //     logger.log("Connected to MQTT broker","success");
+    //   });
+    //   client.on("error", (err) => {
+    //     logger.error(`Connection error: ${err.message}`);
+    //   });
+    //   document
+    //     .getElementById("connect-button")
+    //     .addEventListener("click", () => {
+    //       client.connect();
+    //     });
+    //   document
+    //     .getElementById("disconnect-button")
+    //     .addEventListener("click", () => {
+    //       client.end();
+    //       document.getElementById("status-message").textContent =
+    //         "Disconnected from MQTT broker";
+    //     });
+    //   client.on("message", (topic, message) => {
+    //     const parts = topic.split("/");
+    //     if(parts[1]==="packet"){
+    //         logger.packet(message.toString());
+    //     }
+    //    // logger.packet(`${topic}: ${message.toString()}`);
+    //   });
+      
+
+      logger.info("EnOcean2MQTT Web App initialized");
+    </script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        font-family: Arial, sans-serif;
+      }
+      header,
+      footer {
+        background: #063b72;
+        color: #fff;
+        padding: 1em;
+        text-align: center;
+      }
+      main {
+        flex: 1;
+      }
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+        gap: 2em;
+        padding: 2em;
+        min-height: 60vh;
+      }
+      #main-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2em;
+      }
+      #logger {
+        background: #333;
+        border-radius: 8px;
+        padding: 1em;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      section {
+        margin-bottom: 1em;
+      }
+      button {
+        background-color: #539e43;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        margin-right: 10px;
+      }
+      button:hover {
+        opacity: 0.9;
+      }
+      #disconnect-button {
+        background-color: #c0392b;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>EnOcean2MQTT Web App</h1>
+    </header>
+    <main class="main-grid">
+      <section id="main-left">
+        <section id="status">
+          <h2>Status</h2>
+          <p id="status-message">Connecting...</p>
+        </section>
+        <section id="controls">
+          <h2>Controls</h2>
+          <button id="connect-button">Connect</button>
+          <button id="disconnect-button">Disconnect</button>
+        </section>
+      </section>
+      <my-logger id="logger">
+        </section>
+    </main>
+    <footer>
+      <p>&copy; 2025 enocean-js</p>
+    </footer>
+  </body>
+</html>

@@ -1,16 +1,41 @@
-import { ESP3Packet } from "@enocean-js/esp3-packet";
+/*
+ * Copyright (c) 2025 Holger Will (h.will@klimapartner.de)
+ *
+ * Licensed under Creative Commons Attribution (CC-BY)
+ * https://creativecommons.org/licenses/by/4.0/
+ *
+ * This file is part of the enocean-js project.
+ * You may use this file or parts of it, provided you keep this header intact.
+ */
+import {
+  crc8,
+  getOptionalDataLength,
+  getDataLength,
+  getBodyCRC8,
+  subArray,
+  toString,
+} from "@enocean-js/utils";
 import * as CONST from "./parser-const.js";
-import { transform } from "@enocean-js/esp3-transformer";
-//export { ESP3CallbackParser } from './callback-parser.js'
-import { Transform } from "node:stream";
-//const Transform = require("stream").Transform;
+import { Transform } from "stream";
 
 class ESP3Parser extends Transform {
-  constructor(options = { maxBufferSize: 65535 }) {
-    super({ ...options, ...{ readableObjectMode: true } });
-    this.currentESP3Packet = ESP3Packet.from();
+  constructor(options) {
+    const opt = {
+      ...options,
+      ...{
+        readableObjectMode: true,
+        maxBufferSize: 65535,
+        maxDataSize: 64,
+        maxOptionalSize: 64,
+      },
+    };
+    super(opt);
+    this.options = opt;
+    this.packet = [];
     this.state = CONST.WAIT_FOR_SYNC_BYTE;
-    this.maxBufferSize = options.maxBufferSize;
+    this.maxBufferSize = opt.maxBufferSize;
+    this.maxDataSize = opt.maxDataSize;
+    this.maxOptionalSize = opt.maxOptionalSize;
   }
 
   _transform(chunk, encoding, cb) {
@@ -19,29 +44,36 @@ class ESP3Parser extends Transform {
       switch (this.state) {
         case CONST.WAIT_FOR_SYNC_BYTE:
           if (byte === 0x55) {
-            this.currentESP3Packet = ESP3Packet.from(byte);
+            this.packet = [0x55];
             this.state = CONST.FILL_HEADER;
           }
           break;
         case CONST.FILL_HEADER:
-          this.currentESP3Packet.push(byte);
-          if (this.currentESP3Packet.length < 5) {
+          this.packet.push(byte);
+          if (this.packet.length < 5) {
             break;
           }
           this.state = CONST.CHECK_CRC8_HEADER;
           break;
         case CONST.CHECK_CRC8_HEADER:
-          this.currentESP3Packet.push(byte);
-          if (!this.currentESP3Packet.isHeaderOK()) {
-            let syncCodeIndex = this.currentESP3Packet.findIndex(
-              (item, index) => {
-                return item === 0x55 && index > 0;
-              }
-            );
-            if (syncCodeIndex > 0) {
+          if (crc8(subArray(this.packet, 1, 4)) !== byte) {
+            this.packet.push(byte);
+            let syncCodeIndex = this.packet.findIndex((item, index) => {
+              return item === 0x55 && index > 0;
+            });
+
+            if (syncCodeIndex > 1) {
               this.state = CONST.FILL_HEADER;
               while (syncCodeIndex > 0) {
-                this.currentESP3Packet.shift();
+                this.packet.shift();
+                syncCodeIndex--;
+              }
+              break;
+            }
+            if (syncCodeIndex === 1) {
+              this.state = CONST.CHECK_CRC8_HEADER;
+              while (syncCodeIndex > 0) {
+                this.packet.shift();
                 syncCodeIndex--;
               }
               break;
@@ -53,10 +85,41 @@ class ESP3Parser extends Transform {
             });
             this.state = CONST.WAIT_FOR_SYNC_BYTE;
             break;
+          } else {
+            this.packet.push(byte);
           }
           if (
-            this.currentESP3Packet.dataLength +
-              this.currentESP3Packet.optionalLength <=
+            getDataLength(this.packet) > this.maxDataSize ||
+            getOptionalDataLength(this.packet) > this.maxOptionalSize
+          ) {
+            this.emit("error", {
+              code: CONST.ILLEGAL_PACKET_LENGTH_ERROR,
+              name: "ILLEGAL_PACKET_LENGTH_ERROR",
+              desc: "lenght and optional length should be smaller than 64 bytes each",
+            });
+            if (byte === 0x55) {
+              this.packet = [0x55];
+              this.state = CONST.FILL_HEADER;
+              break;
+            }
+            let syncCodeIndex = this.packet.findIndex((item, index) => {
+              return item === 0x55 && index > 0;
+            });
+
+            if (syncCodeIndex > 0) {
+              this.state = CONST.FILL_HEADER;
+              while (syncCodeIndex > 0) {
+                this.packet.shift();
+                syncCodeIndex--;
+              }
+              break;
+            }
+            this.state = CONST.WAIT_FOR_SYNC_BYTE;
+            break;
+          }
+
+          if (
+            getDataLength(this.packet) + getOptionalDataLength(this.packet) <=
             0
           ) {
             this.emit("error", {
@@ -64,14 +127,15 @@ class ESP3Parser extends Transform {
               name: "ILLEGAL_PACKET_LENGTH_ERROR",
               desc: "there must be at least 1 byte of data or optional data, it can not be 0",
             });
+            this.packet = [];
             this.state = CONST.WAIT_FOR_SYNC_BYTE;
             break;
           }
           this.state = CONST.FILL_DATA_OPTIONALDATA;
           break;
         case CONST.FILL_DATA_OPTIONALDATA:
-          this.currentESP3Packet.push(byte);
-          if (this.currentESP3Packet.length > this.maxBufferSize) {
+          this.packet.push(byte);
+          if (this.packet.length > this.maxBufferSize) {
             this.state = CONST.WAIT_FOR_SYNC_BYTE;
             this.emit("error", {
               code: CONST.BUFFER_OVERFLOW_ERROR,
@@ -81,27 +145,26 @@ class ESP3Parser extends Transform {
             break;
           }
           if (
-            this.currentESP3Packet.length <
-            this.currentESP3Packet.dataLength +
-              this.currentESP3Packet.optionalLength +
-              6
+            this.packet.length <
+            getDataLength(this.packet) + getOptionalDataLength(this.packet) + 6
           ) {
             break;
           }
           this.state = CONST.CHECK_CRC8_DATAS;
           break;
         case CONST.CHECK_CRC8_DATAS:
-          this.currentESP3Packet.push(byte);
           this.state = CONST.WAIT_FOR_SYNC_BYTE;
-          if (!this.currentESP3Packet.isBodyOK()) {
+          if (getBodyCRC8(this.packet) != byte) {
             this.emit("error", {
               code: 2,
               name: "WRONG_BODY_CHECKSUM",
               desc: "data checksum test failed",
             });
             break;
+          } else {
+            this.packet.push(byte);
           }
-          this.push(transform(this.currentESP3Packet));
+          this.push(new Uint8Array(this.packet));
           break;
       }
     }

@@ -8,16 +8,12 @@
   },
   "type": "module",
   "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
-  "license": "CC0-1.0",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/enocean-js/enocean-js"
   },
   "dependencies": {
-    "@enocean-js/crc8": "workspace:*",
-    "@enocean-js/esp3-packets": "workspace:*",
-    "@enocean-js/esp3-packet": "workspace:*",
-    "@enocean-js/esp3-transformer": "workspace:*",
-    "serialport": "^8.0.8"
+    "@enocean-js/utils": "workspace:*"
   }
 }

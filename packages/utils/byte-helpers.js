@@ -77,3 +77,40 @@ export function fromString(str, radix = 16) {
   }
   return new Uint8Array(bytes);
 }
+
+export function checkAndThrow(payload, expectedLength) {
+  if (!payload) throw new Error("No payload");
+  if (payload.byteLength !== expectedLength)
+    throw new Error(
+      `Invalid payload length: expected ${expectedLength}, got ${payload.byteLength}`
+    );
+}
+
+export function subArray(array, startByte, length) {
+  // Validate input parameters
+  if (
+    typeof startByte !== "number" ||
+    startByte < 0 ||
+    startByte >= array.length
+  ) {
+    throw new Error(
+      "The startByte must be a non-negative integer within the bounds of the array."
+    );
+  }
+  if (
+    typeof length !== "number" ||
+    length < 0 ||
+    length > array.length - startByte
+  ) {
+    throw new Error(
+      "The length must be a non-negative integer that does not exceed the remaining elements in the array starting from startByte."
+    );
+  }
+
+  // Extract and return the subarray
+  const result = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    result[i] = array[startByte + i];
+  }
+  return result;
+}

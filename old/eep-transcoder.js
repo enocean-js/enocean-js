@@ -1,0 +1,578 @@
+import * as EEP from "./eep.js";
+//import { ByteArray } from "@enocean-js/byte-array";
+import { manufacturer } from "./manufacturer.js";
+import { UTE_TEACH_IN_SUCCESSFULL } from "@enocean-js/radio-erp1";
+export { EEP };
+//export * as utils from "./utils/utils.js";
+export function getEEP(eep) {
+  let c = EEP[eep.replace(/-/g, "")];
+  if ("ref" in c) {
+    c = EEP[c.ref.replace(/-/g, "")];
+  }
+  return c;
+}
+
+// *************************************************************************************************
+// ********************** ENOCEAN OVER IP MAPPING **************************************************
+function hex(x) {
+  return parseInt(x, 16).toString(16).padStart(2, "0");
+}
+
+function toCamelCase(str) {
+  let lc = str.toLowerCase();
+  lc = lc.replace(/-/g, " ");
+  const arr = lc.split(" ");
+  return arr
+    .map((item, index) => {
+      if (index > 0) {
+        return item.charAt(0).toUpperCase() + item.slice(1);
+      } else {
+        return item;
+      }
+    })
+    .join("");
+}
+
+export function eep2IP(eep) {
+  const eepDesc = getEEP(eep);
+  const funcs = eepDesc.case[0].datafield
+    .reduce((acc, item) => {
+      if (!("reserved" in item) && !(item.shortcut === "LRNB")) {
+        acc.push(item);
+      }
+      return acc;
+    }, [])
+    .map((item) => {
+      const values = [];
+      if ("range" in item) {
+        values.push({
+          range: {
+            min: parseInt(item.scale.min),
+            max: parseInt(item.scale.max),
+            step: (
+              (parseInt(item.scale.max) - parseInt(item.scale.min)) /
+              (parseInt(item.range.max) - parseInt(item.range.min))
+            ).toFixed(3),
+            unit: item.unit,
+          },
+        });
+      }
+      if ("enum" in item) {
+        item.enum.item.forEach((e) => {
+          if ("min" in e) {
+            e.value = {
+              min: e.min,
+              max: e.max,
+            };
+          }
+          values.push({
+            value: e.value,
+            meaning: e.description,
+          });
+        });
+      }
+      return {
+        key: toCamelCase(item.data),
+        shorcut: item.shortcut,
+        description: item.description,
+        values: values,
+      };
+    });
+  return {
+    eep: `${hex(eepDesc.rorg_number)}-${hex(eepDesc.func_number)}-${hex(
+      eepDesc.number
+    )}`,
+    title: `${eepDesc.func_title}, ${eepDesc.title}`,
+    functionGroup: {
+      direction: "from",
+      functions: funcs,
+    },
+  };
+}
+
+// *************************************************************************************************
+// *************************************************************************************************
+
+export function searchEEP(field, condition) {
+  const res = [];
+  for (const item in EEP) {
+    if (item === field && condition.test(EEP[item][field])) {
+      res.push(item);
+    }
+    if (searchInsideField(EEP[item], field, condition)) {
+      res.push(item);
+    }
+  }
+  return res;
+}
+function searchInsideField(currentMember, field, condition) {
+  for (const item in currentMember) {
+    if (item === field) {
+      if (condition.test(currentMember[field])) {
+        return true;
+      }
+    }
+    if (typeof currentMember[item] !== "string") {
+      if (searchInsideField(currentMember[item], field, condition)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function getConditionType(item) {
+  if ("condition" in item) {
+    if ("statusfield" in item.condition) {
+      return "status";
+    }
+    if ("datafield" in item.condition) {
+      return "data";
+    }
+    if ("direction" in item.condition) {
+      return "direction";
+    }
+  }
+  return "none";
+}
+
+function createStatusByte(fields) {
+  const status = ByteArray.from(0);
+  return fields.reduce((a, x) => {
+    a.setSingleBit(parseInt(x.bitoffs), parseInt(x.value));
+    return a;
+  }, status);
+}
+
+function getEEPDescriptor(options) {
+  const selector = {
+    ...{
+      direction: 1,
+      status: 0,
+      payload: ByteArray.from([0, 0, 0, 0]),
+      data: 1,
+    },
+    ...options,
+  };
+  const c = getEEP(selector.eep);
+  let cond;
+  return c.case.find(function (item) {
+    switch (getConditionType(item)) {
+      case "status":
+        if (
+          createStatusByte(item.condition.statusfield)[0] === selector.status
+        ) {
+          return true;
+        }
+        break;
+      case "data":
+        cond = selector.payload.getValue(
+          parseInt(item.condition.datafield.bitoffs),
+          parseInt(item.condition.datafield.bitsize)
+        );
+        if (
+          parseInt(item.condition.datafield.value) ===
+          (cond === 0 || isNaN(cond) ? selector.data : cond)
+        ) {
+          return true;
+        }
+        break;
+      case "direction":
+        if (parseInt(item.condition.direction) === selector.direction) {
+          return true;
+        }
+        break;
+      case "none":
+      default:
+        return true;
+    }
+    return false;
+  });
+}
+
+export function decode(radio, eep, direction = 1) {
+  return Object.freeze(
+    decodeCase(
+      radio.payload,
+      getEEPDescriptor({
+        eep: eep,
+        direction: direction,
+        status: radio.status,
+        payload: radio.payload,
+      })
+    )
+  );
+}
+
+function decodeCase(tel, c) {
+  try {
+    if (!Array.isArray(c.datafield)) c.datafield = [c.datafield];
+    const ret = c.datafield.reduce(makeFieldExtractor(tel), {});
+    return ret;
+  } catch (err) {
+    console.error("ERROR", tel.toString(), c);
+  }
+}
+
+/**
+ *
+ */
+function makeFieldExtractor(payload) {
+  return function (returnValue, datafield, index, array) {
+    let rawValue = payload.getValue(
+      parseInt(datafield.bitoffs),
+      parseInt(datafield.bitsize)
+    );
+    const unit = getUnit(datafield, array, payload);
+    let v;
+    switch (getFieldType(datafield)) {
+      case "enum":
+        returnValue[datafield.shortcut] = {
+          ...{ name: datafield.data, unit: unit, rawValue: rawValue },
+          ...extractEnumValue(rawValue, datafield.enum.item),
+        };
+        break;
+      case "spread":
+        v = datafield.spread.reduce((accumulator, current) => {
+          return `${accumulator}${payload
+            .getValue(parseInt(current.bitoffs), parseInt(current.bitsize))
+            .toString(2)
+            .padStart(current.bitsize, "0")}`;
+        }, "");
+        rawValue = parseInt(v, 2);
+        if (!("range" in datafield)) {
+          break;
+        }
+      /* the next comment is important for eslint */
+      /* falls through */
+      case "range":
+        returnValue[datafield.shortcut] = {
+          name: datafield.data,
+          rawValue: rawValue,
+          value: extractRangeValue(rawValue, datafield, array, payload),
+          range: datafield.range,
+          scale: datafield.scale,
+          unit: unit,
+        };
+        break;
+      case "reserved":
+        break;
+      case "raw":
+      default:
+        returnValue[datafield.shortcut] = {
+          name: datafield.data,
+          value: rawValue,
+          unit: unit,
+        };
+    }
+    return returnValue;
+  };
+}
+
+function getFieldType(datafield) {
+  if ("enum" in datafield && "item" in datafield.enum) {
+    return "enum";
+  }
+  if ("range" in datafield && !("spread" in datafield)) {
+    return "range";
+  }
+  if ("reserved" in datafield) {
+    return "reserved";
+  }
+  if ("spread" in datafield) {
+    return "spread";
+  }
+  return "raw";
+}
+
+function getDataFieldByShortcut(datafield, shortcut) {
+  return datafield.find((item) => item.shortcut === shortcut);
+}
+
+function extractEnumValue(value, list) {
+  if (!Array.isArray(list)) list = [list];
+  return list.find((item) => {
+    if ("min" in item) {
+      if (parseInt(item.min) <= value && parseInt(item.max) >= value) {
+        item.value = value;
+        return true;
+      }
+    }
+    if ("bitmask" in item) {
+      const mask = parseInt(item.bitmask, 2);
+      if ((value & mask) === parseInt(item.value, 2)) {
+        return true;
+      }
+    }
+    if ("scale" in item && parseInt(item.value) === value) {
+      return true;
+    }
+    if (parseInt(item.value) === value) {
+      return true;
+    }
+    return false;
+  });
+}
+
+function extractRangeValue(rawValue, datafield, array, payload) {
+  if (!("scale" in datafield)) {
+    datafield.scale = datafield.range;
+  }
+  let scale = datafield.scale;
+  let range = datafield.range;
+  if ("ref" in datafield.scale) {
+    scale = getRefField(datafield.scale.ref, array, payload).scale;
+  }
+  if ("ref" in datafield.range) {
+    range = getRefField(datafield.range.ref, array, payload).range;
+  }
+
+  // old implementation aof spread fieldDesc
+  //
+  // if (datafield.hasOwnProperty('LSB')) {
+  //   var desc = getDataFieldByShortcut(array, datafield.LSB.ref)
+  //   var ref = getRefField(datafield.LSB.ref, array, payload)
+  //   var lsb = ref.rawValue.toString(2).padStart(desc.bitsize, '0')
+  //   var msb = rawValue.toString(2).padStart(datafield.bitsize, '0')
+  //   rawValue = parseInt(msb + lsb, 2)
+  // }
+
+  return mapValue(rawValue, range, scale);
+}
+
+function mapValue(value, range, scale) {
+  const rangeDistance = Number(range.max) - Number(range.min);
+  const scaleDistance = Number(scale.max) - Number(scale.min);
+  const dx = scaleDistance / rangeDistance;
+  return (value - Number(range.min)) * dx + Number(scale.min);
+}
+
+/**
+ * returns a value for a field by it's shortname
+ * @param {string} shortname - the shortname of the field
+ * @param {object} fieldDesc - the filed descriptor for the current eep
+ * @param {ByteArray} payload - the payload to extract the value from
+ */
+function getRefField(shortname, fieldDescs, payload) {
+  return makeFieldExtractor(payload)(
+    {},
+    getDataFieldByShortcut(fieldDescs, shortname),
+    0,
+    payload
+  )[shortname];
+}
+
+function getUnit(datafield, array, payload) {
+  let unit = "";
+  if ("unit" in datafield) {
+    unit = datafield.unit;
+    if (Object.prototype.hasOwnProperty.call(datafield.unit, "ref")) {
+      unit = getRefField(datafield.unit.ref, array, payload).unit;
+    }
+  }
+  return unit;
+}
+
+function setRangeValue(rawValue, datafield, eep, payload) {
+  if (!("scale" in datafield)) {
+    datafield.scale = datafield.range;
+  }
+  let scale = datafield.scale;
+  let range = datafield.range;
+
+  if ("ref" in datafield.scale) {
+    scale = getRefField(datafield.scale.ref, eep, payload).scale;
+  }
+  if ("ref" in datafield.range) {
+    range = getRefField(datafield.range.ref, eep, payload).range;
+  }
+
+  return mapValue(rawValue, scale, range);
+}
+
+function getPayloadLengthFromEEPDescriptor(desc) {
+  function getBitoffs(field) {
+    if ("spread" in field) {
+      return field.spread.sort((x, y) => y.bitoffs - x.bitoffs)[0].bitoffs;
+    } else {
+      return parseInt(field.bitoffs);
+    }
+  }
+  const res = desc.datafield
+    .map((field) => {
+      if ("spread" in field) {
+        return field.spread.sort((x, y) => y.bitoffs - x.bitoffs)[0];
+      } else {
+        return { bitoffs: field.bitoffs, bitsize: field.bitsize };
+      }
+    })
+    .sort((x, y) => getBitoffs(y) - getBitoffs(x))[0];
+  return (getBitoffs(res) + parseInt(res.bitsize)) / 8;
+}
+
+export function encodeData(data, options) {
+  const selector = {
+    ...{
+      eep: "f6-01-01",
+      direction: 1,
+      status: 0,
+      payload: ByteArray.from([0, 0, 0, 0]),
+      data: 1,
+    },
+    ...options,
+  };
+  const payload = selector.payload;
+  const desc = getEEPDescriptor({
+    eep: selector.eep,
+    direction: selector.direction,
+    status: selector.status,
+    payload: payload,
+    data: selector.data,
+  });
+  const payloadLength = getPayloadLengthFromEEPDescriptor(desc);
+  const diff = payloadLength - payload.length;
+  if (diff > 0) {
+    for (let l1 = 0; l1 < diff; l1++) {
+      payload.unshift(0);
+    }
+  } else {
+    for (let l2 = 0; l2 < -diff; l2++) {
+      payload.pop();
+    }
+  }
+
+  for (const name in data) {
+    const field = getDataFieldByShortcut(desc.datafield, name);
+    if (field) {
+      const fieldType = getFieldType(field);
+      const val = Object.prototype.hasOwnProperty.call(data[name], "value")
+        ? data[name].value
+        : data[name];
+      if (fieldType === "range" || fieldType === "spread") {
+        const v = Math.round(
+          setRangeValue(val, field, desc.datafield, payload)
+        );
+        if (fieldType === "spread") {
+          const totalLength = field.spread.reduce(
+            (acc, current) => acc + current.bitsize
+          );
+          let valueString = v.toString(2).padStart(totalLength, "0");
+          field.spread.forEach((current) => {
+            const curentValue = valueString.substr(0, current.bitsize);
+            valueString = valueString.substr(current.bitsize);
+            payload.setValue(
+              parseInt(curentValue, 2),
+              current.bitoffs,
+              current.bitsize
+            );
+          });
+        } else {
+          payload.setValue(v, parseInt(field.bitoffs), parseInt(field.bitsize));
+        }
+      } else {
+        payload.setValue(val, parseInt(field.bitoffs), parseInt(field.bitsize));
+      }
+    }
+  }
+  return payload;
+}
+
+export function getTeachInInfo(telegram) {
+  const p = telegram;
+  let rorg, func, typ, manId;
+  if (p.RORG === 0xa5 || p.RORG === 0xd5) {
+    if (p.RORG === 0xd5) {
+      rorg = p.RORG;
+      func = 0x00;
+      typ = 0x01;
+      manId = 0x00;
+    } else {
+      rorg = p.RORG;
+      func = p.payload.getValue(0, 6);
+      typ = p.payload.getValue(6, 7);
+      manId = p.payload.getValue(13, 11);
+    }
+    return {
+      teachInType: p.RORG === 0xa5 ? "4BS" : "1BS",
+      senderId: p.senderId,
+      eep: {
+        rorg,
+        func,
+        type: typ,
+        toString() {
+          return `${this.rorg.toString(16).padStart(2, "0")}-${this.func
+            .toString(16)
+            .padStart(2, "0")}-${this.type.toString(16).padStart(2, "0")}`;
+        },
+      },
+      manufacturer: {
+        id: manId,
+        name: manufacturer[manId],
+      },
+    };
+  }
+  if (p.RORG === 0xf6) {
+    const rorg1 = 0xf6;
+    let func1 = 0x02;
+    let type1 = 0x01;
+    if (p.status === 16) {
+      func1 = 0x03;
+      type1 = 0x01;
+    }
+    if (
+      p.status === 32 &&
+      (p.payload[0] === 0xc0 ||
+        p.payload[0] === 0xd0 ||
+        p.payload[0] === 0xe0 ||
+        p.payload[0] === 0xf0)
+    ) {
+      func1 = 0x10;
+      type1 = 0x00;
+    }
+    return {
+      teachInType: "RPS",
+      senderId: p.senderId,
+      eep: {
+        rorg: rorg1,
+        func: func1,
+        type: type1,
+        toString() {
+          return `${this.rorg.toString(16).padStart(2, "0")}-${this.func
+            .toString(16)
+            .padStart(2, "0")}-${this.type.toString(16).padStart(2, "0")}`;
+        },
+      },
+    };
+  }
+  if (p.RORG === 0xd4) {
+    rorg = p.payload.getValue(48, 8);
+    func = p.payload.getValue(40, 8);
+    typ = p.payload.getValue(32, 8);
+    const msb = p.payload.getValue(29, 3).toString(2).padStart(3, "0");
+    const lsb = p.payload.getValue(16, 8).toString(2).padStart(3, "0");
+    manId = parseInt(`${msb}${lsb}`, 2);
+    return {
+      teachInType: "UTE",
+      senderId: p.senderId,
+      bidi: p.payload.getValue(0, 1),
+      responseExpected: p.payload.getValue(1, 1),
+      teachInRequest: p.payload.getValue(2, 2),
+      commandId: p.payload.getValue(4, 4),
+      channelCount: p.payload.getValue(8, 8),
+      eep: {
+        rorg,
+        func,
+        type: typ,
+        toString() {
+          return `${this.rorg.toString(16).padStart(2, "0")}-${this.func
+            .toString(16)
+            .padStart(2, "0")}-${this.type.toString(16).padStart(2, "0")}`;
+        },
+        manufacturer: {
+          id: manId,
+          name: manufacturer[manId],
+        },
+      },
+    };
+  }
+}

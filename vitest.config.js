@@ -6,6 +6,7 @@ export default defineConfig({
     include: ["packages/**/*.test.js"],
     // Enable global APIs (describe, it, expect) like in Mocha/Jest
     globals: true,
+    slowTestThreshold: 10000,
     coverage: {
       // Use the v8 provider for coverage
       provider: "v8",

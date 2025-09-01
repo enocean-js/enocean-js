@@ -1,0 +1,20 @@
+{
+  "name": "@enocean-js/esp3-packets",
+  "version": "0.1.0",
+  "description": "...",
+  "main": "esp3-packets.js",
+  "exports": {
+    ".": "./esp3-packets.js"
+  },
+  "type": "module",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "CC0-1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/enocean-js"
+  },
+  "dependencies": {
+    "@enocean-js/esp3-packet": "workspace:*",
+    "@enocean-js/eep-transcoder": "workspace:*"
+  }
+}
