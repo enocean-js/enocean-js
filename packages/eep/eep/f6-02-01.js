@@ -30,9 +30,7 @@ export const f60201 = {
     }
 
     // T21=1 and NU=1/0 identify a PTM switch telegram
-    const t21 = getValue(status, 2, 1) === 1;
-
-    if (!t21) return null;
+    // const t21 = getValue(status, 2, 1) === 1;
 
     const nu = getValue(status, 3, 1) === 1;
     const action = getValue(payload, 3, 1) === 1;
@@ -40,7 +38,6 @@ export const f60201 = {
       const r1 = getValue(payload, 0, 3);
       const r2 = getValue(payload, 4, 3);
       const sa = getValue(payload, 7, 1) === 1;
-
       if (action) {
         return {
           Button1: r1 === 0 || (r2 === 0 && sa),

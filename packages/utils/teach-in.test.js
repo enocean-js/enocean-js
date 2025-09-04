@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
+ * This file is part of the enocean-js project.
+ */
+
 import { describe, it, expect } from "vitest";
 import { encodeA5TeachIn, isA5TeachIn, decodeA5TeachIn } from "./teach-in.js";
 import { setValue } from "./byte-helpers.js";
@@ -14,7 +21,7 @@ describe("teach-in.js", () => {
     const decoded = decodeA5TeachIn(payload);
     expect(decoded.eep).toBe(eep);
     expect(decoded.manufacturer).toBe("PEHA");
-    expect(decoded.learnType).toBe("with EEP Info");
+    expect(decoded.withEEPInfo).toBe(true);
     expect(decoded.isTeachIn).toBe(true);
   });
 
@@ -30,7 +37,7 @@ describe("teach-in.js", () => {
     const decoded = decodeA5TeachIn(payload);
     expect(decoded.eep).toBe(eep);
     expect(decoded.manufacturer).toBe("PEHA");
-    expect(decoded.learnType).toBe("with EEP Info");
+    expect(decoded.withEEPInfo).toBe(true);
     expect(decoded.isTeachIn).toBe(true);
   });
 
@@ -45,7 +52,7 @@ describe("teach-in.js", () => {
     const decoded = decodeA5TeachIn(payload);
     expect(decoded.eep).toBeNull();
     expect(decoded.manufacturer).toBeNull();
-    expect(decoded.learnType).toBe("without EEP info");
+    expect(decoded.withEEPInfo).toBe(false);
     expect(decoded.isTeachIn).toBe(true);
   });
 

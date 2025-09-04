@@ -1,0 +1,23 @@
+{
+  "name": "@enocean-js/enocean",
+  "version": "0.1.0",
+  "description": "Main package for the enocean-js project",
+  "main": "enocean.js",
+  "exports": {
+    ".": "./enocean.js"
+  },
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/"
+  },
+  "dependencies": {
+    "@enocean-js/eep": "workspace:*",
+    "@enocean-js/serialport-parser": "workspace:*",
+    "@enocean-js/utils": "workspace:*",
+    "better-sqlite3": "^12.2.0",
+    "serialport": "^12.0.0"
+  }
+}

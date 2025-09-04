@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Enocean Gateway</title>
+    <style>
+      label {
+        width: 100px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Enocean Gateway</h1>
+    <script type="module">
+      import * as utils from "./enocean-utils.js";
+      document.getElementById("packetType").innerHTML = `${Object.keys(
+        utils.PacketTypeNameMap
+      )
+        .map(
+          (packetType) =>
+            `<option value="${parseInt(packetType)}">0x${utils.toString([
+              parseInt(packetType),
+            ])} - ${utils.PacketTypeNameMap[packetType].name}</option>`
+        )
+        .join("")}`;
+      document.getElementById("packetType").value = "5"; // Set default to value "5"
+      let telegram = utils.createESP3Telegram(5);
+      telegram = utils.setData(telegram, new Uint8Array([8]));
+      const telegramDiv = document.getElementById("telegram");
+      telegramDiv.innerText = utils.toString(telegram);
+      function updateTelegram() {
+        const packetType = document.getElementById("packetType").value;
+        const data = document.getElementById("data").value;
+        const optionalData = document.getElementById("optionalData").value;
+        telegram = utils.setPacketType(telegram, [packetType]);
+        telegram = utils.setData(telegram, utils.fromString(data));
+        telegram = utils.setOptionalData(
+          telegram,
+          utils.fromString(optionalData)
+        );
+        telegramDiv.innerText = utils.toString(telegram);
+      }
+      document
+        .getElementById("packetType")
+        .addEventListener("change", updateTelegram);
+      document
+        .getElementById("data")
+        .addEventListener("change", updateTelegram);
+      document
+        .getElementById("optionalData")
+        .addEventListener("change", updateTelegram);
+    </script>
+
+    <h3>Packet Builder</h3>
+    <div>
+      <label for="packetType">Packet Type</label
+      ><select id="packetType"></select>
+    </div>
+    <div>
+      <label for="data">Data</label><input type="text" id="data" value="08" />
+    </div>
+    <div>
+      <label for="optionalData">Optional Data</label
+      ><input type="text" id="optionalData" value="" />
+    </div>
+    <div
+      id="telegram"
+      style="
+        font-size: 20px;
+        border: 1px solid black;
+        padding: 5px;
+        margin-top: 10px;
+      "
+    ></div>
+  </body>
+</html>

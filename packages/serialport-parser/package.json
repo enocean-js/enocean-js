@@ -1,7 +1,7 @@
 {
   "name": "@enocean-js/serialport-parser",
   "version": "0.1.0",
-  "description": "serialport parser for enocean-js",
+  "description": "A robust, high-performance Node.js stream parser for EnOcean ESP3 telegrams.",
   "main": "serialport-parser.js",
   "exports": {
     ".": "./serialport-parser.js"

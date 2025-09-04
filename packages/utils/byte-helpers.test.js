@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
+ * This file is part of the enocean-js project.
+ */
 import { toString, fromString } from "./byte-helpers.js";
 import { describe, it, expect } from "vitest";
 import { setValue, getValue } from "./byte-helpers.js";

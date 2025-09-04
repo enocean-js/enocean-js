@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Enocean Gateway</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      label {
+        width: 100px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import * as utils from "./enocean-utils.js";
+      import "./components/header.js";
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const portsResponse = await fetch("/api/list_ports");
+        const ports = (await portsResponse.json()).ports;
+        document.getElementById("ports").innerHTML = ports
+          .map(
+            (port) =>
+              `<option value="${port.path}">${port.path} - ${port.manufacturer}</option>`
+          )
+          .join("");
+      });
+      async function startTeachInMode() {
+        let res = await fetch("/api/start-teachin-mode");
+        res = await res.json();
+        if (res.success) {
+          document.getElementById("teachinstatus").innerText =
+            "Teach-in mode active";
+        }
+      }
+      document
+        .getElementById("start_teachin_button")
+        .addEventListener("click", startTeachInMode);
+
+      async function getDeviceList() {
+        const res = await fetch("/api/device-list");
+        const data = await res.json();
+        console.log(data);
+        const devicesDiv = document.getElementById("devices");
+        if (data.devices.length === 0) {
+          devicesDiv.innerText = "No devices found";
+          return;
+        }
+        const tbody = document
+          .getElementById("deviceTable").querySelector("tbody");
+        tbody.innerHTML = data.devices
+          .map( 
+            (device) => `<tr>
+          <td>${device.id}</td>
+          <td>${device.name}</td>
+          <td>${device.device_id}</td>
+          <td><button onclick="alert('Not implemented yet')">Edit</button>
+              <button onclick="alert('Not implemented yet')">Delete</button></td>
+        </tr>`
+          ) 
+          .join("");
+        
+      }
+      getDeviceList();
+      // Setup EventSource to receive server-sent events
+      const eventSource = new EventSource("/api/events");
+
+      eventSource.addEventListener("teach-in-countdown", (event) => {
+        const eventData = event.data ? JSON.parse(event.data) : {};
+        document.getElementById("teachintimer").innerText = `Time left: ${
+          eventData.timeLeft / 1000
+        } seconds`;
+      });
+      for (const eventName of utils.EventNames) {
+        eventSource.addEventListener(eventName, (event) => {
+          const eventData = event.data ? JSON.parse(event.data) : {};
+          console.log(`Event: ${eventName}`, eventData);
+        });
+      }
+      window.eventSource = eventSource;
+    </script>
+    <header-component></header-component>
+    <h3>Connection</h3>
+    <select id="ports"></select>
+    <h3>teach in</h3>
+    <button id="start_teachin_button">LRN</button>
+    <div id="teachintimer"></div>
+    <div id="teachinstatus"></div>
+    <h3>devices</h3>
+    <div id="devices"></div>
+    <table id="deviceTable" border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+  </body>
+</html>

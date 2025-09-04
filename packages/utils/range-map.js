@@ -1,4 +1,11 @@
 /**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
+ * This file is part of the enocean-js project.
+ */
+
+/**
  * Decodes a raw numeric value into a string key by finding which range it falls into.
  * @param {number} rawValue The numeric value to decode.
  * @param {object} rangeMap An object where keys are strings and values are [min, max] arrays.

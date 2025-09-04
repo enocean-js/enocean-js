@@ -1,0 +1,25 @@
+{
+  "name": "@enocean-js/gateway",
+  "version": "0.1.0",
+  "description": "The Enocean Gateway, use this if you just want to run a gateway server.",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/"
+  },
+  "dependencies": {
+    "@enocean-js/utils": "workspace:*",
+    "@enocean-js/enocean": "workspace:*",
+    "express": "^4.21.2",
+    "yargs": "^18.0.0"
+  },
+  "bin": {
+    "enocean": "./index.js"
+  }
+}

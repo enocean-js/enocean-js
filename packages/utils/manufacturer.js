@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
+ * This file is part of the enocean-js project.
+ */
 export const manufacturerList = [
   { id: 0x000, name: "MANUFACTURER_RESERVED" },
   { id: 0x001, name: "PEHA" },

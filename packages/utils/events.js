@@ -1,0 +1,17 @@
+export const EventNames = [
+  "ready",
+  "data",
+  "error",
+  "serialport-close",
+  "serialport-open",
+  "radio-erp1",
+  "device-data",
+  "unknown-device",
+  "new-device-found",
+  "teach-in-started",
+  "teach-in-stopped",
+  "teach-in-failed",
+  "teach-out-started",
+  "teach-out-stopped",
+  "teach-in-countdown",
+];

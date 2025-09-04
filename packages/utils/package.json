@@ -13,5 +13,9 @@
     "type": "git",
     "url": "https://github.com/enocean-js/enocean-js"
   },
+  "scripts": {
+    "build": "esbuild utils.js --bundle --outfile=dist/enocean-utils.js --platform=browser --format=esm --minify",
+    "prepare": "pnpm run build"
+  },
   "dependencies": {}
 }

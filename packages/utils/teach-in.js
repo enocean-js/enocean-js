@@ -1,8 +1,11 @@
-import { setValue, getValue } from "./byte-helpers.js";
-import {
-  getManufacturerIdByName,
-  getManufacturerNameById,
-} from "./manufacturer.js";
+/**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
+ * This file is part of the enocean-js project.
+ */
+
+import * as utils from "./utils.js";
 
 export function encodeTeachIn({ eep, manufacturer = 0x7ff }) {
   const rorg = eep.split("-")[0];
@@ -12,10 +15,6 @@ export function encodeTeachIn({ eep, manufacturer = 0x7ff }) {
     default:
       return null;
   }
-}
-
-function decodeTeachIn({ eep, manufacturer = 0x7ff }) {
-  //TODO
 }
 
 /**
@@ -32,20 +31,20 @@ export function encodeA5TeachIn({ eep, manufacturer = 0x7ff }) {
   let payload = new Uint8Array(4);
   let manId = 0x7ff;
   if (typeof manufacturer == "string") {
-    manId = getManufacturerIdByName(manufacturer);
+    manId = utils.getManufacturerIdByName(manufacturer);
   } else {
     manId = manufacturer;
   }
   // Set func (bits 0-5)
-  payload = setValue(payload, func, 0, 6);
+  payload = utils.setValue(payload, func, 0, 6);
   // Set type (bits 6-12)
-  payload = setValue(payload, type, 6, 7);
+  payload = utils.setValue(payload, type, 6, 7);
   // Set manufacturer ID (bits 13-23)
-  payload = setValue(payload, manId, 13, 11);
+  payload = utils.setValue(payload, manId, 13, 11);
   // Set LRN Type bit (DB0, bit 7) to 1 - Telegram with EEP and Manufacturer ID
-  payload = setValue(payload, 1, 24, 1);
+  payload = utils.setValue(payload, 1, 24, 1);
   // Set LRN bit (DB0, bit 3) to 0
-  payload = setValue(payload, 0, 28, 1);
+  payload = utils.setValue(payload, 0, 28, 1);
 
   return payload;
 }
@@ -63,8 +62,27 @@ export function isA5TeachIn(payload) {
   if (!payload || payload.length !== 4) {
     throw new Error("Invalid payload for A5 teach-in check.");
   }
-  const lrnBit = getValue(payload, 28, 1);
+  const lrnBit = utils.getValue(payload, 28, 1);
   return lrnBit === 0;
+}
+
+export function isTeachIn(telegram) {
+  if (utils.getPacketType(telegram) !== 1) {
+    return false;
+  }
+  switch (utils.erp1.getRORGName(telegram)) {
+    case "UTE":
+      return true;
+    case "RPS":
+      return true;
+    case "VLD":
+      return false;
+    case "4BS":
+      return isA5TeachIn(utils.erp1.getPayload(telegram));
+    default:
+      // other teach in methosds not implemented yet
+      return false;
+  }
 }
 
 /**
@@ -87,27 +105,27 @@ export function decodeA5TeachIn(payload) {
     throw new Error("Not a valid A5 teach-in payload.");
   }
   // if lrnType is 0, it's a teach-in without EEP info
-  const lrnType = getValue(payload, 24, 1);
+  const lrnType = utils.getValue(payload, 24, 1);
   if (lrnType === 0) {
     return {
       eep: null,
       manufacturer: null,
-      learnType: "without EEP info",
+      withEEPInfo: false,
       isTeachIn: true,
     };
   }
   // extract func, type, manufacturer ID
-  const func = getValue(payload, 0, 6);
-  const typ = getValue(payload, 6, 7);
-  const man = getValue(payload, 13, 11);
-  const lrnBit = getValue(payload, 28, 1);
+  const func = utils.getValue(payload, 0, 6);
+  const typ = utils.getValue(payload, 6, 7);
+  const man = utils.getValue(payload, 13, 11);
+  const lrnBit = utils.getValue(payload, 28, 1);
 
   return {
     eep: `a5-${func.toString(16).padStart(2, "0")}-${typ
       .toString(16)
       .padStart(2, "0")}`,
-    manufacturer: getManufacturerNameById(man),
-    learnType: lrnType ? "with EEP Info" : "without EEP info",
-    isTeachIn: lrnBit === 0,
+    manufacturer: utils.getManufacturerNameById(man),
+    withEEPInfo: lrnType ? true : false,
+    isTeachIn: lrnBit === 0 ? true : false,
   };
 }

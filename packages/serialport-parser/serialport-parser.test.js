@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
+ * This file is part of the enocean-js project.
+ */
 import { describe, it, expect, vi } from "vitest";
 import { ESP3Parser } from "./serialport-parser.js";
 import { toString } from "@enocean-js/utils";
@@ -116,19 +122,4 @@ describe("ESP3Parser", () => {
       }
     }
   }, 20000);
-  /* 
-  it("test single breaking siege", function () {
-    const parser = new ESP3Parser({ maxBufferSize: 1000 });
-    const dataSpy = vi.fn();
-
-    parser.on("data", dataSpy);
-    parser.on("error", (err) => {
-      console.log("Got error", err);
-      // ignore errors
-    });
-    let tel =
-      "55ac67f8d1cf4e2223a103d4fc21dfac41a17689dcf18cf585b5086f92334d6b40aa137856ddd97f779510aabcad7efb65d7f4aa4746d47a53a8977625caf9ecc1ade93e8a236f31522e7d90a10d39c79dba7cad2600091c7ce289b1a7ea0e6f37d3f8f455000a0701eba5c87f710fffdba5e40001ffffffff47000d";
-    parser.write(Buffer.from(tel, "hex"));
-    expect(dataSpy).toHaveBeenCalled();
-  });*/
 });

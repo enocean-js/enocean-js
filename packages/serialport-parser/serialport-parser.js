@@ -1,11 +1,8 @@
-/*
- * Copyright (c) 2025 Holger Will (h.will@klimapartner.de)
- *
- * Licensed under Creative Commons Attribution (CC-BY)
- * https://creativecommons.org/licenses/by/4.0/
- *
+/**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
  * This file is part of the enocean-js project.
- * You may use this file or parts of it, provided you keep this header intact.
  */
 import {
   crc8,
