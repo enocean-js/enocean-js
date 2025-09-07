@@ -56,15 +56,34 @@ importers:
       '@enocean-js/enocean':
         specifier: workspace:*
         version: link:../enocean
+      '@enocean-js/gateway-api-client':
+        specifier: workspace:*
+        version: link:../gateway-api-client
       '@enocean-js/utils':
         specifier: workspace:*
         version: link:../utils
+      eventsource:
+        specifier: ^4.0.0
+        version: 4.0.0
       express:
         specifier: ^4.21.2
         version: 4.21.2
       yargs:
         specifier: ^18.0.0
         version: 18.0.0
+
+  packages/gateway-api-client:
+    dependencies:
+      '@enocean-js/utils':
+        specifier: workspace:*
+        version: link:../utils
+      eventsource:
+        specifier: ^4.0.0
+        version: 4.0.0
+    devDependencies:
+      '@enocean-js/gateway':
+        specifier: workspace:*
+        version: link:../gateway
 
   packages/serialport-parser:
     dependencies:
@@ -722,6 +741,14 @@ packages:
   etag@1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
+
+  eventsource-parser@3.0.6:
+    resolution: {integrity: sha512-Vo1ab+QXPzZ4tCa8SwIHJFaSzy4R6SHf7BY79rFBDf0idraZWAkYrDjDj8uWaSm3S2TK+hJ7/t1CEmZ7jXw+pg==}
+    engines: {node: '>=18.0.0'}
+
+  eventsource@4.0.0:
+    resolution: {integrity: sha512-fvIkb9qZzdMxgZrEQDyll+9oJsyaVvY92I2Re+qK0qEJ+w5s0X3dtz+M0VAPOjP1gtU3iqWyjQ0G3nvd5CLZ2g==}
+    engines: {node: '>=20.0.0'}
 
   expand-template@2.0.3:
     resolution: {integrity: sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg==}
@@ -1865,6 +1892,12 @@ snapshots:
       '@types/estree': 1.0.8
 
   etag@1.8.1: {}
+
+  eventsource-parser@3.0.6: {}
+
+  eventsource@4.0.0:
+    dependencies:
+      eventsource-parser: 3.0.6
 
   expand-template@2.0.3: {}
 

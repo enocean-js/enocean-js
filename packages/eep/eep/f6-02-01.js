@@ -12,13 +12,13 @@ export const f60201 = {
     status: "released",
   },
   profile: () => ({
-    type: "sensor",
+    type: "switch",
     readings: [
-      { name: "A0_press", type: "boolean" },
-      { name: "A1_press", type: "boolean" },
-      { name: "B0_press", type: "boolean" },
-      { name: "B1_press", type: "boolean" },
-      { name: "Multiple_press", type: "boolean" },
+      { name: "Button1", type: "boolean" },
+      { name: "Button2", type: "boolean" },
+      { name: "Button3", type: "boolean" },
+      { name: "Button4", type: "boolean" },
+      { name: "Multiple", type: "boolean" },
     ],
   }),
   decode: (payload, status) => {

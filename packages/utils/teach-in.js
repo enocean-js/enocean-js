@@ -129,3 +129,37 @@ export function decodeA5TeachIn(payload) {
     isTeachIn: lrnBit === 0 ? true : false,
   };
 }
+
+export function decodeUTETeachIn(paylaod) {
+  const requests = ["teachIn", "teachOut", "teachInOut"];
+  return {
+    bidi: utils.getValue(paylaod, 0, 1) === 1,
+    responseExpected: utils.getValue(paylaod, 1, 1) === 0,
+    request: requests[utils.getValue(paylaod, 2, 2)],
+    command: utils.getValue(paylaod, 4, 4) === 0 ? "Query" : "Response",
+    numChannels: utils.getValue(paylaod, 8, 8),
+    manufacturer: utils.getSpreadedValue(paylaod, [
+      { bitOffset: 16, bitLength: 8 },
+      { bitOffset: 29, bitLength: 3 },
+    ]),
+    rorg: utils.getValue(paylaod, 32, 8),
+    func: utils.getValue(paylaod, 40, 8),
+    type: utils.getValue(paylaod, 48, 8),
+  };
+}
+
+export function encodeUTETeachInResponse(paylaod) {
+  let result = new Uint8Array(paylaod);
+  result = utils.setValue(result, 1, 0, 1); // bidi
+  result = utils.setValue(result, 1, 2, 2); // teach in successful
+  result = utils.setValue(result, 1, 4, 4); // this is a teach in response
+  return result;
+}
+
+export function isUTEResponseExpected(payload) {
+  return (
+    utils.getValue(payload, 1, 1) === 0 &&
+    utils.getValue(payload, 4, 4) === 0 &&
+    utils.getValue(payload, 0, 1) === 1
+  );
+}

@@ -161,7 +161,7 @@ class ESP3Parser extends Transform {
           } else {
             this.packet.push(byte);
           }
-          this.push(new Uint8Array(this.packet));
+          this.push(this.packet);
           break;
       }
     }

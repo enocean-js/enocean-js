@@ -6,7 +6,12 @@
  */
 import { toString, fromString } from "./byte-helpers.js";
 import { describe, it, expect } from "vitest";
-import { setValue, getValue } from "./byte-helpers.js";
+import {
+  setValue,
+  getValue,
+  getSpreadedValue,
+  setSpreadedValue,
+} from "./byte-helpers.js";
 
 describe("toString/fromString roundtrip", () => {
   it("bin roundtrip", () => {
@@ -46,5 +51,23 @@ describe("setValue/getValue Monte Carlo roundtrip", () => {
       const decoded = getValue(payload, pos, len);
       expect(decoded).toBe(val);
     }
+  });
+});
+
+describe("getSpreadedValue", () => {
+  it("decodes values spread across mutiple bytes", () => {
+    const payload = new Uint8Array([0b11100000, 0b00000001, 0b00001010]);
+    const val = getSpreadedValue(payload, [
+      { bitOffset: 0, bitLength: 3 },
+      { bitOffset: 15, bitLength: 1 },
+      { bitOffset: 20, bitLength: 4 },
+    ]);
+    expect(val).toBe(0b000011111010);
+    const rev = setSpreadedValue(new Uint8Array(3), val, [
+      { bitOffset: 0, bitLength: 3 },
+      { bitOffset: 15, bitLength: 1 },
+      { bitOffset: 20, bitLength: 4 },
+    ]);
+    expect(Array.from(rev)).toEqual(Array.from(payload));
   });
 });

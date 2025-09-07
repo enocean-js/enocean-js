@@ -42,7 +42,6 @@ export const a51003 = {
       temperature: parseFloat(
         scale(rawTemperature, [255, 0], [0, 40]).toFixed(1)
       ),
-      isTeachIn,
     };
   },
   encode: (data) => {

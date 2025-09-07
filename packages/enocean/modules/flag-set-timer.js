@@ -9,8 +9,14 @@ export class FlagSetTimer {
     this.stopEventName = options.stopEventName;
     this.countdownEventName = options.countdownEventName;
     this.countdownInterval = options.countdownInterval || 1000; // ms
+    this.oldTimeout = this.timeout;
   }
-  start() {
+  start(timeout) {
+    console.log("FlagSetTimer: start", this.flagName, timeout);
+    this.oldTimeout = this.timeout;
+    if (timeout) {
+      this.timeout = timeout;
+    }
     if (this.teachInTimer) {
       this.stop();
       clearTimeout(this.timer);
@@ -29,15 +35,18 @@ export class FlagSetTimer {
     return { success: true, timeout: this.timeout };
   }
   stop() {
+    let success = false;
     if (this.timer) {
       clearTimeout(this.timer);
       clearInterval(this.countdown);
       this.timer = null;
     }
     if (this.enocean[this.flagName]) {
-      this.enocean.emit(this.stopEventName, {});
+      success = true;
+      this.enocean.emit(this.stopEventName, { timeout: this.timeout });
     }
-
+    this.timeout = this.oldTimeout;
     this.enocean[this.flagName] = false;
+    return { success: success, timeout: this.timeout };
   }
 }

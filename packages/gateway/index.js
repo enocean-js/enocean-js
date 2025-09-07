@@ -1,4 +1,5 @@
 #! /usr/bin/env node
-import { startServer } from "./server.js";
+import { EnoceanGateway } from "./server.js";
 
-startServer();
+let server = new EnoceanGateway();
+server.start();

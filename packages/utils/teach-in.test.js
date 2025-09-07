@@ -6,7 +6,13 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { encodeA5TeachIn, isA5TeachIn, decodeA5TeachIn } from "./teach-in.js";
+import {
+  encodeA5TeachIn,
+  isA5TeachIn,
+  decodeA5TeachIn,
+  decodeUTETeachIn,
+  encodeUTETeachInResponse,
+} from "./teach-in.js";
 import { setValue } from "./byte-helpers.js";
 describe("teach-in.js", () => {
   it("encodes and decodes a teach-in telegram with EEP and manufacturer", () => {
@@ -68,5 +74,32 @@ describe("teach-in.js", () => {
   it("throws for invalid payload length", () => {
     expect(() => isA5TeachIn(new Uint8Array(3))).toThrow();
     expect(() => decodeA5TeachIn(new Uint8Array(3))).toThrow();
+  });
+});
+
+describe("decodeUTETeachIn", () => {
+  it("creates a UTE teach-in telegram", () => {
+    //1000110
+    let payload = new Uint8Array([
+      0b10000000, 0b00000001, 0b00001000, 0b00000110, 0xd2, 0x02, 0x05,
+    ]);
+    const decoded = decodeUTETeachIn(payload);
+    expect(decoded.bidi).to.be.true;
+    expect(decoded.responseExpected).to.be.true;
+    expect(decoded.manufacturer).toBe(0x46);
+    expect(decoded.command).toBe("Query");
+    expect(decoded.numChannels).toBe(1);
+    expect(decoded.request).toBe("teachIn");
+    expect(decoded.rorg).toBe(0xd2);
+    expect(decoded.func).toBe(0x02);
+    expect(decoded.type).toBe(0x05);
+    const payload2 = encodeUTETeachInResponse(payload);
+    expect(payload2[0]).toBe(0b10010001);
+    expect(payload2[1]).toBe(1);
+    expect(payload2[2]).toBe(payload[2]);
+    expect(payload2[3]).toBe(payload[3]);
+    expect(payload2[4]).toBe(payload[4]);
+    expect(payload2[5]).toBe(payload[5]);
+    expect(payload2[6]).toBe(payload[6]);
   });
 });

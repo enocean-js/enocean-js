@@ -9,6 +9,8 @@ export {
   toString,
   fromString,
   subArray,
+  getSpreadedValue,
+  setSpreadedValue,
 } from "./byte-helpers.js";
 export { checkAndThrow } from "./eep-helpers.js";
 export { scale } from "./scale.js";
@@ -25,6 +27,9 @@ export {
   encodeTeachIn,
   decodeA5TeachIn,
   isTeachIn,
+  decodeUTETeachIn,
+  encodeUTETeachInResponse,
+  isUTEResponseExpected,
 } from "./teach-in.js";
 export { crc8 } from "./crc8.js";
 export {

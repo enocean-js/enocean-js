@@ -40,6 +40,36 @@ export function setSingleBit(byteArray, bitOffset, value) {
   return result;
 }
 
+export function getSpreadedValue(bytes, offsets) {
+  let bits = "";
+  const binbytes = toString(bytes, 2);
+  for (let i = 0; i < offsets.length; i++) {
+    const curr = binbytes.substring(
+      offsets[i].bitOffset,
+      offsets[i].bitOffset + offsets[i].bitLength
+    );
+    bits += curr;
+  }
+  return parseInt(bits, 2);
+}
+
+export function setSpreadedValue(bytes, value, offsets) {
+  let result = new Uint8Array(bytes);
+  const totalLength = offsets.reduce((acc, cur) => acc + cur.bitLength, 0);
+  let bits = value.toString(2).padStart(totalLength, "0");
+  for (let i = 0; i < offsets.length; i++) {
+    const currValue = parseInt(bits.substring(0, offsets[i].bitLength), 2);
+    result = setValue(
+      result,
+      currValue,
+      offsets[i].bitOffset,
+      offsets[i].bitLength
+    );
+    bits = bits.substring(offsets[i].bitLength);
+  }
+  return result;
+}
+
 export function toString(byteArray, radix = 16) {
   const arr = Array.from(byteArray);
   switch (radix) {

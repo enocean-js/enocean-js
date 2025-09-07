@@ -5,7 +5,27 @@
  * This file is part of the enocean-js project.
  */
 
-import { getDataLength, subArray, toString } from "./utils.js";
+import {
+  createESP3Telegram,
+  getDataLength,
+  setData,
+  setOptionalData,
+  subArray,
+  toString,
+} from "./utils.js";
+
+export const UTE_BIDIRECTIONAL = 0;
+export const UTE_UNIDIRECTIONAL = 1;
+export const UTE_TEACH_IN_SUCCESSFULL = 1;
+export const UTE_DELETION_SUCCESSFULL = 2;
+export const UTE_EEP_NOT_SUPPORTED = 3;
+export const UTE_TEACH_IN_NOT_ACCEPTED = 0;
+export const UTE_QUERY_TEACH_IN_REQUEST = 0;
+export const UTE_QUERY_DELETION_REQUEST = 1;
+export const UTE_QUERY_TEACH_IN_OR_DELETION = 2;
+export const UTE_QUERY_NOT_USED = 3;
+export const UTE_CMD_QUERY = 0;
+export const UTE_CMD_RESPONSE = 1;
 
 export const RORGS = {
   0xf6: { name: "RPS", description: "Repeated Switch" },
@@ -46,6 +66,29 @@ export function getRORG(telegram) {
 }
 
 export function getRORGName(telegram) {
-  console.log(telegram[6], RORGS[telegram[6]]);
+  //console.log(telegram[6], RORGS[telegram[6]]);
   return RORGS[telegram[6]].name;
+}
+
+export function createERP1Telegram({
+  rorg = 0xa5,
+  payload = new Uint8Array(4),
+  senderId = new Uint8Array(4),
+  status = 0,
+  subTelNum = 0x03,
+  destinationId = new Uint8Array([0xff, 0xff, 0xff, 0xff]),
+  rssi = 0xff,
+  securityLevel = 0x00,
+}) {
+  let tel = createESP3Telegram(1);
+  let data = new Uint8Array([rorg, ...payload, ...senderId, status]);
+  let optionalData = new Uint8Array([
+    subTelNum,
+    ...destinationId,
+    rssi,
+    securityLevel,
+  ]);
+  tel = setData(tel, data);
+  tel = setOptionalData(tel, optionalData);
+  return tel;
 }

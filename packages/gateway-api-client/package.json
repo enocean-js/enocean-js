@@ -1,0 +1,27 @@
+{
+  "name": "@enocean-js/gateway-api-client",
+  "version": "0.1.0",
+  "description": "...",
+  "main": "gateway-api-client.js",
+  "exports": {
+    ".": "./gateway-api-client.js"
+  },
+  "type": "module",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/enocean-js"
+  },
+  "scripts": {
+    "build": "esbuild gateway-api-client.js --bundle --outfile=dist/gateway-api-client.js --platform=browser --format=esm --minify",
+    "prepare": "pnpm run build"
+  },
+  "dependencies": {
+    "@enocean-js/utils": "workspace:*",
+    "eventsource": "^4.0.0"
+  },
+  "devDependencies": {
+    "@enocean-js/gateway": "workspace:*"
+  }
+}

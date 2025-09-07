@@ -8,6 +8,11 @@ import Database from "better-sqlite3";
 import os from "os";
 import path from "path";
 
+function log(...args) {
+  const tag = "[CORE - DB]";
+  console.log(tag, ...args);
+}
+
 export class Memory {
   constructor(options) {
     this.options = options || { dbName: "default" };
@@ -15,7 +20,7 @@ export class Memory {
       os.homedir(),
       `.enocean-js/${this.options.dbName}.sqlite`
     );
-    console.log("DB Path:", this.path);
+    log("File Path:", this.path);
     this.db = new Database(this.path);
     this.initialize();
   }
@@ -36,19 +41,44 @@ export class Memory {
   storeTelegram(senderId, eep, telegram) {
     this.db
       .prepare(
-        "UPDATE device_eep SET last_telegram = ?, last_seen = CURRENT_TIMESTAMP WHERE device_id = ? AND eep = ?"
+        "UPDATE devices SET last_telegram = ?, last_seen = CURRENT_TIMESTAMP WHERE device_id = ? AND eep = ?"
       )
       .run([telegram, senderId, eep]);
   }
   getDevice(id, rorg) {
+    if (rorg) {
+      id = id + "_" + rorg;
+    }
     return this.db
-      .prepare("SELECT * FROM devices WHERE id = ?")
-      .get(id + "_" + rorg);
+      .prepare("SELECT * FROM devices WHERE id like ?")
+      .all(id + "%");
   }
+  setDeviceName(id, name) {
+    this.db
+      .prepare("UPDATE devices SET name = ? WHERE device_id = ?")
+      .run([name, id]);
+  }
+  deleteDevice(id, rorg) {
+    if (key) {
+      id = id + "_" + rorg;
+    }
+    return this.db.prepare("DELETE FROM devices WHERE id = ?").run(id + "%");
+  }
+
   getAllDevices() {
     return this.db.prepare("SELECT * FROM devices").all();
   }
-
+  getAllVirtualDevices() {
+    return this.db.prepare("SELECT * FROM virtual_devices").all();
+  }
+  getVirtualDevice(id) {
+    return this.db
+      .prepare("SELECT * FROM virtual_devices WHERE id = ?")
+      .get(id);
+  }
+  deleteVirtualDevice(id) {
+    return this.db.prepare("DELETE FROM virtual_devices WHERE id = ?").run(id);
+  }
   createVirtualDevice(name, eep, profile) {
     const result = this.db
       .prepare(
@@ -82,6 +112,12 @@ export class Memory {
       .prepare("SELECT value FROM meta WHERE key = ?")
       .get(key);
     return row ? row.value : null;
+  }
+  getAllMetadata() {
+    const data = this.db.prepare("SELECT * FROM meta").all();
+    return data
+      .map((item) => ({ [item.key]: item.value }))
+      .reduce((a, b) => ({ ...a, ...b }), {});
   }
   initialize() {
     this.db.pragma("journal_mode = WAL");

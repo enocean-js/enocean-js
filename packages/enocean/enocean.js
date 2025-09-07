@@ -15,8 +15,13 @@ import * as CC from "./modules/commands.js";
 import { FlagSetTimer } from "./modules/flag-set-timer.js";
 
 import { onPacket as erp1PacketHandler } from "./packet_handlers/radio_erp1.js";
-import { start } from "node:repl";
+import * as EEP from "@enocean-js/eep";
+
 //import pkg from "./package.json" with { type: "json" };
+function log(...args) {
+  const tag = "[CORE - enocean.js]";
+  console.log(tag, ...args);
+}
 
 export class Enocean extends EventEmitter {
   constructor(options) {
@@ -26,8 +31,12 @@ export class Enocean extends EventEmitter {
     this.hwInfo = {};
 
     this.memory = new Memory({
-      dbName: this.options.dbname || "default",
+      dbName: this.options.dbName || "default",
     });
+
+    if (options && options.serialPortPath) {
+      this.memory.setMetadata("serialPortPath", options.serialPortPath);
+    }
 
     const path = this.memory.getMetadata("serialPortPath");
     if (path) {
@@ -41,8 +50,8 @@ export class Enocean extends EventEmitter {
       enocean: this,
       flagName: "teachInModeActive",
       timeout: this.options.teachInTimeout,
-      startEventName: "teach-in-start",
-      stopEventName: "teach-in-stop",
+      startEventName: "teach-in-started",
+      stopEventName: "teach-in-stopped",
       countdownEventName: "teach-in-countdown",
       countdownInterval: 1000,
     });
@@ -80,7 +89,7 @@ export class Enocean extends EventEmitter {
       ...dbInfo,
       // enoceanVersion: pkg.version,
     };
-    console.log("Enocean hardware info:", this.hwInfo);
+    //log("Enocean hardware info:", this.hwInfo);
     this.emit("ready", this.hwInfo);
   }
 
@@ -121,13 +130,19 @@ export class Enocean extends EventEmitter {
       this.emit("error", error);
     });
   }
-
+  async getBaseId() {
+    return await CC.getBaseId(this);
+  }
   async listPorts() {
     let portList = await SerialPort.list();
     portList = portList.filter((port) => {
       return port.vendorId != undefined && port.productId != undefined;
     });
     return portList;
+  }
+  getProfile(eep) {
+    const eepid = eep.split("-").join("");
+    return EEP[eepid].profile();
   }
 
   async handleData(data) {

@@ -1,5 +1,5 @@
 import express from "express";
-import os from "os";
+import os, { type } from "os";
 import { fileURLToPath } from "url";
 import path from "path";
 import { Enocean } from "@enocean-js/enocean";
@@ -9,32 +9,63 @@ const __dirname = path.dirname(__filename);
 const clients = new Set();
 const utils = Enocean.utils;
 
-const enocean = new Enocean();
+function log(...args) {
+  const tag = "[GATEWAY]";
+  console.log(tag, ...args);
+}
+
+// option: { dbName: "mydb", teachInTimeout: 60000 , serialPortPath: "/dev/ttyUSB0", ip: "0.0.0.0", port: 0xc0de}
+export class EnoceanGateway {
+  constructor(options) {
+    this.enocean = new Enocean(options);
+    this.options = options || {};
+    this.options.ip = this.options.ip || "0.0.0.0";
+    this.options.port = this.options.port || 0xc0de; // 49374 in decimal
+    this.options.serialPortPath = this.options.serialPortPath || null;
+
+    this.app = express();
+    for (const eventName of utils.EventNames) {
+      this.enocean.on(eventName, (data) => {
+        sendSSE(eventName, data);
+      });
+    }
+  }
+  start() {
+    return startServer(
+      this.app,
+      this.enocean,
+      this.options.ip,
+      this.options.port
+    );
+  }
+}
 
 function sendSSE(eventName, data) {
+  //log("SSE Event:", eventName, data);
+  if (typeof data === "Uint8Array") {
+    data = Array.from(data);
+  }
+  if (typeof data === "undefined") {
+    data = {};
+  }
   for (const client of clients) {
     const message = `event: ${eventName}\ndata: ${JSON.stringify(data)}\n\n`;
     client.res.write(message);
   }
 }
 
-for (const eventName of utils.EventNames) {
-  enocean.on(eventName, (data) => {
-    sendSSE(eventName, data);
-  });
-}
-
-export function startServer() {
-  const app = express();
-  const ip = getLocalIp();
-  const port = 0xc0de; // 49374 in decimal
+export function startServer(app, enocean, ip, port) {
   app.use(express.static(path.join(__dirname, "webroot")));
   app.use(
     express.static(path.join(__dirname, "node_modules/@enocean-js/utils/dist"))
   );
-  app.get("/", (req, res) => {
-    res.send("hallo");
-  });
+  app.use(
+    express.static(
+      path.join(__dirname, "node_modules/@enocean-js/gateway-api-client/dist")
+    )
+  );
+
+  // API: openPort
   app.get("/api/open_port", (req, res) => {
     const port = req.query.port || "/dev/ttyUSB0";
     if (enocean.port && enocean.port.isOpen) {
@@ -52,6 +83,8 @@ export function startServer() {
     enocean.once("ready", successHandler);
     enocean.port.once("error", errorHandler);
   });
+
+  // API: closePort
   app.get("/api/close_port", (req, res) => {
     if (enocean.port && enocean.port.isOpen) {
       enocean.closeSerialPort();
@@ -62,21 +95,29 @@ export function startServer() {
       res.json({ success: false, error: "Port not open" });
     }
   });
+
+  //API: isPortOpen
   app.get("/api/port_status", (req, res) => {
-    if (enocean.port.isOpen) {
+    if (enocean.port && enocean.port.isOpen) {
       enocean.emit("serialport-open");
+      res.json({
+        isOpen: true,
+      });
     } else {
       enocean.emit("serialport-close");
+      res.json({
+        isOpen: false,
+      });
     }
-    res.json({
-      isOpen: enocean.port ? enocean.port.isOpen : false,
-    });
   });
+
+  // API: listPorts
   app.get("/api/list_ports", async (req, res) => {
     let portList = await enocean.listPorts();
     res.json({ ports: portList });
   });
 
+  // Event Stream endpoint (Server Send Events) - EventSource can connect here
   app.get("/api/events", (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -85,36 +126,190 @@ export function startServer() {
 
     const client = { id: Date.now(), res };
     clients.add(client);
-    console.log(`SSE client connected: ${client.id}`);
+    log(`SSE client connected: ${client.id}`);
     //res.write("data: connected\n\n");
     req.on("close", () => {
       clients.delete(client);
-      console.log(`SSE client disconnected: ${client.id}`);
+      log(`SSE client disconnected: ${client.id}`);
       res.end();
     });
   });
 
+  // API: startTeachIn
   app.get("/api/start-teachin-mode", (req, res) => {
-    res.json(enocean.teachInTimer.start());
+    log("Starting teach-in mode");
+    const timeout = req.query.timeout || null;
+    res.json(enocean.teachInTimer.start(timeout));
   });
 
+  // API: stopTeachIn
+  app.get("/api/stop-teachin-mode", (req, res) => {
+    res.json(enocean.teachInTimer.stop());
+  });
+
+  // API: startTeachOut
+  app.get("/api/start-teachout-mode", (req, res) => {
+    const timeout = req.query.timeout || null;
+    res.json(enocean.teachOutTimer.start(timeout));
+  });
+
+  // API: stopTeachOut
+  app.get("/api/stop-teachout-mode", (req, res) => {
+    res.json(enocean.teachOutTimer.stop());
+  });
+
+  // API: getBaseId
+  app.get("/api/base-id", async (req, res) => {
+    res.json(await enocean.getBaseId());
+  });
+
+  // API: getHWInfo
+  app.get("/api/hw-info", (req, res) => {
+    res.json(enocean.hwInfo);
+  });
+
+  // API: getMeta
+  app.get("/api/meta", (req, res) => {
+    const key = req.query.key;
+    const ret = enocean.memory.getMetadata(key);
+    res.send(ret);
+  });
+
+  app.get("/api/all-meta", (req, res) => {
+    return res.json(enocean.memory.getAllMetadata());
+  });
+
+  // API: setMeta
+  app.get("/api/set-meta", (req, res) => {
+    const { key, value } = req.query;
+    enocean.memory.setMetadata(key, value);
+    res.json({ success: true });
+  });
+
+  // API: getAllDevices
   app.get("/api/device-list", (req, res) => {
     res.json({ devices: enocean.memory.getAllDevices() });
   });
 
-  app.listen(port, () => {
-    console.log(`ENOCEAN Gateway listening at http://${ip}:${port}`);
-  });
-}
-
-function getLocalIp() {
-  const nets = os.networkInterfaces();
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      if (net.family === "IPv4" && !net.internal) {
-        return net.address;
-      }
+  // API: setDeviceName
+  app.get("/api/device/:id/name/set", (req, res) => {
+    const id = req.params.id;
+    const name = req.query.name;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Missing device id parameter" });
     }
-  }
-  return "localhost";
+    if (!name) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Missing device name parameter" });
+    }
+    enocean.memory.setDeviceName(id, name);
+    res.json({ success: true });
+  });
+
+  // API: getDevice
+  app.get("/api/device/:id", (req, res) => {
+    const id = req.query.id;
+    const key = req.query.key ? req.query.key : null;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Missing device id parameter" });
+    }
+    const device = enocean.memory.getDeviceById(id, key);
+    if (device) {
+      res.json({ success: true, device });
+    } else {
+      res.status(404).json({ success: false, error: "Device not found" });
+    }
+  });
+
+  // API: addDevice
+  app.post("/api/device/:id", express.json(), (req, res) => {
+    const eep = req.body.eep;
+    const profile = req.body.profile || {};
+    const name = req.body.name || "New Device";
+    return enocean.memory.learn(req.params.id, eep, profile, name);
+  });
+
+  // API: removeDevice
+  app.delete("/api/device:id", express.json(), (req, res) => {
+    res.json({ message: "not implemented yet" });
+  });
+
+  // API: getAllVirtualDevices
+  app.get("/api/virtual-device-list", (req, res) => {
+    res.json({ devices: enocean.memory.getAllVirtualDevices() });
+  });
+
+  // API: getVirtualDevice
+  app.get("/api/virtual-device/:id", (req, res) => {
+    const id = req.params.id;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Missing virtual device id parameter" });
+    }
+    const device = enocean.memory.getVirtualDeviceById(id);
+    if (device) {
+      res.json({ success: true, device });
+    } else {
+      res
+        .status(404)
+        .json({ success: false, error: "Virtual Device not found" });
+    }
+  });
+
+  // API: addVirtualDevice
+  app.post("/api/virtual-device", express.json(), (req, res) => {
+    const device = this.memory.createVirtualDevice(
+      req.body.name,
+      req.body.eep,
+      req.body.profile
+    );
+    res.json({ success: true, device: device });
+  });
+
+  // API: removeVirtualDevice
+  app.delete("/api/virtual-device/:id", express.json(), (req, res) => {
+    const id = req.params.id;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Missing virtual device id parameter" });
+    }
+    const result = enocean.memory.deleteVirtualDevice(id);
+    if (result.changes > 0) {
+      res.json({ success: true });
+    } else {
+      res
+        .status(404)
+        .json({ success: false, error: "Virtual Device not found" });
+    }
+  });
+
+  app.get("/api/profile/:eep", (req, res) => {
+    const eep = req.params.eep;
+    res.json(enocean.getProfile(eep));
+  });
+
+  app.put("/api/pipe", () => {
+    const packet = req.body;
+    if (typeof packet === "string") {
+      packet = utils.fromString(packet);
+    }
+    enocean.emitr("data", packet);
+  });
+
+  return new Promise((resolve, reject) => {
+    app.listen(port, ip, (err) => {
+      if (err) {
+        reject(err);
+      }
+      resolve();
+      log(`Server started, listening at http://${ip}:${port}`);
+    });
+  });
 }
