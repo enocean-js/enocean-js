@@ -24,9 +24,8 @@ for (const key of Object.keys(EEP)) {
         expect(eep.profile).to.be.a("function");
       });
       it(`should return an object with type and readings`, () => {
-        const profile = eep.profile();
+        const profile = eep.profile("IN");
         expect(profile).to.be.an("object");
-        expect(profile.type).to.be.a("string").and.not.to.be.empty;
         expect(profile.readings).to.be.an("array").and.not.to.be.empty;
         for (const reading of profile.readings) {
           expect(reading.name).to.be.a("string").and.not.to.be.empty;
@@ -42,7 +41,7 @@ for (const key of Object.keys(EEP)) {
       });
     });
 
-    const profile = eep.profile();
+    const profile = eep.profile("IN");
     if (eep.meta.rorg === "a5") {
       it(`should throw an error when decoding invalid payloads`, () => {
         expect(() => eep.decode()).to.throw();
@@ -89,7 +88,6 @@ for (const key of Object.keys(EEP)) {
         expect(decoded.Button2).to.be.false;
         expect(decoded.Button3).to.be.false;
         expect(decoded.Button4).to.be.false;
-        expect(decoded.Multiple).to.be.false;
       });
       it(`it should decode button2 presses`, () => {
         const data = new Uint8Array([0b00111000]); // Button 1 pressed
@@ -99,7 +97,6 @@ for (const key of Object.keys(EEP)) {
         expect(decoded.Button2).to.be.true;
         expect(decoded.Button3).to.be.false;
         expect(decoded.Button4).to.be.false;
-        expect(decoded.Multiple).to.be.false;
       });
       it(`it should decode button3 presses`, () => {
         const data = new Uint8Array([0b01011000]); // Button 1 pressed
@@ -109,7 +106,6 @@ for (const key of Object.keys(EEP)) {
         expect(decoded.Button2).to.be.false;
         expect(decoded.Button3).to.be.true;
         expect(decoded.Button4).to.be.false;
-        expect(decoded.Multiple).to.be.false;
       });
       it(`it should decode button4 presses`, () => {
         const data = new Uint8Array([0b01111000]); // Button 1 pressed
@@ -119,7 +115,6 @@ for (const key of Object.keys(EEP)) {
         expect(decoded.Button2).to.be.false;
         expect(decoded.Button3).to.be.false;
         expect(decoded.Button4).to.be.true;
-        expect(decoded.Multiple).to.be.false;
       });
       it(`it should decode release`, () => {
         const data = new Uint8Array([0b00001000]); // Button 1 pressed
@@ -129,7 +124,6 @@ for (const key of Object.keys(EEP)) {
         expect(decoded.Button2).to.be.false;
         expect(decoded.Button3).to.be.false;
         expect(decoded.Button4).to.be.false;
-        expect(decoded.Multiple).to.be.false;
       });
       it(`it should decode button1 and button2 pressed simultaniously`, () => {
         const data = new Uint8Array([0b00010011]); // Button 1 pressed
@@ -139,7 +133,6 @@ for (const key of Object.keys(EEP)) {
         expect(decoded.Button2).to.be.true;
         expect(decoded.Button3).to.be.false;
         expect(decoded.Button4).to.be.false;
-        expect(decoded.Multiple).to.be.false;
       });
       it(`it should decode Mutliple presses (NU=0)`, () => {
         const data = new Uint8Array([0b01110000]); // Button 1 pressed

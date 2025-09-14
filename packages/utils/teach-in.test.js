@@ -81,7 +81,7 @@ describe("decodeUTETeachIn", () => {
   it("creates a UTE teach-in telegram", () => {
     //1000110
     let payload = new Uint8Array([
-      0b10000000, 0b00000001, 0b00001000, 0b00000110, 0xd2, 0x02, 0x05,
+      0b10000000, 0b00000001, 0b00001000, 0b00000110, 0x05, 0x02, 0xd2,
     ]);
     const decoded = decodeUTETeachIn(payload);
     expect(decoded.bidi).to.be.true;

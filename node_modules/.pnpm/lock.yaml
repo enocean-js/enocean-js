@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      lodash.merge:
+        specifier: ^4.6.2
+        version: 4.6.2
     devDependencies:
       '@vitest/coverage-v8':
         specifier: ^3.2.4
@@ -29,6 +33,9 @@ importers:
       '@enocean-js/eep':
         specifier: workspace:*
         version: link:../eep
+      '@enocean-js/logger':
+        specifier: workspace:*
+        version: link:../logger
       '@enocean-js/serialport-parser':
         specifier: workspace:*
         version: link:../serialport-parser
@@ -38,6 +45,12 @@ importers:
       better-sqlite3:
         specifier: ^12.2.0
         version: 12.2.0
+      lodash.merge:
+        specifier: ^4.6.2
+        version: 4.6.2
+      semver:
+        specifier: ^7.7.2
+        version: 7.7.2
       serialport:
         specifier: ^12.0.0
         version: 12.0.0
@@ -84,6 +97,8 @@ importers:
       '@enocean-js/gateway':
         specifier: workspace:*
         version: link:../gateway
+
+  packages/logger: {}
 
   packages/serialport-parser:
     dependencies:
@@ -892,6 +907,9 @@ packages:
 
   js-tokens@9.0.1:
     resolution: {integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==}
+
+  lodash.merge@4.6.2:
+    resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
   loupe@3.2.1:
     resolution: {integrity: sha512-CdzqowRJCeLU72bHvWqwRBBlLcMEtIvGrlvef74kMnV2AolS9Y8xUv1I0U/MNAWMhBlKIoyuEgoJ0t/bbwHbLQ==}
@@ -2070,6 +2088,8 @@ snapshots:
       '@pkgjs/parseargs': 0.11.0
 
   js-tokens@9.0.1: {}
+
+  lodash.merge@4.6.2: {}
 
   loupe@3.2.1: {}
 

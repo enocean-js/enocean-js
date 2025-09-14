@@ -112,12 +112,18 @@ export function setOptionalData(telegram, optionalData) {
   newTelegram[3] = optionalLength;
 
   // Recalculate CRCs
-
+  const test = new Uint8Array([
+    246, 16, 255, 225, 202, 130, 49, 3, 255, 255, 255, 255, 255, 0,
+  ]);
+  const test2 = new Uint8Array([
+    0xf6, 0, 0, 0x2b, 0x7c, 0xac, 0x21, 0x00, 0xff, 0xff, 0xff, 0xff, 0x41,
+    0x00,
+  ]); //0x85
   newTelegram[5] = crc8(subArray(newTelegram, 1, 4)); // Header CRC8
   newTelegram[newTelegram.length - 1] = crc8(
     subArray(newTelegram, 6, dataLength + optionalLength)
   ); // Body CRC8
-
+  console.log(newTelegram);
   return newTelegram;
 }
 

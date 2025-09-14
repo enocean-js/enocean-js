@@ -1,0 +1,16 @@
+{
+  "name": "@enocean-js/logger",
+  "version": "0.1.0",
+  "description": "...",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "type": "module",
+  "author": "Holger Will <h.will@klimapartner.de> (https://klimapartner.de)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enocean-js/enocean-js"
+  }
+}

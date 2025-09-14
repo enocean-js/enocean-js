@@ -19,7 +19,7 @@ class HeaderComponent extends LitElement {
   static styles = css`
     :host {
       width: auto;
-      height: calc(100vh - 10px);
+      height: calc(100vh - 20px);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: block;
       background-color: #f0f0f0;
@@ -130,6 +130,12 @@ class HeaderComponent extends LitElement {
         <div>
           <a href="monitor.html">
             <material-icon icon="monitor"></material-icon>
+            <lable>Monitor</lable>
+          </a>
+        </div>
+        <div>
+          <a href="dev.html">
+            <material-icon icon="logo_dev"></material-icon>
             <lable>Monitor</lable>
           </a>
         </div>

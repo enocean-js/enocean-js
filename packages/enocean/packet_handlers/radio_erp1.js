@@ -1,81 +1,124 @@
-import * as utils from "@enocean-js/utils";
-import * as EEP from "@enocean-js/eep";
+/**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
+ * This file is part of the enocean-js project.
+ */
 
+import * as utils from "@enocean-js/utils";
+import { ProfileManager } from "@enocean-js/eep";
+
+const EEP = await ProfileManager.getInstance();
 function log(...args) {
   const tag = "[PACKET HANDLER - RADIO_ERP1]";
   console.log(tag, ...args);
 }
 
 export async function onPacket(telegram) {
-  const senderId = utils.erp1.getSenderId(telegram);
-  const payload = utils.erp1.getPayload(telegram);
-  const rorg = telegram[6].toString(16).padStart(2, "0");
-  const status = telegram[7];
-  const known = this.memory.getDevice(senderId, rorg);
+  let ret = {
+    input_id: utils.erp1.getSenderId(telegram),
+    payload: utils.erp1.getPayload(telegram),
+    input_rorg: utils.erp1.getRORG(telegram),
+    rorgInfo: utils.erp1.getRORGInfo(telegram),
+    status: utils.erp1.getStatus(telegram),
+    signalStrength: utils.erp1.getSignalStrength(telegram),
+    raw: telegram,
+  };
 
-  if (known.length) {
+  if (ret.input_rorg === 0xd0) {
+    // D0 is a SIGNAL telegram, there are no eep profiles for it.
+    // we can decode SIGNALS in any case, so we handle it here directly.
+    handleD0.call(this, ret);
+    return;
+  }
+
+  // Check if there is a device with the senderId and rorg know
+  // Each device may support several unique RORGs, but only one type of RORG is assigned per device instance.
+  const knownDevice = this.memory.getDeviceEntriesRORG(
+    ret.input_id,
+    ret.input_rorg
+  );
+
+  if (knownDevice) {
+    // we know the device
+
+    if (utils.isTeachIn(telegram) && ret.input_rorg != 0xf6) {
+      // so we do not have to teach it in again,
+      // should we emit?
+      return;
+    }
+    let decoder = null;
     try {
-      // emit known device event without decoded data for a plugable decoder solution.
-      // register dedicated decode handlers like express middleware wit a next() function?
-      const eepID = known[0].eep.split("-").join("");
-      const decoder = EEP[eepID];
+      // Try to get EEP profile.
 
-      if (utils.isTeachIn(telegram) && rorg != "f6") {
-        return;
-      }
-      this.memory.storeTelegram(
-        senderId,
-        known[0].eep,
-        JSON.stringify({
-          data: decoder.decode(payload, status),
-          raw: telegram,
-        })
-      );
-      this.emit("device-data", {
-        name: known[0].name,
-        eep: known[0].eep,
-        senderId: senderId,
-        data: decoder.decode(payload, status),
-        raw: telegram,
-        profile: decoder.profile(),
-      });
-      return;
+      decoder = EEP.getEEP(knownDevice.input_eep); /// EEP Lookup
+      //console.log("Using EEP decoder", knownDevice.input_eep, decoder);
     } catch (e) {
-      this.emit("device-data", {
-        eep: known[0].eep,
-        senderId: senderId,
-        data: { payload: payload, status: status },
-        raw: telegram,
-      });
-      console.warn(`No EEP decoder for ${known.eep} found:${e.message}`);
+      // If we fail to get the eep profile, let the upstream system know we can not decode the telegram.
+      // instead push the raw payload upstream, it may get decoded there.
+      this.emit("device-data-no-eep", ret);
+      // also log a warning so we can suggest to implememt the missing EEP decoder.
+      log(
+        `[EEP MISSING] No EEP decoder for ${knownDevice.input_eep} found:${e.message}`
+      );
       return;
     }
+    // decode the payload
+    const decoded = decoder.decode(ret.payload, ret.status);
+    // update the profile with the new values
+    let profile = updatePropValues(knownDevice.profile, decoded);
+    // store the new values in the memory
+    this.memory.setDeviceProfileRORG(ret.input_id, ret.input_rorg, profile);
+    // emit the decoded data
+    ret.data = decoded;
+    ret.profile = profile;
+    ret = { ...knownDevice, ...ret };
+    // finally emit the device data
+    this.emit("device-data", ret);
+
+    return;
   } else {
+    // we do not know the device
     if (this.teachInModeActive) {
-      handleTeachIn.call(this, senderId, payload, rorg, telegram);
-    } else {
+      //if we are in teachs in mode, try to teach it in
+      handleTeachIn.call(this, ret);
     }
-    this.emit("unknown-device", {
-      senderId: senderId,
-      rorg: rorg,
-      payload: payload,
-      status: status,
-      raw: telegram,
-    });
+    // else just emit that we do not know the device
+    this.emit("unknown-device", ret);
   }
 }
 
-function handleTeachIn(senderId, payload, rorg, telegram) {
+// profile is a JSON.srtringified object
+function updatePropValues(profile, decoded) {
+  // copy profile to keep function pure
+  let newProfile = JSON.parse(profile);
+  // assume we have no channels
+  let channel = newProfile.props;
+  //but if we do have channels, use the props of the correct channel
+  if (newProfile.channels) {
+    channel = newProfile.channels[decoded.channel].props;
+  }
+  // now update the values of the properties in the profile
+  for (let prop of channel) {
+    if (decoded[prop.name] !== undefined) {
+      prop.value = decoded[prop.name];
+    }
+  }
+  // and return the updated profile
+  return newProfile;
+}
+
+function handleTeachIn(packet) {
   if (this.teachInModeActive) {
-    if (utils.isTeachIn(telegram)) {
+    if (utils.isTeachIn(packet.raw)) {
       this.teachInTimer.stop();
-      switch (rorg) {
-        case "f6":
-          return handleF6TeachIn.call(this, senderId);
-        case "a5":
-          return handleA5TeachIn.call(this, senderId, payload);
-        case "d4":
-          return handleUTETeachIn.call(this, senderId, payload, telegram);
+      switch (packet.input_rorg) {
+        case 0xf6:
+          return handleF6TeachIn.call(this, packet);
+        case 0xa5:
+          return handleA5TeachIn.call(this, packet);
+        case 0xd4:
+          return handleUTETeachIn.call(this, packet);
         default:
           return false;
       }
@@ -83,24 +126,35 @@ function handleTeachIn(senderId, payload, rorg, telegram) {
   }
 }
 
-function handleF6TeachIn(senderId) {
-  EEP.f60201.profile();
-  this.memory.learn(
-    senderId,
+function handleF6TeachIn(packet) {
+  const profile = EEP.getEEP("f6-02-01").profile("IN");
+  this.memory.memorize(
+    packet.input_id,
+    null,
+    "uni",
+    "New Device",
     "f6-02-01",
-    JSON.stringify(EEP.f60201.profile()),
-    "New Device"
+    null,
+    profile,
+    utils.DIRECTION_IN
   );
+
   this.emit("new-device-found", {
-    senderId,
-    eep: "f6-02-01",
-    profile: EEP.f60201.profile(),
+    ...packet,
+    ...{
+      input_eep: "f6-02-01",
+      name: "New Device",
+      type: "uni",
+      profile: profile,
+      direction: utils.DIRECTION_IN,
+    },
   });
   return true;
 }
 
-function handleA5TeachIn(senderId, payload) {
-  const teachInInfo = utils.decodeA5TeachIn(payload);
+function handleA5TeachIn(packet) {
+  const teachInInfo = utils.decodeA5TeachIn(packet.payload);
+
   if (!teachInInfo.withEEPInfo) {
     this.emit("teach-in-failed", {
       reason: "Can not teach in a5 teachIn telegrams without eep info",
@@ -109,51 +163,166 @@ function handleA5TeachIn(senderId, payload) {
   }
   let profile = null;
   try {
-    profile = EEP[teachInInfo.eep.replace(/-/g, "")].profile();
+    profile = EEP.getEEP(teachInInfo.eep).profile("IN");
   } catch (e) {
+    log(`[EEP MISSING] No EEP decoder for ${teachInInfo.eep}`);
     this.emit("teach-in-failed", {
-      reason: "EEP not supported",
-      eep: teachInInfo.eep,
+      ...packet,
+      ...{
+        reason: "EEP not supported",
+        eep: teachInInfo.eep,
+      },
     });
     return false;
   }
-  this.memory.learn(
-    senderId,
+  this.memory.memorize(
+    packet.input_id,
+    null,
+    "uni",
+    "New Device",
     teachInInfo.eep,
-    JSON.stringify(profile),
-    "New Device"
+    null,
+    profile,
+    utils.DIRECTION_IN
   );
+
   this.emit("new-device-found", {
-    senderId,
-    eep: teachInInfo.eep,
-    profile: profile,
+    ...packet,
+    ...{
+      input_eep: teachInInfo.eep,
+      name: "New Device",
+      type: "uni",
+      profile: profile,
+      direction: utils.DIRECTION_IN,
+    },
   });
   return true;
 }
 
-function handleUTETeachIn(senderId, payload, telegram) {
-  let teachInInfo = utils.decodeUTETeachIn(payload);
+function handleUTETeachIn(packet) {
+  let teachInInfo = utils.decodeUTETeachIn(packet.payload);
+  const eep = teachInInfo.eep;
+  let profile = null;
+  try {
+    // Try to get EEP profile.
+    profile = EEP.getEEP(teachInInfo.eep).profile(
+      "IN",
+      teachInInfo.numChannels
+    );
+  } catch (e) {
+    // If we fail to get the eep profile, let the requesting device know that we can not handle it.
+    let tel = utils.erp1.createERP1Telegram({
+      rorg: 0xd4,
+      payload: utils.encodeUTETeachInResponse(packet.payload, 3),
+      senderId: this.baseId,
+      destinationId: utils.fromString(packet.input_id),
+    });
+    // EEP NOT SUPPORTED MESSAGE
+    this.send(tel);
+    // let the uptsream system know we failed to teach in the device.
+    this.emit("teach-in-failed", {
+      ...packet,
+      ...{
+        reason: "EEP not supported",
+        eep: teachInInfo.eep,
+      },
+    });
+    // log a warning in the console.
+    log(`[EEP MISSING] No EEP decoder for ${teachInInfo.eep}`);
+    return false;
+  }
 
-  const eep = `${teachInInfo.rorg
-    .toString(16)
-    .padStart(2, "0")}-${teachInInfo.func
-    .toString(16)
-    .padStart(2, "0")}-${teachInInfo.type.toString(16).padStart(2, "0")}`;
+  // we know the eep.
 
-  let newId = this.memory.createVirtualDevice("New Virtual Device", eep, {});
-  log({
-    rorg: 0xd4,
-    payload: utils.encodeUTETeachInResponse(payload),
-    senderId: utils.fromString(newId),
-    destinationId: utils.fromString(senderId),
-  });
+  let newId = this.memory.getNewId();
+
+  newId = newId.hex;
+  this.memory.memorize(
+    packet.input_id,
+    newId,
+    "bidi",
+    "New Device",
+    eep,
+    eep,
+    profile,
+    utils.DIRECTION_IN
+  );
+
   let tel = utils.erp1.createERP1Telegram({
     rorg: 0xd4,
-    payload: utils.encodeUTETeachInResponse(payload),
+    payload: utils.encodeUTETeachInResponse(packet.payload),
     senderId: utils.fromString(newId),
-    destinationId: utils.fromString(senderId),
+    destinationId: utils.fromString(packet.input_id),
   });
-  log(utils.toString(telegram));
-  log(utils.toString(tel));
   this.send(tel);
+
+  this.emit("new-device-found", {
+    ...packet,
+    ...{
+      output_id: newId,
+      input_eep: eep,
+      output_eep: eep,
+      type: "bidi",
+      name: "New Device",
+      profile: profile,
+      direction: utils.DIRECTION_IN,
+    },
+  });
+}
+
+function handleD0(packet) {
+  //log("D0 SIGNAL telegram", packet);
+  const payload = utils.erp1.getPayload(packet.raw);
+  const mid = packet.payload[0];
+  const midString = mid.toString(16).padStart(2, "0");
+  const eep = "d0-00-" + midString;
+  const knownDevice = this.memory.getDeviceEntriesEEP(packet.input_id, eep);
+
+  if (knownDevice) {
+    const decoded = utils.decodeD0(packet.raw);
+    const profile = updatePropValues(
+      JSON.stringify(EEP.getEEP(eep).profile("IN")),
+      decoded
+    );
+    this.memory.setDeviceProfileEEP(packet.input_id, eep, profile);
+
+    this.emit("device-data", {
+      ...packet,
+      ...{
+        name: knownDevice.name,
+        input_eep: "d0-00-" + eep,
+        data: decoded,
+        raw: packet.raw,
+        profile: profile,
+      },
+    });
+  } else {
+    log("New D0 SIGNAL device found", packet.input_id, eep);
+    let profile = EEP.getEEP(eep).profile("IN");
+    const decoded = utils.decodeD0(packet.raw);
+
+    profile = updatePropValues(JSON.stringify(profile), decoded);
+
+    this.memory.memorize(
+      packet.input_id,
+      null,
+      "uni",
+      "New Device",
+      "d0-00-" + midString,
+      null,
+      profile,
+      utils.DIRECTION_IN
+    );
+
+    this.emit("new-device-found", {
+      ...packet,
+      ...{
+        type: "uni",
+        eep: "d0-00-00",
+        name: "New Device",
+        profile: JSON.stringify(profile),
+        direction: utils.DIRECTION_IN,
+      },
+    });
+  }
 }

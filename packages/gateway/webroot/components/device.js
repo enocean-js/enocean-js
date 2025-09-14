@@ -5,6 +5,7 @@ import {
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js";
 import { EnoceanJSElement } from "./enocean-js-element.js";
 import "./material-icon.js";
+import "./prop.js";
 
 const apiClient = EnoceanJSElement.apiClient;
 
@@ -17,7 +18,9 @@ class EnoceanDevice extends EnoceanJSElement {
   constructor() {
     super();
     this.profile = {};
-    this.last_telegram = "";
+    this.last_telegram = JSON.stringify({
+      data: { data: { name: "foo", type: "bar" } },
+    });
   }
   static styles = css`
     :host {
@@ -33,6 +36,9 @@ class EnoceanDevice extends EnoceanJSElement {
       padding: 10px;
     }
     .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 5px;
       border-radius: 10px 10px 0 0;
       display: flex;
@@ -56,27 +62,44 @@ class EnoceanDevice extends EnoceanJSElement {
       color: #222;
       text-align: right;
     }
+    .delete {
+      cursor: pointer;
+      color: #f44;
+    }
+    #name {
+    
+      font-size: 1em;
+      font-weight: bold;
+      border: none;
+      background: transparent;
+      color: white;
+      width: 100%;
+    }
+    #name:focus {
+      outline: none;
   `;
   static properties = {
     profile: { type: String },
     name: { type: String },
     eep: { type: String },
     id: { type: String },
-    last_telegram: { type: String },
+    com_type: { type: String },
+    output_eep: { type: String },
+    output_id: { type: String },
+    direction: { type: Number },
   };
   connectedCallback() {
     super.connectedCallback();
     this.unsubscribe_known = apiClient.on("device-data", (event) => {
-      //console.log("device data", event);
-      if (event.senderId == this.id) {
-        this.last_telegram = JSON.stringify(event);
+      if (event.input_id == this.id) {
+        this.profile = JSON.stringify(event.profile);
+        this.requestUpdate();
       }
     });
   }
 
   async setName(e) {
-    console.log("set name", e.target.innerText);
-    const newName = e.target.innerText;
+    const newName = e.target.value;
     await apiClient.setDeviceName(this.id, newName);
     this.name = newName;
   }
@@ -86,37 +109,73 @@ class EnoceanDevice extends EnoceanJSElement {
     this.unsubscribe_known(); // unsubscribe
   }
 
+  deleteDevice(id, eep) {
+    return async () => {
+      if (confirm(`Are you sure to delete device ${id} (${eep})?`)) {
+        await apiClient.removeDevice(id, eep);
+        this.dispatchEvent(
+          new CustomEvent("deleted", {
+            detail: { id: id, eep: eep },
+            bubbles: true,
+            composed: true,
+          })
+        );
+      }
+    };
+  }
+
   render() {
     const profile = JSON.parse(this.profile || "{}");
-    const last = this.last_telegram
-      ? JSON.parse(this.last_telegram)
-      : { data: { data: { name: "foo", type: "bar" } } };
-    const findReading = (name) => {
-      let ret = profile.readings.find((r) => r.name === name);
-      return ret;
-    };
-    console.log("render device", this.name, this.name == "New Device");
+    let channels = [];
+    if (profile.channels) {
+      channels = profile.channels;
+    } else {
+      channels = [profile];
+    }
+
     return html` <div class="device">
-      <div class="header ${this.name == "New Device" ? "new" : ""}">
+      <div class="header ${this.name == "New Device" ? "new" : ""} ">
         <material-icon
           icon="${deviceIconMap[this.eep] || "speed"}"
         ></material-icon>
-        <div contenteditable="true" @focusout="${this.setName}">
-          ${this.name}
-        </div>
+        <input
+          id="name"
+          type="text"
+          @change="${this.setName}"
+          value="${this.name}"
+        />
+        <material-icon
+          icon="${this.direction == 1 ? "arrow_back" : "arrow_forward"}"
+          title="${this.direction == 1 ? "input" : "output"}"
+        ></material-icon>
+        ${this.com_type == "bidi"
+          ? html`<material-icon
+              icon="${this.direction == 1 ? "arrow_forward" : "arrow_back"}"
+              title="${this.direction == 1 ? "input" : "output"}"
+            ></material-icon>`
+          : ""}
+        <material-icon
+          icon="delete"
+          class="delete"
+          @click="${this.deleteDevice(this.id, this.eep)}"
+        ></material-icon>
       </div>
       <div class="data">
-        ${Object.keys(last.data)
-          .map(
-            (key) =>
-              html`<span class="key">${key}</span> =
-                <span
-                  class="value ${findReading(key).type} 
-                    ${last.data[key] == true ? "true" : "false"}"
-                  >${last.data[key]}</span
-                >`
-          )
-          .reduce((prev, curr) => [prev, ", ", curr])}
+        ${channels.map((ch, index) => {
+          return html`<div>
+            ${channels.length == 1 ? "" : html`<div>Channel ${index + 1}</div>`}
+            ${ch.props.map(
+              (prop) => html`<enocean-prop
+                .prop="${prop}"
+                deviceId="${this.id}"
+                eep="${this.eep}"
+                output_id="${this.output_id}"
+                output_eep="${this.output_eep}"
+                channel="${index + 1}"
+              ></enocean-prop>`
+            )}
+          </div>`;
+        })}
       </div>
       <div class="footer">${this.id} - ${this.eep}</div>
     </div>`;

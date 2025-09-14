@@ -77,9 +77,9 @@ export class GatewayApiClient {
     const resBaseId = await fetch(`${this.url}/api/base-id`);
     return await resBaseId.json();
   }
-  async getHWInfo() {
-    const resHWInfo = await fetch(`${this.url}/api/hw-info`);
-    return await resHWInfo.json();
+  async getSystemInfo() {
+    const resSystemInfo = await fetch(`${this.url}/api/system-info`);
+    return await resSytemInfo.json();
   }
   async getMetadata(key) {
     const resMeta = await fetch(
@@ -149,13 +149,23 @@ export class GatewayApiClient {
     });
     return await res.json();
   }
-  async removeDevice(id) {
+  async removeDevice(id, eep) {
     const resDeleteDevice = await fetch(`${this.url}/api/device/${id}`, {
       method: "DELETE",
+      body: JSON.stringify({ eep }),
+      headers: { "Content-Type": "application/json" },
     });
     return await resDeleteDevice.json();
   }
-
+  async doAction(id, prop) {
+    console.log("Action", id, prop);
+    const resDoAction = await fetch(`${this.url}/api/action/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(prop),
+    });
+    return await resDoAction.json();
+  }
   async editDevice(id, params) {
     const resUpdateDevice = await fetch(`${this.url}/api/device/${id}`, {
       method: "PUT",

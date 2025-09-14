@@ -7,6 +7,7 @@
 import Database from "better-sqlite3";
 import os from "os";
 import path from "path";
+import * as utils from "@enocean-js/utils";
 
 function log(...args) {
   const tag = "[CORE - DB]";
@@ -24,84 +25,152 @@ export class Memory {
     this.db = new Database(this.path);
     this.initialize();
   }
-  learn(senderId, eep, profile, name = "New Device") {
-    this.db
+
+  memorize(
+    input_id,
+    output_id,
+    communication_type,
+    name,
+    input_eep,
+    output_eep,
+    profile,
+    direction = utils.DIRECTION_IN
+  ) {
+    if (typeof profile === "object") {
+      profile = JSON.stringify(profile);
+    }
+    return this.db
       .prepare(
-        "INSERT OR REPLACE INTO devices (id,device_id,name,eep,profile,last_seen) VALUES (?,?,?,?,?,?)"
+        "INSERT OR REPLACE INTO devices2 (input_id,input_rorg,output_id,output_rorg,output_id_int,type,name,input_eep,output_eep,profile,last_seen,direction) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
       )
       .run(
-        `${senderId}_${eep.split("-")[0]}`,
-        senderId,
+        input_id,
+        input_eep ? input_eep.split("-")[0] : "",
+        output_id,
+        output_eep ? output_eep.split("-")[0] : "",
+        output_id ? BigInt(parseInt(output_id, 16)) : null,
+        communication_type,
         name,
-        eep,
+        input_eep,
+        output_eep,
         profile,
-        Date.now()
+        Date.now(),
+        direction
       );
   }
+
   storeTelegram(senderId, eep, telegram) {
     this.db
       .prepare(
-        "UPDATE devices SET last_telegram = ?, last_seen = CURRENT_TIMESTAMP WHERE device_id = ? AND eep = ?"
+        "UPDATE devices2 SET last_telegram = ?, last_seen = CURRENT_TIMESTAMP WHERE input_id = ? AND input_eep = ?"
       )
       .run([telegram, senderId, eep]);
   }
-  getDevice(id, rorg) {
-    if (rorg) {
-      id = id + "_" + rorg;
-    }
-    return this.db
-      .prepare("SELECT * FROM devices WHERE id like ?")
-      .all(id + "%");
-  }
-  setDeviceName(id, name) {
-    this.db
-      .prepare("UPDATE devices SET name = ? WHERE device_id = ?")
-      .run([name, id]);
-  }
-  deleteDevice(id, rorg) {
-    if (key) {
-      id = id + "_" + rorg;
-    }
-    return this.db.prepare("DELETE FROM devices WHERE id = ?").run(id + "%");
+
+  getDeviceEntries(id) {
+    return this.db.prepare("SELECT * FROM devices2 WHERE input_id = ?").all(id);
   }
 
+  getDeviceEntriesRORG(id, rorg) {
+    if (typeof rorg === "number") {
+      rorg = rorg.toString(16).padStart(2, "0");
+    }
+    return this.db
+      .prepare("SELECT * FROM devices2 WHERE input_id = ? and input_rorg = ?")
+      .get(id, rorg);
+  }
+
+  getDeviceEntriesEEP(id, eep) {
+    return this.db
+      .prepare("SELECT * FROM devices2 WHERE input_id = ? and input_eep = ?")
+      .get(id, eep);
+  }
+
+  setDeviceName(id, name) {
+    this.db
+      .prepare("UPDATE devices2 SET name = ? WHERE input_id = ?")
+      .run([name, id]);
+  }
+
+  setDeviceProfileRORG(id, rorg, profile) {
+    if (typeof rorg === "number") {
+      rorg = rorg.toString(16).padStart(2, "0");
+    }
+    return this.db
+      .prepare(
+        "UPDATE devices2 SET profile = ? , last_seen = CURRENT_TIMESTAMP WHERE input_id = ? AND input_rorg = ?"
+      )
+      .run(JSON.stringify(profile), id, rorg);
+  }
+
+  setDeviceProfileEEP(id, eep, profile) {
+    return this.db
+      .prepare(
+        "UPDATE devices2 SET profile = ? , last_seen = CURRENT_TIMESTAMP WHERE input_id = ? AND input_eep = ?"
+      )
+      .run(JSON.stringify(profile), id, eep);
+  }
+  setDeviceOutputProfileEEP(id, eep, profile) {
+    return this.db
+      .prepare(
+        "UPDATE devices2 SET profile = ? , last_seen = CURRENT_TIMESTAMP WHERE output_id = ? AND output_eep = ?"
+      )
+      .run(JSON.stringify(profile), id, eep);
+  }
+  deleteDevice(id, eep) {
+    console.log("delete device", id, eep);
+    return this.db
+      .prepare("DELETE FROM devices2 WHERE input_id = ? and input_eep = ?")
+      .run(id, eep);
+  }
+  deleteDeviceByName(name) {
+    return this.db.prepare("DELETE FROM devices2 WHERE name = ?").run(name);
+  }
   getAllDevices() {
-    return this.db.prepare("SELECT * FROM devices").all();
+    return this.db.prepare("SELECT * FROM devices2").all();
   }
-  getAllVirtualDevices() {
-    return this.db.prepare("SELECT * FROM virtual_devices").all();
-  }
+
   getVirtualDevice(id) {
     return this.db
-      .prepare("SELECT * FROM virtual_devices WHERE id = ?")
+      .prepare("SELECT * FROM devices2 WHERE output_id = ?")
       .get(id);
   }
+
   deleteVirtualDevice(id) {
-    return this.db.prepare("DELETE FROM virtual_devices WHERE id = ?").run(id);
+    return this.db
+      .prepare("DELETE FROM devices2 WHERE output_id like ?")
+      .run(id);
   }
-  createVirtualDevice(name, eep, profile) {
-    const result = this.db
+
+  getNewId() {
+    // Get baseId or default to 0
+    const baseRow = this.db
       .prepare(
-        `WITH base AS (
-          SELECT CAST( value AS INTEGER) as baseId FROM meta WHERE key = 'baseId'
-        ),
-        nums(n) AS (
-          SELECT baseId + 1 FROM base
-          UNION ALL
-          SELECT n + 1 FROM nums, base WHERE n < baseId + 127
-        )
-        SELECT MIN(n) AS next_id
-        FROM nums
-        WHERE n NOT IN (SELECT id FROM virtual_devices);`
+        "SELECT CAST(value AS INTEGER) as baseId FROM meta WHERE key = 'baseId'"
       )
       .get();
-    this.db
+
+    const baseId =
+      baseRow && typeof baseRow.baseId === "number" ? baseRow.baseId : 0;
+    // Find next available ID in range
+    const result = this.db
       .prepare(
-        "INSERT OR REPLACE INTO virtual_devices (id, name, eep, profile) VALUES (?, ?, ?, ?)"
+        `
+      WITH nums(n) AS (
+        SELECT ? + 1
+        UNION ALL
+        SELECT n + 1 FROM nums WHERE n < ? + 127
       )
-      .run(BigInt(result.next_id), name, eep, JSON.stringify(profile));
-    return result.next_id.toString(16).padStart(8, "0");
+      SELECT MIN(n) AS next_id
+      FROM nums
+      WHERE n NOT IN (SELECT output_id_int FROM devices2 WHERE output_id_int IS NOT NULL)
+    `
+      )
+      .get(BigInt(baseId), BigInt(baseId));
+    const nextId = result.next_id;
+    return { int: nextId, hex: nextId.toString(16).padStart(8, "0") };
   }
+
   setMetadata(key, value) {
     this.db
       .prepare("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)")
@@ -124,20 +193,37 @@ export class Memory {
     this.db.exec(
       "CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)"
     );
-    this.db.exec(`CREATE TABLE IF NOT EXISTS devices (
-        id TEXT PRIMARY KEY,
-        device_id TEXT,
+    this.db.exec(`CREATE TABLE IF NOT EXISTS devices2 (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        input_id TEXT,
+        input_rorg TEXT,
+        output_id TEXT,
+        output_rorg TEXT,
+        output_id_int INTERGER,
+        type Text ,
+        direction INTERGER,
         name TEXT,
-        eep TEXT,
+        input_eep TEXT,
+        output_eep TEXT,
         profile TEXT,
-        last_seen INTEGER DEFAULT CURRENT_TIMESTAMP,
-        last_telegram TEXT
+        last_seen INTEGER DEFAULT CURRENT_TIMESTAMP
       )`);
-    this.db.exec(`CREATE TABLE IF NOT EXISTS virtual_devices (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        eep TEXT,
-        profile TEXT
-      )`);
+    /* this.db.exec("ALTER TABLE devices2 ADD COLUMN direction INTERGER");
+    this.db.exec(
+      "UPDATE devices2 SET direction = 1 WHERE type = 'bidi_in' OR type ='uni_in'"
+    );
+    this.db.exec(
+      "UPDATE devices2 SET direction = 0 WHERE type = 'bidi_out' OR type ='uni_out'"
+    );
+    this.db.exec(
+      "UPDATE devices2 SET type = 'bidi' WHERE type = 'bidi_in' OR type = 'bidi_out'"
+    );
+
+    this.db.exec(
+      "UPDATE devices2 SET type = 'uni' WHERE type = 'uni_in' OR type = 'uni_out' "
+    ); */
+
+    //this.db.exec("DELETE FROM devices2 where input_rorg = 'd0'");
+    //this.getNewId();
   }
 }

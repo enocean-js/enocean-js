@@ -28,11 +28,44 @@
   <body>
     <script type="module">
       import "./components/header.js";
+      import { EnoceanJSElement } from "./components/enocean-js-element.js";
+      import "./components/material-icon.js";
+      const apiClient = EnoceanJSElement.apiClient;
+      const ports = await apiClient.listPorts();
+      console.log("Available ports", ports);
+      const select = document.getElementById("serialPortSelect");
+      ports.forEach((port) => {
+        const option = document.createElement("option");
+        option.value = port.path;
+        option.text = port.path;
+        select.appendChild(option);
+      });
+      document
+        .getElementById("connectButton")
+        .addEventListener("click", async () => {
+          const selectedPort = select.value;
+          if (!selectedPort) {
+            alert("Please select a serial port");
+            return;
+          }
+          try {
+            await apiClient.openPort(selectedPort);
+            document.getElementById("status").innerText = "Status: Connected";
+          } catch (error) {
+            alert("Failed to connect: " + error.message);
+          }
+        });
     </script>
     <div class="layout">
       <header-component></header-component>
       <div class="main-content">
         <h1>Enocean Gateway Settings</h1>
+        <select id="serialPortSelect">
+          <option value="">Select Serial Port</option>
+        </select>
+        <button id="refreshButton">Refresh</button>
+        <button id="connectButton">Connect</button>
+        <div id="status">Status: Disconnected</div>
       </div>
     </div>
   </body>

@@ -1,27 +1,100 @@
 /**
+ * Copyright (c) 2025 Holger Will
+ * Licensed under the MIT License
+ * https://opensource.org/licenses/MIT
+ * This file is part of the enocean-js project.
+ */
+
+/**
  * EEP F6-02-01: Light and Blind Control - Application Style 1
  */
 import { getValue, setValue } from "@enocean-js/utils";
-export const f60201 = {
-  meta: {
-    eep: "f6-02-01",
-    rorg: "f6",
-    func: "02",
-    type: "01",
-    title: "Light and Blind Control - Application Style 1",
-    status: "released",
+
+export const meta = {
+  version: "1.0.3",
+  eep: "f6-02-01",
+  rorg: "f6",
+  func: "02",
+  type: "01",
+  title: "Light and Blind Control - Application Style 1",
+};
+export const SPEC = {
+  meta,
+  profile: (direction) => {
+    const IN = {
+      meta,
+      props: [
+        {
+          name: "Button1",
+          type: "boolean",
+          read: true,
+          write: false,
+          role: "indicator",
+        },
+        {
+          name: "Button2",
+          type: "boolean",
+          read: true,
+          write: false,
+          role: "indicator",
+        },
+        {
+          name: "Button3",
+          type: "boolean",
+          read: true,
+          write: false,
+          role: "indicator",
+        },
+        {
+          name: "Button4",
+          type: "boolean",
+          read: true,
+          write: false,
+          role: "indicator",
+        },
+      ],
+    };
+    const OUT = {
+      meta,
+      props: [
+        {
+          name: "Button1",
+          type: "boolean",
+          read: false,
+          write: true,
+          role: "button",
+          value: false,
+        },
+        {
+          name: "Button2",
+          type: "boolean",
+          read: false,
+          write: true,
+          role: "button",
+          value: false,
+        },
+        {
+          name: "Button3",
+          type: "boolean",
+          read: false,
+          write: true,
+          role: "button",
+          value: false,
+        },
+        {
+          name: "Button4",
+          type: "boolean",
+          read: false,
+          write: true,
+          role: "button",
+          value: false,
+        },
+      ],
+    };
+    return direction === "IN" ? IN : OUT;
   },
-  profile: () => ({
-    type: "switch",
-    readings: [
-      { name: "Button1", type: "boolean" },
-      { name: "Button2", type: "boolean" },
-      { name: "Button3", type: "boolean" },
-      { name: "Button4", type: "boolean" },
-      { name: "Multiple", type: "boolean" },
-    ],
-  }),
   decode: (payload, status) => {
+    console.log("f6-02-01 decode", payload, status);
     if (typeof status === "number") {
       status = new Uint8Array([status]);
     }
@@ -66,10 +139,13 @@ export const f60201 = {
       };
     }
   },
-
   encode: (data) => {
     let payload = new Uint8Array(1);
     let numberOfButtonsPressed = 0;
+    let status = new Uint8Array(1);
+    status = setValue(status, 1, 4, 4); // RC=1
+    status = setValue(status, 1, 2, 1); // T21=1
+    status = setValue(status, 1, 3, 1); // NU=1
     let encodeMutiple = (n, id) => {
       if (n > 1) {
         payload = setValue(payload, id, 4, 3);
@@ -96,9 +172,11 @@ export const f60201 = {
       numberOfButtonsPressed++;
       encodeMutiple(numberOfButtonsPressed, 3);
     }
+
     payload = setValue(payload, 1, 3, 1);
+
     if (numberOfButtonsPressed === 0) {
-      // releases
+      status = setValue(status, 0, 3, 1); // NU=0
       payload = setValue(payload, 0, 3, 1);
     }
     if (numberOfButtonsPressed == 2) {
@@ -108,9 +186,6 @@ export const f60201 = {
 
     // For simplicity, we only encode a single action.
     // R2 and SA bits remain 0.
-    return payload;
-  },
-  teachIn: () => {
-    return new Uint8Array([0b00000000]);
+    return { payload, status: status[0] };
   },
 };

@@ -70,7 +70,7 @@ export function isTeachIn(telegram) {
   if (utils.getPacketType(telegram) !== 1) {
     return false;
   }
-  switch (utils.erp1.getRORGName(telegram)) {
+  switch (utils.erp1.getRORGInfo(telegram).name) {
     case "UTE":
       return true;
     case "RPS":
@@ -132,6 +132,14 @@ export function decodeA5TeachIn(payload) {
 
 export function decodeUTETeachIn(paylaod) {
   const requests = ["teachIn", "teachOut", "teachInOut"];
+
+  const rorg = utils.getValue(paylaod, 48, 8);
+  const func = utils.getValue(paylaod, 40, 8);
+  const type = utils.getValue(paylaod, 32, 8);
+  const eep = `${rorg.toString(16).padStart(2, "0")}-${func
+    .toString(16)
+    .padStart(2, "0")}-${type.toString(16).padStart(2, "0")}`;
+
   return {
     bidi: utils.getValue(paylaod, 0, 1) === 1,
     responseExpected: utils.getValue(paylaod, 1, 1) === 0,
@@ -142,16 +150,17 @@ export function decodeUTETeachIn(paylaod) {
       { bitOffset: 16, bitLength: 8 },
       { bitOffset: 29, bitLength: 3 },
     ]),
-    rorg: utils.getValue(paylaod, 32, 8),
-    func: utils.getValue(paylaod, 40, 8),
-    type: utils.getValue(paylaod, 48, 8),
+    type: type,
+    func: func,
+    rorg: rorg,
+    eep: eep,
   };
 }
 
-export function encodeUTETeachInResponse(paylaod) {
+export function encodeUTETeachInResponse(paylaod, success_code = 1) {
   let result = new Uint8Array(paylaod);
   result = utils.setValue(result, 1, 0, 1); // bidi
-  result = utils.setValue(result, 1, 2, 2); // teach in successful
+  result = utils.setValue(result, success_code, 2, 2); // teach in successful
   result = utils.setValue(result, 1, 4, 4); // this is a teach in response
   return result;
 }

@@ -45,5 +45,8 @@
     "@vitest/coverage-v8": "^3.2.4",
     "esbuild": "^0.25.9",
     "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "lodash.merge": "^4.6.2"
   }
 }

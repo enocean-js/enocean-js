@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Enocean Gateway - Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .layout {
+        display: flex;
+        flex-direction: row;
+        height: 100vh;
+      }
+
+      .main-content {
+        flex: 1;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import "./components/header.js";
+      import "./components/ed-prop-list.js";
+    </script>
+    <div class="layout">
+      <header-component></header-component>
+      <ed-prop-list></ed-prop-list>
+    </div>
+  </body>
+</html>

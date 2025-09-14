@@ -33,7 +33,10 @@ async addVirtualDevice(eep) {}
 async removeVirtualDevice(id) {}
 async editVirtualDevice(id,profile) {}
 
-async getProfile()eep
+async getProfile(eep)
+//async getEEPMeta(eep)
 async pipe(packet) {
 
 }
+
+doAction()

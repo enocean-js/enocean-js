@@ -3,38 +3,68 @@
  */
 import { scale, setValue, getValue, checkAndThrow } from "@enocean-js/utils";
 
-export const a51003 = {
-  meta: {
-    eep: "a5-10-03",
-    rorg: "a5",
-    func: "10",
-    type: "03",
-    title: "Temperature Sensor, Set Point Control",
-    status: "released",
+export const meta = {
+  version: "1.0.0",
+  eep: "a5-10-03",
+  rorg: "a5",
+  func: "10",
+  type: "03",
+  title: "Temperature Sensor, Set Point Control",
+};
+export const SPEC = {
+  meta,
+  profile: (direction) => {
+    const IN = {
+      meta,
+      props: [
+        {
+          name: "setPoint",
+          type: "number",
+          min: 0,
+          max: 255,
+          read: true,
+          write: false,
+        },
+        {
+          name: "temperature",
+          type: "number",
+          unit: "°C",
+          min: 0,
+          max: 40,
+          read: true,
+          write: false,
+        },
+      ],
+    };
+
+    const OUT = {
+      meta,
+      props: [
+        {
+          name: "setPoint",
+          type: "number",
+          min: 0,
+          max: 255,
+          read: false,
+          write: true,
+        },
+        {
+          name: "temperature",
+          type: "number",
+          unit: "°C",
+          min: 0,
+          max: 40,
+          read: false,
+          write: true,
+        },
+      ],
+    };
+    return direction === "IN" ? IN : OUT;
   },
-  profile: () => ({
-    type: "sensor",
-    readings: [
-      {
-        name: "setPoint",
-        type: "number",
-        min: 0,
-        max: 255,
-      },
-      {
-        name: "temperature",
-        type: "number",
-        unit: "°C",
-        min: 0,
-        max: 40,
-      },
-    ],
-  }),
   decode: (payload) => {
     checkAndThrow(payload, 4);
     const rawSetPoint = getValue(payload, 8, 8);
     const rawTemperature = getValue(payload, 16, 8);
-    const isTeachIn = getValue(payload, 28, 1) === 0;
     // Set point: linear 0...255
     // Temperature: linear 255...0 maps to 0...40°C
     return {

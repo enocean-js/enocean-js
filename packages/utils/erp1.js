@@ -32,6 +32,7 @@ export const RORGS = {
   0xd5: { name: "1BS", description: "1 Byte Sensor" },
   0xa5: { name: "4BS", description: "4 Byte Sensor" },
   0xd2: { name: "VLD", description: "Variable Length Data" },
+  0xd0: { name: "SIG", description: "Signal Telegram" },
   0xd1: { name: "MSC", description: "Multi Sensor Command" },
   0xd4: { name: "UTE", description: "Universal Teach-in" },
   0xa6: { name: "ADT", description: "Addressing Destination Telegram" },
@@ -52,7 +53,7 @@ export function getSenderId(telegram) {
 }
 
 export function getStatus(telegram) {
-  let endOfData = getDataLength(telegram) + 6;
+  let endOfData = getDataLength(telegram) + 5;
   return telegram[endOfData];
 }
 
@@ -65,9 +66,17 @@ export function getRORG(telegram) {
   return telegram[6];
 }
 
-export function getRORGName(telegram) {
+export function getRORGInfo(telegram) {
   //console.log(telegram[6], RORGS[telegram[6]]);
-  return RORGS[telegram[6]].name;
+  return RORGS[telegram[6]];
+}
+
+export function getSignalStrength(telegram) {
+  return telegram[telegram.length - 3];
+}
+
+export function getDestinationId(telegram) {
+  return toString(subArray(telegram, telegram.length - 7, 4));
 }
 
 export function createERP1Telegram({

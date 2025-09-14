@@ -64,7 +64,7 @@ export function startServer(app, enocean, ip, port) {
       path.join(__dirname, "node_modules/@enocean-js/gateway-api-client/dist")
     )
   );
-
+  app.use(express.json());
   // API: openPort
   app.get("/api/open_port", (req, res) => {
     const port = req.query.port || "/dev/ttyUSB0";
@@ -163,9 +163,9 @@ export function startServer(app, enocean, ip, port) {
     res.json(await enocean.getBaseId());
   });
 
-  // API: getHWInfo
-  app.get("/api/hw-info", (req, res) => {
-    res.json(enocean.hwInfo);
+  // API: getSystemInfo
+  app.get("/api/system-info", (req, res) => {
+    res.json(enocean.systemInfo);
   });
 
   // API: getMeta
@@ -229,45 +229,33 @@ export function startServer(app, enocean, ip, port) {
   // API: addDevice
   app.post("/api/device/:id", express.json(), (req, res) => {
     const eep = req.body.eep;
-    const profile = req.body.profile || {};
+    const profile = enocean.getProfile(eep, "IN"); // just to check if EEP is valid
     const name = req.body.name || "New Device";
     return enocean.memory.learn(req.params.id, eep, profile, name);
   });
+  app.post("/api/device/new", express.json(), async (req, res) => {
+    await enocean.createVirtualDevice(req.body.name, req.body.eep, "OUT");
+  });
 
   // API: removeDevice
-  app.delete("/api/device:id", express.json(), (req, res) => {
-    res.json({ message: "not implemented yet" });
+  app.delete("/api/device/:id", express.json(), (req, res) => {
+    const eep = req.body.eep || null;
+    const id = req.params.id;
+    const result = enocean.memory.deleteDevice(id, eep);
+    res.json({ success: true, result });
   });
 
   // API: getAllVirtualDevices
   app.get("/api/virtual-device-list", (req, res) => {
-    res.json({ devices: enocean.memory.getAllVirtualDevices() });
-  });
-
-  // API: getVirtualDevice
-  app.get("/api/virtual-device/:id", (req, res) => {
-    const id = req.params.id;
-    if (!id) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Missing virtual device id parameter" });
-    }
-    const device = enocean.memory.getVirtualDeviceById(id);
-    if (device) {
-      res.json({ success: true, device });
-    } else {
-      res
-        .status(404)
-        .json({ success: false, error: "Virtual Device not found" });
-    }
+    res.json({ devices: [] });
   });
 
   // API: addVirtualDevice
   app.post("/api/virtual-device", express.json(), (req, res) => {
-    const device = this.memory.createVirtualDevice(
+    const device = this.createVirtualDevice(
       req.body.name,
       req.body.eep,
-      req.body.profile
+      req.body.io
     );
     res.json({ success: true, device: device });
   });
@@ -300,7 +288,13 @@ export function startServer(app, enocean, ip, port) {
     if (typeof packet === "string") {
       packet = utils.fromString(packet);
     }
-    enocean.emitr("data", packet);
+    enocean.emit("data", packet);
+  });
+
+  app.post("/api/action/:id", async (req, res) => {
+    const id = req.params.id;
+    const prop = req.body;
+    res.json(await enocean.doAction(id, prop));
   });
 
   return new Promise((resolve, reject) => {

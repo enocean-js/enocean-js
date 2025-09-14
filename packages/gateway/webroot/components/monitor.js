@@ -10,13 +10,7 @@ const apiClient = EnoceanJSElement.apiClient;
 class EnoceanMonitor extends EnoceanJSElement {
   constructor() {
     super();
-    this.lines = [
-      { text: "Monitor started", type: "info" },
-      {
-        text: "-------------------------------------------------------------",
-        type: "info",
-      },
-    ];
+    this.lines = [{ text: "Monitor started", type: "info" }];
   }
   static properties = {
     lines: { type: Array },
@@ -25,30 +19,28 @@ class EnoceanMonitor extends EnoceanJSElement {
     super.connectedCallback();
     this.unsubscribe_unknown = apiClient.on("unknown-device", (event) => {
       this.printLine(
-        html`[<span class="unknown-device">${event.senderId}</span>]
+        html`[<span class="unknown-device">${event.input_id}</span>]
           ${this.utils.toString(event.raw)}`,
         "unknown-device"
       );
     });
     this.unsubscribe_known = apiClient.on("device-data", (event) => {
-      const findReading = (name) => {
-        let ret = event.profile.readings.find((r) => r.name === name);
-        console.log(ret, name);
-        return ret;
-      };
+      const channel =
+        event.profile.channel !== undefined
+          ? event.profile.channels
+          : [event.profile];
+      console.log(event, channel);
       this.printLine(
         html`[<span class="known-device">${event.name}</span>]
-          ${Object.keys(event.data)
-            .map(
-              (key) =>
-                html`<span class="key">${key}</span> =
-                  <span
-                    class="value ${findReading(key).type} 
-                    ${event.data[key] == true ? "true" : "false"}"
-                    >${event.data[key]}</span
-                  >`
-            )
-            .reduce((prev, curr) => [prev, ", ", curr])}
+          ${channel.map(
+            (prop) =>
+              html`<span class="key">${prop.name}</span> =
+                <span
+                  class="value ${prop.type} 
+                    ${prop.value == true ? "true" : "false"}"
+                  >${prop.value}</span
+                >`
+          )}
           (${event.eep})`,
         "known-device"
       );
@@ -72,6 +64,7 @@ class EnoceanMonitor extends EnoceanJSElement {
       display: block;
     }
     .line {
+      padding-top: 2px;
       color: #ddd;
       font-family: monospace;
     }

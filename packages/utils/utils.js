@@ -49,3 +49,5 @@ export {
 } from "./esp3.js";
 export * as erp1 from "./erp1.js";
 export { EventNames } from "./events.js";
+export { SIGNAL, decodeD0 } from "./sig.js";
+export { DIRECTION_IN, DIRECTION_OUT } from "./const.js";
