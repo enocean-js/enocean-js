@@ -1,13 +1,14 @@
 /**
  * EEP A5-10-03: Temperature Sensor, Set Point Control
  */
-import { setValue, getValue } from "@enocean-js/utils";
+import { setValue, getValue, DIRECTION_IN } from "@enocean-js/utils";
 export const meta = {
   version: "1.0.0",
   eep: "d2-01-0f",
   rorg: "d2",
   func: "01",
   type: "0e",
+  communication_type: "bidi",
   title:
     "Electronic switches and dimmers with Energy Measurement and Local Control",
 };
@@ -57,7 +58,7 @@ export const SPEC = {
       IN.channels.push({ name: `Channel_${i + 1}`, props: [...props] });
     }
     const OUT = {};
-    return direction === "IN" ? IN : OUT;
+    return direction === DIRECTION_IN ? IN : OUT;
   },
   decode: (payload) => {
     const cmd = getValue(payload, 4, 4);

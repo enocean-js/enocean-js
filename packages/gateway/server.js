@@ -1,5 +1,4 @@
 import express from "express";
-import os, { type } from "os";
 import { fileURLToPath } from "url";
 import path from "path";
 import { Enocean } from "@enocean-js/enocean";
@@ -195,11 +194,6 @@ export function startServer(app, enocean, ip, port) {
   app.get("/api/device/:id/name/set", (req, res) => {
     const id = req.params.id;
     const name = req.query.name;
-    if (!id) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Missing device id parameter" });
-    }
     if (!name) {
       return res
         .status(400)
@@ -227,14 +221,46 @@ export function startServer(app, enocean, ip, port) {
   });
 
   // API: addDevice
+  app.post(
+    "/api/device/" + utils.CREATE_NEW_DEVICE_FLAG,
+    express.json(),
+    async (req, res) => {
+      let result = await enocean.createVirtualDevice(
+        req.body.name,
+        req.body.eep,
+        utils.DIRECTION_OUT
+      );
+      res.json({ success: true });
+    }
+  );
   app.post("/api/device/:id", express.json(), (req, res) => {
     const eep = req.body.eep;
-    const profile = enocean.getProfile(eep, "IN"); // just to check if EEP is valid
+    const profile = enocean.getProfile(eep, 1); // just to check if EEP is valid
+    const type = enocean.EEP.getEEP(eep).meta.communication_type;
     const name = req.body.name || "New Device";
-    return enocean.memory.learn(req.params.id, eep, profile, name);
-  });
-  app.post("/api/device/new", express.json(), async (req, res) => {
-    await enocean.createVirtualDevice(req.body.name, req.body.eep, "OUT");
+
+    res.json(
+      enocean.memory.memorize(
+        req.params.id,
+        null,
+        type,
+        name,
+        eep,
+        null,
+        profile,
+        utils.DIRECTION_IN
+      )
+    );
+    enocean.emit("new-device-found", {
+      output_id: null,
+      output_eep: null,
+      input_id: req.params.id,
+      input_eep: eep,
+      name: name,
+      type: type,
+      profile: JSON.stringify(profile),
+      direction: 1,
+    });
   });
 
   // API: removeDevice

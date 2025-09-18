@@ -71,6 +71,9 @@ export function setSpreadedValue(bytes, value, offsets) {
 }
 
 export function toString(byteArray, radix = 16) {
+  if (typeof byteArray == "number") {
+    byteArray = [byteArray];
+  }
   const arr = Array.from(byteArray);
   switch (radix) {
     case "bin":

@@ -146,10 +146,12 @@ export function decodeUTETeachIn(paylaod) {
     request: requests[utils.getValue(paylaod, 2, 2)],
     command: utils.getValue(paylaod, 4, 4) === 0 ? "Query" : "Response",
     numChannels: utils.getValue(paylaod, 8, 8),
-    manufacturer: utils.getSpreadedValue(paylaod, [
-      { bitOffset: 16, bitLength: 8 },
-      { bitOffset: 29, bitLength: 3 },
-    ]),
+    manufacturer: utils.getManufacturerNameById(
+      utils.getSpreadedValue(paylaod, [
+        { bitOffset: 16, bitLength: 8 },
+        { bitOffset: 29, bitLength: 3 },
+      ])
+    ),
     type: type,
     func: func,
     rorg: rorg,

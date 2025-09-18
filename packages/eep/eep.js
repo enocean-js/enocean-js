@@ -1,7 +1,12 @@
 import { SIGNAL } from "@enocean-js/utils";
-import { readdirSync } from "fs";
+import { mkdirSync, readdirSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import os from "os";
+const customEEPFolder = join(os.homedir(), `.enocean-js/eep/custom`);
+const overwriteEEPFolder = join(os.homedir(), `.enocean-js/eep/overwrite`);
+mkdirSync(customEEPFolder, { recursive: true });
+mkdirSync(overwriteEEPFolder, { recursive: true });
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -12,7 +17,7 @@ export class ProfileManager {
   static getInstance = async () => {
     if (!ProfileManager._instance) {
       ProfileManager._instance = new ProfileManager();
-      await ProfileManager._instance.loadEEPFromDisc();
+      await ProfileManager._instance.init();
     }
     return ProfileManager._instance;
   };
@@ -25,18 +30,25 @@ export class ProfileManager {
       return this.EEP[eep];
     }
   }
-  async loadEEPFromDisc() {
-    const files = readdirSync(join(__dirname, "eep")).filter((f) =>
-      f.endsWith(".js")
+  async init() {
+    await this.loadEEPFromDisc(join(__dirname, "eep"));
+    await this.loadEEPFromDisc(join(os.homedir(), ".enocean-js/eep/custom"));
+    await this.loadEEPFromDisc(
+      join(os.homedir(), ".enocean-js/eep/overwrite"),
+      true
     );
+  }
+  async loadEEPFromDisc(folder, overwrite = false) {
+    console.log(folder);
+    const files = readdirSync(folder).filter((f) => f.endsWith(".js"));
     await Promise.all(
       files.map(async (file) => {
-        const mod = await import(`./eep/${file}`);
+        const mod = await import(join(folder, file));
         if (!mod.meta || !mod.meta.eep) {
           console.error("EEP module does not have meta.eep property.");
           return;
         }
-        if (this.EEP[mod.meta.eep]) {
+        if (this.EEP[mod.meta.eep] && !overwrite) {
           console.warn("EEP module already loaded.", mod.meta.eep);
           return;
         }

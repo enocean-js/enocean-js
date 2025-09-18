@@ -3,6 +3,7 @@ import { GatewayApiClient, utils } from "../gateway-api-client.js";
 
 class EnoceanJSElement extends LitElement {
   utils = utils;
+  static utils = utils;
   static apiClient = new GatewayApiClient();
 }
 

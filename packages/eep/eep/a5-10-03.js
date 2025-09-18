@@ -1,7 +1,13 @@
 /**
  * EEP A5-10-03: Temperature Sensor, Set Point Control
  */
-import { scale, setValue, getValue, checkAndThrow } from "@enocean-js/utils";
+import {
+  scale,
+  setValue,
+  getValue,
+  checkAndThrow,
+  DIRECTION_IN,
+} from "@enocean-js/utils";
 
 export const meta = {
   version: "1.0.0",
@@ -10,6 +16,7 @@ export const meta = {
   func: "10",
   type: "03",
   title: "Temperature Sensor, Set Point Control",
+  communication_type: "uni",
 };
 export const SPEC = {
   meta,
@@ -24,6 +31,7 @@ export const SPEC = {
           max: 255,
           read: true,
           write: false,
+          role: "value",
         },
         {
           name: "temperature",
@@ -33,6 +41,7 @@ export const SPEC = {
           max: 40,
           read: true,
           write: false,
+          role: "value.temperature",
         },
       ],
     };
@@ -47,6 +56,8 @@ export const SPEC = {
           max: 255,
           read: false,
           write: true,
+          role: "level.temperature",
+          unit: "",
         },
         {
           name: "temperature",
@@ -56,10 +67,11 @@ export const SPEC = {
           max: 40,
           read: false,
           write: true,
+          role: "value.temperature",
         },
       ],
     };
-    return direction === "IN" ? IN : OUT;
+    return direction === DIRECTION_IN ? IN : OUT;
   },
   decode: (payload) => {
     checkAndThrow(payload, 4);

@@ -141,12 +141,13 @@ export class GatewayApiClient {
     );
     return await res.json();
   }
-  async addDevice(addr, eep, profile, name) {
+  async addDevice(id = "new", name, eep) {
     const res = await fetch(`/api/device/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ eep, name, profile }),
+      body: JSON.stringify({ eep, name }),
     });
+
     return await res.json();
   }
   async removeDevice(id, eep) {

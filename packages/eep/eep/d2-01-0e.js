@@ -1,13 +1,14 @@
 /**
  * EEP A5-10-03: Temperature Sensor, Set Point Control
  */
-import { setValue, getValue } from "@enocean-js/utils";
+import { setValue, getValue, DIRECTION_IN } from "@enocean-js/utils";
 export const meta = {
   version: "1.0.2",
   eep: "d2-01-0e",
   rorg: "d2",
   func: "01",
   type: "0e",
+  communication_type: "bidi",
   title:
     "Electronic switches and dimmers with Energy Measurement and Local Control",
 };
@@ -33,7 +34,7 @@ export const SPEC = {
       {
         name: "status",
         type: "boolean",
-        role: "switch",
+        role: "switch.power",
         desc: "switch status",
         read: true,
         write: true,
@@ -79,6 +80,7 @@ export const SPEC = {
         desc: "Instantaneous power consumption",
         write: false,
         read: true,
+        role: "value.power",
       },
       {
         name: "energy",
@@ -86,18 +88,19 @@ export const SPEC = {
         desc: "Accumulated energy consumption",
         write: false,
         read: true,
+        role: "value.power.consumption",
       },
       {
         name: "powerUnit",
         type: "string",
-        desc: "Unit of the device (e.g., kWh)",
+        desc: "Unit of the device (e.g., W,kW)",
         write: false,
         read: true,
       },
       {
         name: "energyUnit",
         type: "string",
-        desc: "Unit of the device (e.g., kWh)",
+        desc: "Unit of the device (e.g., Ws,kWh)",
         write: false,
         read: true,
       },
@@ -108,7 +111,7 @@ export const SPEC = {
       IN.channels.push({ name: `Channel_${i + 1}`, props: [...props] });
     }
     const OUT = {};
-    return direction === "IN" ? IN : OUT;
+    return direction === DIRECTION_IN ? IN : OUT;
   },
   decode: (payload) => {
     const cmd = getValue(payload, 4, 4);

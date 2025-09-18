@@ -30,9 +30,10 @@ export class Enocean extends EventEmitter {
   constructor(options) {
     super();
     log("Starting enocean-js...");
+    this.EEP = EEP;
     this.options = options || {};
     this.options.teachInTimeout = this.options.teachInTimeout || 60000; // ms
-    this.sytemInfo = {};
+    this.systemInfo = {};
     this.packetHandlers = {};
     this.teachInModeActive = false;
     this.teachOutModeActive = false;
@@ -73,14 +74,11 @@ export class Enocean extends EventEmitter {
     this.registerPacketHandler(0x01, erp1PacketHandler); // Radio ERP1
 
     log("loading EEPs");
-    //this.memory.db.exec("DELETE FROM devices2 WHERE input_eep = 'd2-01-0e'");
-    this.memory.db.exec(
-      "UPDATE devices2 SET type='bidi' WHERE type = 'bidi_in'"
-    );
+
     this.memory.getAllDevices().forEach((dev) => {
       const profile = JSON.parse(dev.profile || "{}");
       if (dev.direction === 1) {
-        const eeProfile = EEP.getEEP(dev.input_eep).profile("IN");
+        const eeProfile = EEP.getEEP(dev.input_eep).profile(utils.DIRECTION_IN);
         if (semver.gt(eeProfile.meta.version, profile.meta.version)) {
           this.memory.setDeviceProfileEEP(
             dev.input_id,
@@ -92,7 +90,9 @@ export class Enocean extends EventEmitter {
           );
         }
       } else {
-        const eeProfile = EEP.getEEP(dev.output_eep).profile("OUT");
+        const eeProfile = EEP.getEEP(dev.output_eep).profile(
+          utils.DIRECTION_OUT
+        );
         if (semver.gt(eeProfile.meta.version, profile.meta.version)) {
           this.memory.setDeviceOutputProfileEEP(
             dev.output_id,
@@ -116,13 +116,13 @@ export class Enocean extends EventEmitter {
     // console.log(this.memory.getAllDevices());
     // console.log(this.memory.getNewId().toString(16).padStart(8, "0"));
     // console.log((4292987522.0).toString(16).padStart(8, "0"));
-    console.log(
-      utils.decodeA5TeachIn(
-        utils.erp1.getPayload(
-          utils.fromString("55000a0701eba5441002a0ffd031060000ffffffff5000af")
-        )
-      )
-    );
+    // console.log(
+    //   utils.decodeA5TeachIn(
+    //     utils.erp1.getPayload(
+    //       utils.fromString("55000a0701eba5441002a0ffd031060000ffffffff5000af")
+    //     )
+    //   )
+    // );
     this.on("ready", (si) => {
       // more test code when everything is ready
     });
@@ -236,19 +236,33 @@ export class Enocean extends EventEmitter {
       });
     }
   }
-  getProfile(eep, io = "IN") {
+  getProfile(eep, io = 1) {
     return EEP.getEEP(eep).profile(io);
   }
 
-  createVirtualDevice(name, eep, type = "uni_out") {
+  createVirtualDevice(name, eep, direction = utils.DIRECTION_OUT) {
     const newId = this.memory.getNewId().hex;
-    const profile = JSON.stringify(this.getProfile(eep, "OUT"));
-    let dev = this.memory.memorize(null, newId, type, name, null, eep, profile);
+    const profile = JSON.stringify(this.getProfile(eep, direction));
+    const type = EEP.getEEP(eep).meta.type;
+    let dev = this.memory.memorize(
+      null,
+      newId,
+      type,
+      name,
+      null,
+      eep,
+      profile,
+      direction
+    );
     this.emit("new-device-found", {
-      input_eep: eep,
+      output_id: newId,
+      output_eep: eep,
+      input_id: null,
+      input_eep: null,
       name: name,
       type: type,
       profile,
+      direction,
     });
   }
 
@@ -293,7 +307,6 @@ export class Enocean extends EventEmitter {
       };
       this.once("response", onResponse);
       this.once("error", onError);
-      log("Sending telegram:", utils.toString(telegram));
       this.port.write(telegram);
     });
   }

@@ -34,14 +34,15 @@ export class Memory {
     input_eep,
     output_eep,
     profile,
-    direction = utils.DIRECTION_IN
+    direction = utils.DIRECTION_IN,
+    manufacturer = "EnOcean"
   ) {
     if (typeof profile === "object") {
       profile = JSON.stringify(profile);
     }
     return this.db
       .prepare(
-        "INSERT OR REPLACE INTO devices2 (input_id,input_rorg,output_id,output_rorg,output_id_int,type,name,input_eep,output_eep,profile,last_seen,direction) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+        "INSERT OR REPLACE INTO devices2 (input_id,input_rorg,output_id,output_rorg,output_id_int,type,name,input_eep,output_eep,profile,last_seen,direction,manufacturer) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
       )
       .run(
         input_id,
@@ -55,16 +56,17 @@ export class Memory {
         output_eep,
         profile,
         Date.now(),
-        direction
+        direction,
+        manufacturer
       );
   }
 
-  storeTelegram(senderId, eep, telegram) {
+  storeRSSI(senderId, rssi) {
     this.db
       .prepare(
-        "UPDATE devices2 SET last_telegram = ?, last_seen = CURRENT_TIMESTAMP WHERE input_id = ? AND input_eep = ?"
+        "UPDATE devices2 SET last_seen = CURRENT_TIMESTAMP, rssi = ? WHERE input_id = ?"
       )
-      .run([telegram, senderId, eep]);
+      .run([rssi, senderId]);
   }
 
   getDeviceEntries(id) {
@@ -88,8 +90,10 @@ export class Memory {
 
   setDeviceName(id, name) {
     this.db
-      .prepare("UPDATE devices2 SET name = ? WHERE input_id = ?")
-      .run([name, id]);
+      .prepare(
+        "UPDATE devices2 SET name = ? WHERE input_id = ? OR output_id = ?"
+      )
+      .run([name, id, id]);
   }
 
   setDeviceProfileRORG(id, rorg, profile) {
@@ -120,8 +124,10 @@ export class Memory {
   deleteDevice(id, eep) {
     console.log("delete device", id, eep);
     return this.db
-      .prepare("DELETE FROM devices2 WHERE input_id = ? and input_eep = ?")
-      .run(id, eep);
+      .prepare(
+        "DELETE FROM devices2 WHERE (input_id = ? and input_eep = ?) OR (output_id = ? and output_eep = ?)"
+      )
+      .run(id, eep, id, eep);
   }
   deleteDeviceByName(name) {
     return this.db.prepare("DELETE FROM devices2 WHERE name = ?").run(name);
@@ -206,10 +212,13 @@ export class Memory {
         input_eep TEXT,
         output_eep TEXT,
         profile TEXT,
-        last_seen INTEGER DEFAULT CURRENT_TIMESTAMP
+        last_seen INTEGER DEFAULT CURRENT_TIMESTAMP,
+        rssi INTEGER,
+        manufacturer TEXT
       )`);
-    /* this.db.exec("ALTER TABLE devices2 ADD COLUMN direction INTERGER");
-    this.db.exec(
+
+    //this.db.exec("ALTER TABLE devices2 ADD COLUMN manufacturer TEXT");
+    /*this.db.exec(
       "UPDATE devices2 SET direction = 1 WHERE type = 'bidi_in' OR type ='uni_in'"
     );
     this.db.exec(

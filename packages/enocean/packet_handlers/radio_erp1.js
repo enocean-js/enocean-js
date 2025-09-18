@@ -41,7 +41,7 @@ export async function onPacket(telegram) {
 
   if (knownDevice) {
     // we know the device
-
+    this.memory.storeRSSI(ret.input_id, ret.signalStrength);
     if (utils.isTeachIn(telegram) && ret.input_rorg != 0xf6) {
       // so we do not have to teach it in again,
       // should we emit?
@@ -127,7 +127,7 @@ function handleTeachIn(packet) {
 }
 
 function handleF6TeachIn(packet) {
-  const profile = EEP.getEEP("f6-02-01").profile("IN");
+  const profile = EEP.getEEP("f6-02-01").profile(utils.DIRECTION_IN);
   this.memory.memorize(
     packet.input_id,
     null,
@@ -136,7 +136,8 @@ function handleF6TeachIn(packet) {
     "f6-02-01",
     null,
     profile,
-    utils.DIRECTION_IN
+    utils.DIRECTION_IN,
+    "EnOcean GmbH"
   );
 
   this.emit("new-device-found", {
@@ -145,8 +146,9 @@ function handleF6TeachIn(packet) {
       input_eep: "f6-02-01",
       name: "New Device",
       type: "uni",
-      profile: profile,
+      profile: JSON.stringify(profile),
       direction: utils.DIRECTION_IN,
+      manufacturer: "EnOcean GmbH",
     },
   });
   return true;
@@ -154,7 +156,6 @@ function handleF6TeachIn(packet) {
 
 function handleA5TeachIn(packet) {
   const teachInInfo = utils.decodeA5TeachIn(packet.payload);
-
   if (!teachInInfo.withEEPInfo) {
     this.emit("teach-in-failed", {
       reason: "Can not teach in a5 teachIn telegrams without eep info",
@@ -163,7 +164,7 @@ function handleA5TeachIn(packet) {
   }
   let profile = null;
   try {
-    profile = EEP.getEEP(teachInInfo.eep).profile("IN");
+    profile = EEP.getEEP(teachInInfo.eep).profile(utils.DIRECTION_IN);
   } catch (e) {
     log(`[EEP MISSING] No EEP decoder for ${teachInInfo.eep}`);
     this.emit("teach-in-failed", {
@@ -183,7 +184,8 @@ function handleA5TeachIn(packet) {
     teachInInfo.eep,
     null,
     profile,
-    utils.DIRECTION_IN
+    utils.DIRECTION_IN,
+    teachInInfo.manufacturer
   );
 
   this.emit("new-device-found", {
@@ -192,8 +194,9 @@ function handleA5TeachIn(packet) {
       input_eep: teachInInfo.eep,
       name: "New Device",
       type: "uni",
-      profile: profile,
+      profile: JSON.stringify(profile),
       direction: utils.DIRECTION_IN,
+      manufacturer: teachInInfo.manufacturer,
     },
   });
   return true;
@@ -206,7 +209,7 @@ function handleUTETeachIn(packet) {
   try {
     // Try to get EEP profile.
     profile = EEP.getEEP(teachInInfo.eep).profile(
-      "IN",
+      utils.DIRECTION_IN,
       teachInInfo.numChannels
     );
   } catch (e) {
@@ -245,7 +248,8 @@ function handleUTETeachIn(packet) {
     eep,
     eep,
     profile,
-    utils.DIRECTION_IN
+    utils.DIRECTION_IN,
+    teachInInfo.manufacturer
   );
 
   let tel = utils.erp1.createERP1Telegram({
@@ -264,8 +268,9 @@ function handleUTETeachIn(packet) {
       output_eep: eep,
       type: "bidi",
       name: "New Device",
-      profile: profile,
+      profile: JSON.stringify(profile),
       direction: utils.DIRECTION_IN,
+      manufacturer: teachInInfo.manufacturer,
     },
   });
 }
@@ -279,9 +284,10 @@ function handleD0(packet) {
   const knownDevice = this.memory.getDeviceEntriesEEP(packet.input_id, eep);
 
   if (knownDevice) {
+    this.memory.storeRSSI(packet.input_id, packet.signalStrength);
     const decoded = utils.decodeD0(packet.raw);
     const profile = updatePropValues(
-      JSON.stringify(EEP.getEEP(eep).profile("IN")),
+      JSON.stringify(EEP.getEEP(eep).profile(utils.DIRECTION_IN)),
       decoded
     );
     this.memory.setDeviceProfileEEP(packet.input_id, eep, profile);
@@ -298,7 +304,7 @@ function handleD0(packet) {
     });
   } else {
     log("New D0 SIGNAL device found", packet.input_id, eep);
-    let profile = EEP.getEEP(eep).profile("IN");
+    let profile = EEP.getEEP(eep).profile(utils.DIRECTION_IN);
     const decoded = utils.decodeD0(packet.raw);
 
     profile = updatePropValues(JSON.stringify(profile), decoded);
@@ -311,7 +317,8 @@ function handleD0(packet) {
       "d0-00-" + midString,
       null,
       profile,
-      utils.DIRECTION_IN
+      utils.DIRECTION_IN,
+      "Diverse"
     );
 
     this.emit("new-device-found", {
@@ -322,6 +329,7 @@ function handleD0(packet) {
         name: "New Device",
         profile: JSON.stringify(profile),
         direction: utils.DIRECTION_IN,
+        manufacturer: diverse,
       },
     });
   }

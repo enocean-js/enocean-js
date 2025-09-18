@@ -8,7 +8,7 @@
 /**
  * EEP F6-02-01: Light and Blind Control - Application Style 1
  */
-import { getValue, setValue } from "@enocean-js/utils";
+import { getValue, setValue, DIRECTION_IN } from "@enocean-js/utils";
 
 export const meta = {
   version: "1.0.3",
@@ -17,6 +17,7 @@ export const meta = {
   func: "02",
   type: "01",
   title: "Light and Blind Control - Application Style 1",
+  communication_type: "uni",
 };
 export const SPEC = {
   meta,
@@ -91,10 +92,9 @@ export const SPEC = {
         },
       ],
     };
-    return direction === "IN" ? IN : OUT;
+    return direction === DIRECTION_IN ? IN : OUT;
   },
   decode: (payload, status) => {
-    console.log("f6-02-01 decode", payload, status);
     if (typeof status === "number") {
       status = new Uint8Array([status]);
     }

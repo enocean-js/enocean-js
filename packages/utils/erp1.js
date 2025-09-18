@@ -6,12 +6,18 @@
  */
 
 import {
+  getSyncByte,
+  getOptionalDataLength,
+  getPacketType,
+  getHeaderCRC8,
+  getBodyCRC8,
   createESP3Telegram,
   getDataLength,
   setData,
   setOptionalData,
   subArray,
   toString,
+  fromString,
 } from "./utils.js";
 
 export const UTE_BIDIRECTIONAL = 0;
@@ -70,13 +76,89 @@ export function getRORGInfo(telegram) {
   //console.log(telegram[6], RORGS[telegram[6]]);
   return RORGS[telegram[6]];
 }
-
+export function getSubTelNum(telegram) {
+  return telegram[telegram.length - 8];
+}
 export function getSignalStrength(telegram) {
   return telegram[telegram.length - 3];
 }
-
+export function getSecurityLevel(telegram) {
+  return telegram[telegram.length - 2];
+}
 export function getDestinationId(telegram) {
   return toString(subArray(telegram, telegram.length - 7, 4));
+}
+
+export function parse(telegram) {
+  if (typeof telegram === "string") {
+    telegram = fromString(telegram);
+  }
+  if (!telegram || telegram.length < 7) {
+    throw new Error("Invalid telegram");
+  }
+  return {
+    header: {
+      length: getDataLength(telegram),
+      optionalLength: getOptionalDataLength(telegram),
+      paketType: getPacketType(telegram),
+    },
+    data: {
+      rorg: getRORG(telegram),
+      payload: getPayload(telegram),
+      senderId: fromString(getSenderId(telegram)),
+      status: getStatus(telegram),
+    },
+    optionalData: {
+      subTelNum: getSubTelNum(telegram),
+      destinationId: fromString(getDestinationId(telegram)),
+      signalStrength: getSignalStrength(telegram),
+      securityLevel: getSecurityLevel(telegram),
+    },
+    syncByte: getSyncByte(telegram),
+    headerCRC: getHeaderCRC8(telegram),
+    dataCRC: getBodyCRC8(telegram),
+  };
+}
+
+export function toHTML(tel) {
+  const telegram = parse(tel);
+  return `
+  <div class="erp1_telegram">
+    <span class="erp1_syncByte">${toString(telegram.syncByte)}</span>
+    <div class="erp1_header">
+      <span class="erp1_length">${toString(telegram.header.length)}</span>
+      <span class="erp1_optionalLength">${toString(
+        telegram.header.optionalLength
+      )}</span>
+       <span class="erp1_packetType">${toString(
+         telegram.header.paketType
+       )}</span>
+    </div>
+    <span class="erp1_HeaderCRC">${toString(telegram.headerCRC)}</span>
+    <div class="erp1_body">
+      <div class="erp1_data">
+        <span class="erp1_rorg">${toString(telegram.data.rorg)}</span>
+        <span class="erp1_payload">${toString(telegram.data.payload)}</span>
+        <span class="erp1_senderId">${toString(telegram.data.senderId)}</span>
+        <span class="erp1_status">${toString(telegram.data.status)}</span>
+      </div>
+      <div class="erp1_optional_data">
+        <span class="erp1_subTelNum">${toString(
+          telegram.optionalData.subTelNum
+        )}</span>
+        <span class="erp1_destinationId">${toString(
+          telegram.optionalData.destinationId
+        )}</span>
+        <span class="erp1_signalStrength">${toString(
+          telegram.optionalData.signalStrength
+        )}</span>
+        <span class="erp1_securityLevel">${toString(
+          telegram.optionalData.securityLevel
+        )}</span>
+      </div>
+    </div>
+    <span class="erp1_dataCRC">${toString(telegram.dataCRC)}</span>
+  </div>`;
 }
 
 export function createERP1Telegram({
@@ -100,4 +182,36 @@ export function createERP1Telegram({
   tel = setData(tel, data);
   tel = setOptionalData(tel, optionalData);
   return tel;
+}
+
+/**
+ * Converts a raw 1-byte EnOcean RSSI value to a signal quality rating.
+ * The rating is on a scale of 1 to 4, where 1 is excellent and 4 is poor.
+ *
+ * @param {number} rawRssiByte - The raw RSSI value (0-255) from the EnOcean telegram.
+ * @returns {number} The signal quality rating (1-4). Returns 4 if the input is invalid.
+ */
+export function getSignalQualityRating(rawRssiByte) {
+  // Ensure the input is a valid number.
+  if (
+    typeof rawRssiByte !== "number" ||
+    rawRssiByte <= 0 ||
+    rawRssiByte >= 255
+  ) {
+    return 0; // Return 'very poor' for invalid input.
+  }
+
+  // These thresholds are approximate and can be adjusted as needed.
+  // The values represent a relative scale where higher is better.
+  if (rawRssiByte >= 80) {
+    return 4; // Excellent
+  } else if (rawRssiByte >= 60) {
+    return 3; // Good
+  } else if (rawRssiByte >= 40) {
+    return 2; // Fair
+  } else if (rawRssiByte >= 20) {
+    return 1; // Poor
+  } else {
+    return 0; // Very Poor (below 40)
+  }
 }

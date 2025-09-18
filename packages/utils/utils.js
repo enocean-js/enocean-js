@@ -50,4 +50,8 @@ export {
 export * as erp1 from "./erp1.js";
 export { EventNames } from "./events.js";
 export { SIGNAL, decodeD0 } from "./sig.js";
-export { DIRECTION_IN, DIRECTION_OUT } from "./const.js";
+export {
+  DIRECTION_IN,
+  DIRECTION_OUT,
+  CREATE_NEW_DEVICE_FLAG,
+} from "./const.js";
