@@ -33,12 +33,13 @@
       const apiClient = EnoceanJSElement.apiClient;
       const ports = await apiClient.listPorts();
       console.log("Available ports", ports);
+      const list = document.getElementById("serialPortList");
       const select = document.getElementById("serialPortSelect");
       ports.forEach((port) => {
         const option = document.createElement("option");
         option.value = port.path;
         option.text = port.path;
-        select.appendChild(option);
+        list.appendChild(option);
       });
       document
         .getElementById("connectButton")
@@ -60,9 +61,14 @@
       <header-component></header-component>
       <div class="main-content">
         <h1>Enocean Gateway Settings</h1>
-        <select id="serialPortSelect">
-          <option value="">Select Serial Port</option>
-        </select>
+        <input
+          type="text"
+          id="serialPortSelect"
+          placeholder="Enter Serial Port"
+          list="serialPortList"
+        />
+        <datalist id="serialPortList"> </datalist>
+
         <button id="refreshButton">Refresh</button>
         <button id="connectButton">Connect</button>
         <div id="status">Status: Disconnected</div>
