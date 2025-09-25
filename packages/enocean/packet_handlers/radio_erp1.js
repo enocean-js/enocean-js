@@ -7,6 +7,7 @@
 
 import * as utils from "@enocean-js/utils";
 import { ProfileManager } from "@enocean-js/eep";
+import merge from "lodash.merge";
 
 const EEP = await ProfileManager.getInstance();
 function log(...args) {
@@ -64,7 +65,11 @@ export async function onPacket(telegram) {
       return;
     }
     // decode the payload
-    const decoded = decoder.decode(ret.payload, ret.status);
+    const decoded = decoder.decode(
+      ret.payload,
+      ret.status,
+      knownDevice.profile
+    );
     // update the profile with the new values
     let profile = updatePropValues(knownDevice.profile, decoded);
     // store the new values in the memory
@@ -98,12 +103,15 @@ function updatePropValues(profile, decoded) {
   if (newProfile.channels) {
     channel = newProfile.channels[decoded.channel].props;
   }
+
   // now update the values of the properties in the profile
-  for (let prop of channel) {
-    if (decoded[prop.name] !== undefined) {
-      prop.value = decoded[prop.name];
+  decoded.props.forEach((item) => {
+    const prop = channel.find((p) => p.name === item.name);
+    if (prop) {
+      merge(prop, item);
     }
-  }
+  });
+
   // and return the updated profile
   return newProfile;
 }

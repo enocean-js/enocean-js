@@ -56,7 +56,7 @@ class EnoceanProp extends EnoceanJSElement {
     return html` <div class="prop">
       <div class="name">${this.prop.name}</div>
       ${when(
-        this.prop.role == "switch" && this.prop.write == true,
+        this.prop.role?.includes("switch") && this.prop.write == true,
         () =>
           html`<div>
             <material-icon
@@ -100,7 +100,7 @@ class EnoceanProp extends EnoceanJSElement {
         this.prop.type == "number" && this.prop.write != true,
         () =>
           html`<div class="value boolean ${this.prop.value}">
-            ${this.prop.value}
+            ${this.prop.value} ${this.prop.unit || ""}
           </div>`,
         () => {}
       )}

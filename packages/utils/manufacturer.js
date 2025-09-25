@@ -120,6 +120,7 @@ export const manufacturerList = [
   { id: 0x072, name: "ALM Controls" },
   { id: 0x073, name: "Tomasso Technologies" },
   { id: 0x074, name: "REHAU" },
+  { id: 0x230, name: "NodOn" },
   { id: 0x7ff, name: "Diverse" },
 ];
 

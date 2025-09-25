@@ -70,7 +70,9 @@ export class Memory {
   }
 
   getDeviceEntries(id) {
-    return this.db.prepare("SELECT * FROM devices2 WHERE input_id = ?").all(id);
+    return this.db
+      .prepare("SELECT * FROM devices2 WHERE input_id = ? OR output_id = ?")
+      .all(id, id);
   }
 
   getDeviceEntriesRORG(id, rorg) {
@@ -78,14 +80,18 @@ export class Memory {
       rorg = rorg.toString(16).padStart(2, "0");
     }
     return this.db
-      .prepare("SELECT * FROM devices2 WHERE input_id = ? and input_rorg = ?")
+      .prepare(
+        "SELECT * FROM devices2 WHERE (input_id = ? and input_rorg = ?) "
+      )
       .get(id, rorg);
   }
 
   getDeviceEntriesEEP(id, eep) {
     return this.db
-      .prepare("SELECT * FROM devices2 WHERE input_id = ? and input_eep = ?")
-      .get(id, eep);
+      .prepare(
+        "SELECT * FROM devices2 WHERE (input_id = ? and input_eep = ?) OR (output_id = ? and output_eep = ?)"
+      )
+      .get(id, eep, id, eep);
   }
 
   setDeviceName(id, name) {
@@ -102,9 +108,9 @@ export class Memory {
     }
     return this.db
       .prepare(
-        "UPDATE devices2 SET profile = ? , last_seen = CURRENT_TIMESTAMP WHERE input_id = ? AND input_rorg = ?"
+        "UPDATE devices2 SET profile = ? , last_seen = CURRENT_TIMESTAMP WHERE (input_id = ? AND input_rorg = ?) OR (output_id = ? AND output_rorg = ?)"
       )
-      .run(JSON.stringify(profile), id, rorg);
+      .run(JSON.stringify(profile), id, rorg, id, rorg);
   }
 
   setDeviceProfileEEP(id, eep, profile) {

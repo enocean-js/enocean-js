@@ -21,7 +21,27 @@
 
       .main-content {
         flex: 1;
-        padding: 20px;
+        padding: 10px;
+      }
+      footer {
+        position: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #f0f0f0;
+        padding: 0;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 5px 10px;
+      }
+      #right_block {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
       }
     </style>
   </head>
@@ -29,10 +49,18 @@
     <script type="module">
       import "./components/header.js";
       import "./components/device-list.js";
+      import "./components/connection.js";
     </script>
     <div class="layout">
       <header-component></header-component>
       <enocean-device-list class="main-content"></enocean-device-list>
     </div>
+    <footer>
+      <div></div>
+      <div id="right_block">
+        <connection-component></connection-component>
+        <div>00:00</div>
+      </div>
+    </footer>
   </body>
 </html>

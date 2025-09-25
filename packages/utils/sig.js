@@ -75,7 +75,9 @@ export const SIGNAL = {
       return IN;
     },
     decode: (payload) => {
-      return { batteryLevel: payload[1] };
+      return {
+        props: [{ name: "batteryLevel", value: payload[1], unit: "%" }],
+      };
     },
     encode: (batteryLevelPercent) => {
       return { batteryLevel: new Uint8Array([0x06, batteryLevelPercent]) };

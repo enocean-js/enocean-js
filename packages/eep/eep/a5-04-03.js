@@ -55,21 +55,28 @@ export const SPEC = {
     props = props.map((prop) => ({ ...prop, read, write }));
     return { meta, props };
   },
-  decode: (payload, profile) => {
-    for (let prop of profile.props) {
+  decode: (payload, status, profile) => {
+    profile = JSON.parse(profile); // Deep clone to avoid mutation
+
+    const ret = profile.props.map((prop) => {
       if (prop.type === "number" && prop.read === true) {
-        prop.value = utils.scale(
-          utils.getValue(
-            payload,
-            prop.bytePosition.bitStart,
-            prop.bytePosition.bitLength
-          ),
-          [prop.bytePosition.bit_min, prop.bytePosition.bit_max],
-          [prop.min, prop.max]
-        );
+        prop.value = utils
+          .scale(
+            utils.getValue(
+              payload,
+              prop.bytePosition.bitStart,
+              prop.bytePosition.bitLength
+            ),
+            [prop.bytePosition.bit_min, prop.bytePosition.bit_max],
+            [prop.min, prop.max]
+          )
+          .toFixed(1);
+        return prop;
+      } else {
+        return prop;
       }
-    }
-    return profile;
+    });
+    return { props: ret };
   },
   encode: (data, profile) => {
     // Deep clone profile to avoid mutation

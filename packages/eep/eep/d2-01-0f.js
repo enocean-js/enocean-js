@@ -55,7 +55,7 @@ export const SPEC = {
     const IN = { meta };
     IN.channels = [];
     for (let i = 0; i < numChannels; i++) {
-      IN.channels.push({ name: `Channel_${i + 1}`, props: [...props] });
+      IN.channels.push({ channel: `Channel_${i + 1}`, props: [...props] });
     }
     const OUT = {};
     return direction === DIRECTION_IN ? IN : OUT;
@@ -67,8 +67,10 @@ export const SPEC = {
       const rawDimLevel = getValue(payload, 17, 7);
       return {
         channel: getValue(payload, 11, 5),
-        dimLevel: rawDimLevel,
-        status: rawDimLevel > 0,
+        props: [
+          { name: "dimLevel", value: rawDimLevel },
+          { name: "status", value: rawDimLevel > 0 },
+        ],
       };
     }
   },
@@ -84,7 +86,6 @@ export const SPEC = {
           payload = setValue(payload, 0, 8, 3); // set to value (Not supported: dim to value)
           payload = setValue(payload, options[action] ? 100 : 0, 17, 7); // value true/false
           ret.push(payload);
-          console.log("Payload status", payload);
           break;
         case "dimLevel":
           payload = new Uint8Array(3);

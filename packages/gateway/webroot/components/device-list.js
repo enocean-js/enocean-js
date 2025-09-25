@@ -100,7 +100,7 @@ class EnoceanDeviceList extends EnoceanJSElement {
       padding: 5px;
       margin: 10px;
       cursor: pointer;
-      bottom: 0;
+      bottom: 30px;
       right: 0;
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
       z-index: 1000;

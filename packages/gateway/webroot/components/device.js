@@ -12,9 +12,9 @@ const utils = EnoceanJSElement.utils;
 
 const deviceIconMap = {
   "f6-02-01": "switch",
+  "a5-02-*": "thermometer",
   "a5-10-03": "thermostat",
   "d2-01-*": "smart_outlet",
-  "d0-00-06": "battery_android_frame_4",
   "d0-00-*": "notifications_active",
   "*-*-*": "general_device",
 };
@@ -169,7 +169,6 @@ class EnoceanDevice extends EnoceanJSElement {
   }
 
   render() {
-    console.log(this.profile);
     const profile = JSON.parse(this.profile || "{}");
     let channels = [];
     if (profile.channels) {

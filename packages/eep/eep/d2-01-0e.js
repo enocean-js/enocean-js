@@ -1,9 +1,14 @@
 /**
  * EEP A5-10-03: Temperature Sensor, Set Point Control
  */
-import { setValue, getValue, DIRECTION_IN } from "@enocean-js/utils";
+import {
+  setValue,
+  getValue,
+  DIRECTION_IN,
+  setSpreadedValue,
+} from "@enocean-js/utils";
 export const meta = {
-  version: "1.0.2",
+  version: "1.0.3",
   eep: "d2-01-0e",
   rorg: "d2",
   func: "01",
@@ -24,13 +29,6 @@ export const SPEC = {
   meta,
   profile: (direction, numChannels) => {
     const props = [
-      {
-        name: "channel",
-        type: "number",
-        desc: "No. of Channel",
-        read: true,
-        write: false,
-      },
       {
         name: "status",
         type: "boolean",
@@ -91,18 +89,12 @@ export const SPEC = {
         role: "value.power.consumption",
       },
       {
-        name: "powerUnit",
-        type: "string",
-        desc: "Unit of the device (e.g., W,kW)",
-        write: false,
-        read: true,
-      },
-      {
-        name: "energyUnit",
-        type: "string",
-        desc: "Unit of the device (e.g., Ws,kWh)",
-        write: false,
-        read: true,
+        name: "setMeasurement",
+        type: "boolean",
+        role: "button",
+        desc: "Set measurement parameters",
+        write: true,
+        read: false,
       },
     ];
     const IN = { meta };
@@ -120,8 +112,10 @@ export const SPEC = {
       const rawDimLevel = getValue(payload, 17, 7);
       return {
         channel: getValue(payload, 11, 5),
-        dimLevel: rawDimLevel,
-        status: rawDimLevel > 0,
+        props: [
+          { name: "dimLevel", value: rawDimLevel },
+          { name: "status", value: rawDimLevel > 0 },
+        ],
       };
     }
     if (cmd == 7) {
@@ -130,14 +124,24 @@ export const SPEC = {
       if (unit < 3) {
         return {
           channel: getValue(payload, 11, 5),
-          unit: unitMap[unit],
-          energy: getValue(payload, 16, 32),
+          props: [
+            {
+              name: "energy",
+              value: getValue(payload, 16, 32),
+              unit: unitMap[unit],
+            },
+          ],
         };
       } else {
         return {
           channel: getValue(payload, 11, 5),
-          unit: unitMap[unit],
-          power: getValue(payload, 16, 32),
+          props: [
+            {
+              name: "power",
+              value: getValue(payload, 16, 32),
+              unit: unitMap[unit],
+            },
+          ],
         };
       }
     }
@@ -184,9 +188,47 @@ export const SPEC = {
           payload = setValue(payload, channel, 11, 5);
           ret.push(payload);
           break;
+        case "setMeasurement":
+          payload = SPEC.setMeasurement(channel);
+          ret.push(payload);
       }
     }
 
     return { payload };
+  },
+  init: (NumChannels) => {
+    // Initialize the measurement settings
+
+    for (let i = 0; i < NumChannels; i++) {
+      SPEC.setMeasurement(i, true, 0, 1, 1, 1, 10);
+      SPEC.setMeasurement(i, true, 1, 3, 1, 1, 10);
+    }
+  },
+  setMeasurement: (
+    channel,
+    auto = true,
+    mode = 1,
+    unit = 3,
+    delta = 1,
+    minInterval = 1,
+    maxInterval = 10
+  ) => {
+    let payload = new Uint8Array(6);
+    payload = setValue(payload, 5, 4, 4); // cmd 0x06 measurement query
+    payload = setValue(payload, auto == true ? 1 : 0, 8, 1); // query energy
+    payload = setValue(payload, channel, 11, 5);
+    payload = setValue(payload, mode, 10, 1); // mode (energy or power)
+    if (mode == 1 && unit <= 2) {
+      unit = 3;
+    }
+    payload = setValue(payload, unit, 21, 3); // mode==0 unit:0 = Ws unit:1 =Wh unit:2 =kWh; mode==1 unit:3 = W unit:4 = kW
+    payload = setSpreadedValue(payload, delta, [
+      { bitStart: 24, bitLength: 8 },
+      { bitStart: 16, bitLength: 4 },
+    ]);
+    payload = setValue(payload, minInterval, 40, 8);
+    payload = setValue(payload, Math.round(maxInterval / 10), 32, 8);
+    console.log(payload);
+    return payload;
   },
 };

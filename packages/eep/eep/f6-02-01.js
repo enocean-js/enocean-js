@@ -113,29 +113,35 @@ export const SPEC = {
       const sa = getValue(payload, 7, 1) === 1;
       if (action) {
         return {
-          Button1: r1 === 0 || (r2 === 0 && sa),
-          Button2: r1 === 1 || (r2 === 1 && sa),
-          Button3: r1 === 2 || (r2 === 2 && sa),
-          Button4: r1 === 3 || (r2 === 3 && sa),
-          Multiple: false,
+          props: [
+            { name: "Button1", value: r1 === 0 || (r2 === 0 && sa) },
+            { name: "Button2", value: r1 === 1 || (r2 === 1 && sa) },
+            { name: "Button3", value: r1 === 2 || (r2 === 2 && sa) },
+            { name: "Button4", value: r1 === 3 || (r2 === 3 && sa) },
+            { name: "Multiple", value: false },
+          ],
         };
       } else {
         return {
-          Button1: false,
-          Button2: false,
-          Button3: false,
-          Button4: false,
-          Multiple: false,
+          props: [
+            { name: "Button1", value: false },
+            { name: "Button2", value: false },
+            { name: "Button3", value: false },
+            { name: "Button4", value: false },
+            { name: "Multiple", value: false },
+          ],
         };
       }
     } else {
       const r1 = getValue(payload, 0, 3);
       return {
-        Button1: false,
-        Button2: false,
-        Button3: false,
-        Button4: false,
-        Multiple: r1 == 3 && action,
+        props: [
+          { name: "Button1", value: false },
+          { name: "Button2", value: false },
+          { name: "Button3", value: false },
+          { name: "Button4", value: false },
+          { name: "Multiple", value: r1 == 3 && action },
+        ],
       };
     }
   },

@@ -80,10 +80,15 @@ export const SPEC = {
     // Set point: linear 0...255
     // Temperature: linear 255...0 maps to 0...40°C
     return {
-      setPoint: rawSetPoint,
-      temperature: parseFloat(
-        scale(rawTemperature, [255, 0], [0, 40]).toFixed(1)
-      ),
+      props: [
+        { name: "setPoint", value: rawSetPoint },
+        {
+          name: "temperature",
+          value: parseFloat(
+            scale(rawTemperature, [255, 0], [0, 40]).toFixed(1)
+          ),
+        },
+      ],
     };
   },
   encode: (data) => {

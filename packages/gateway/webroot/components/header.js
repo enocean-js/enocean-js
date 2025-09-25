@@ -76,7 +76,7 @@ class HeaderComponent extends LitElement {
     }
     footer {
       position: fixed;
-      bottom: 0;
+      bottom: 20px;
       font-size: 0.7em;
       padding: 10px;
       color: #666;

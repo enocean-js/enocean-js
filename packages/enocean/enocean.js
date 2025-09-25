@@ -274,10 +274,27 @@ export class Enocean extends EventEmitter {
     );
   }
   async doAction(id, prop) {
-    const encoder = EEP.getEEP(prop.eep);
+    // first get the divice from db, if it has only one eep, use that info. that makse prop.eep optional.
+    // if there are more than eep, rorg is enough.
+    // if rorg is d0 or eep starts with d0, dont check db, just send the signal!
+    if (prop.eep && prop.eep.startsWith("d0")) {
+      const encoder = EEP.getEEP(prop.eep);
+      const encoded = encoder.encode(prop);
+      const tel = utils.erp1.createERP1Telegram({
+        rorg: parseInt(prop.eep.split("-")[0], 16),
+        senderId: utils.fromString(id),
+        payload: encoded.payload,
+        status: encoded.status || 0,
+        destinationId: utils.fromString("ffffffff"),
+      });
+      return await this.send(tel);
+    }
+    const device = this.memory.getDeviceEntries(id)[0];
+    console.log(device.output_eep);
+    const encoder = EEP.getEEP(device.output_eep);
     const encoded = encoder.encode(prop);
     const tel = utils.erp1.createERP1Telegram({
-      rorg: parseInt(prop.eep.split("-")[0], 16),
+      rorg: parseInt(device.output_eep.split("-")[0], 16),
       senderId: utils.fromString(id),
       payload: encoded.payload,
       status: encoded.status || 0,
@@ -285,11 +302,13 @@ export class Enocean extends EventEmitter {
     });
     return await this.send(tel);
   }
+
   async send(telegram) {
     // TODO: validate telegram before sending (check length, datalength, optionallenght, and CRCs)
     if (typeof telegram === "string") {
       telegram = utils.fromString(telegram);
     }
+
     return new Promise((resolve, reject) => {
       const onResponse = (data) => {
         this.removeListener("error", onError);
