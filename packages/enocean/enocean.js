@@ -183,6 +183,7 @@ export class Enocean extends EventEmitter {
     this.port.on("open", () => {
       // Get base ID, init, and emit "ready" event
       log("Serial port opened");
+      this.memory.setMetadata("serialPortPath", port);
       this.emit("serialport-open", { port: port, baudRate: baudRate });
       CC.getBaseId(this)
         .then(this.init.bind(this)) // calling init() after getting baseId
@@ -211,9 +212,9 @@ export class Enocean extends EventEmitter {
   }
   async listPorts() {
     let portList = await SerialPort.list();
-    portList = portList.filter((port) => {
-      return port.vendorId != undefined && port.productId != undefined;
-    });
+    // portList = portList.filter((port) => {
+    //   return port.vendorId != undefined && port.productId != undefined;
+    // });
     return portList;
   }
   async autoDetectPort() {

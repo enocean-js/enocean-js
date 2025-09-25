@@ -38,7 +38,7 @@
       ports.forEach((port) => {
         const option = document.createElement("option");
         option.value = port.path;
-        option.text = port.path;
+        option.text = `${port.path} (${port.manufacturer})`;
         list.appendChild(option);
       });
       document
