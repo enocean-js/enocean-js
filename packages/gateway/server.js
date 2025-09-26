@@ -187,7 +187,7 @@ export function startServer(app, enocean, ip, port) {
 
   // API: getAllDevices
   app.get("/api/device-list", (req, res) => {
-    res.json({ devices: enocean.memory.getAllDevices() });
+    res.json({ devices: enocean.memory.getGroupedDevices() });
   });
 
   // API: setDeviceName

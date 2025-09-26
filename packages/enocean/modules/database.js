@@ -141,7 +141,28 @@ export class Memory {
   getAllDevices() {
     return this.db.prepare("SELECT * FROM devices2").all();
   }
-
+  getGroupedDevices() {
+    return this.db
+      .prepare("SELECT * FROM devices2")
+      .all()
+      .reduce((accumulator, current) => {
+        const inputId = current.input_id;
+        const outputId = current.output_id;
+        const direction = current.direction;
+        if (direction === 1) {
+          if (!accumulator[inputId]) {
+            accumulator[inputId] = [];
+          }
+          accumulator[inputId].push(current);
+        } else {
+          if (!accumulator[outputId]) {
+            accumulator[outputId] = [];
+          }
+          accumulator[outputId].push(current);
+        }
+        return accumulator;
+      }, {});
+  }
   getVirtualDevice(id) {
     return this.db
       .prepare("SELECT * FROM devices2 WHERE output_id = ?")

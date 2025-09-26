@@ -6,6 +6,7 @@ import {
 import { EnoceanJSElement } from "./enocean-js-element.js";
 import "./material-icon.js";
 import "./prop.js";
+import "./tab-group.js";
 
 const apiClient = EnoceanJSElement.apiClient;
 const utils = EnoceanJSElement.utils;
@@ -13,8 +14,10 @@ const utils = EnoceanJSElement.utils;
 const deviceIconMap = {
   "f6-02-01": "switch",
   "a5-02-*": "thermometer",
+  "a5-04-*": "dew_point",
   "a5-10-03": "thermostat",
   "d2-01-*": "smart_outlet",
+  "d0-00-06": "battery_android_frame_full",
   "d0-00-*": "notifications_active",
   "*-*-*": "general_device",
 };
@@ -125,14 +128,18 @@ class EnoceanDevice extends EnoceanJSElement {
     direction: { type: Number },
     rssi: { type: Number },
     manufacturer: { type: String },
+    device: { type: Object },
   };
   connectedCallback() {
     super.connectedCallback();
     this.unsubscribe_known = apiClient.on("device-data", (event) => {
-      if (event.input_id == this.id) {
-        this.profile = JSON.stringify(event.profile);
+      if (event.input_id == this.device.id) {
+        let eep = this.device.eeps.find(
+          (eep) => eep.input_eep === event.input_eep
+        );
+        eep.profile = JSON.stringify(event.profile);
         this.rssi = event.signalStrength;
-        //this.requestUpdate();
+        this.requestUpdate();
       }
     });
   }
@@ -169,38 +176,38 @@ class EnoceanDevice extends EnoceanJSElement {
   }
 
   render() {
-    const profile = JSON.parse(this.profile || "{}");
-    let channels = [];
-    if (profile.channels) {
-      channels = profile.channels;
-    } else {
-      channels = [profile];
-    }
+    const regularDeviceEEPs = this.device.eeps.filter(
+      (eep) => eep.input_rorg !== "d0"
+    );
+    const signals = this.device.eeps.filter((eep) => eep.input_rorg === "d0");
 
     return html` <div class="device ">
-      <div class="header ${this.name == "New Device" ? "new" : ""} ">
-        <material-icon icon="${getDeviceIcon(this.eep)}"></material-icon>
+      <div
+        class="header ${this.device.eeps[0]?.name == "New Device"
+          ? "new"
+          : ""} "
+      >
         <input
           id="name"
           type="text"
           @change="${this.setName}"
-          value="${this.name}"
+          value="${this.device.eeps[0]?.name}"
         />
-        ${this.direction == 1
+        ${this.device.direction == 1
           ? html`<material-icon
               icon="signal_cellular_${utils.erp1.getSignalQualityRating(
-                this.rssi
+                this.device.eeps[0].rssi
               )}_bar"
-              title="-${100 - this.rssi}dBm"
+              title="${this.device.eeps[0].rssi}%"
             ></material-icon>`
           : ""}
         <material-icon
-          icon="${this.com_type == "bidi"
+          icon="${this.device.eeps[0].com_type == "bidi"
             ? "swap_vert"
-            : this.direction == 1
+            : this.device.direction == 1
             ? "arrow_downward"
             : "arrow_upward"}"
-          class="${this.direction == 1 ? "input" : "output"}"
+          class="${this.device.direction == 1 ? "input" : "output"}"
         ></material-icon>
 
         <material-icon
@@ -209,36 +216,94 @@ class EnoceanDevice extends EnoceanJSElement {
           @click="${this.deleteDevice()}"
         ></material-icon>
       </div>
-      <div class="data">
-        ${channels.map((ch, index) => {
-          return html`<div>
-            ${channels.length == 1 ? "" : html`<div>Channel ${index + 1}</div>`}
-            ${ch.props.map(
-              (prop) => html`<enocean-prop
-                .prop="${prop}"
-                deviceId="${this.id}"
-                eep="${this.eep}"
-                output_id="${this.output_id}"
-                output_eep="${this.output_eep}"
-                channel="${index + 1}"
-              ></enocean-prop>`
-            )}
-          </div>`;
-        })}
-      </div>
+      <enocean-tab-group
+        .tabs="${[
+          ...regularDeviceEEPs.map((eep) => {
+            let eepstr = eep.direction === 1 ? eep.input_eep : eep.output_eep;
+            const profile = JSON.parse(eep.profile || "{}");
+            let channels = [];
+            if (profile.channels) {
+              channels = profile.channels;
+            } else {
+              channels = [profile];
+            }
+            return {
+              label: eepstr,
+              icon: getDeviceIcon(eepstr),
+              content: html`<div class="data">
+                ${channels.map((ch, index) => {
+                  return html`<div>
+                    ${channels.length == 1
+                      ? ""
+                      : html`<div>Channel ${index + 1}</div>`}
+                    ${ch.props.map(
+                      (prop) => html` <enocean-prop
+                        .prop="${prop}"
+                        deviceId="${eep.input_id}"
+                        eep="${eep.input_eep}"
+                        output_id="${eep.output_id}"
+                        output_eep="${eep.output_eep}"
+                        channel="${index + 1}"
+                      ></enocean-prop>`
+                    )}
+                  </div>`;
+                })}
+              </div>`,
+            };
+          }),
+          ...signals.map((eep) => {
+            return {
+              label: eep.input_eep,
+              icon: getDeviceIcon(eep.input_eep),
+              content: html`${eep.input_eep}`,
+            };
+          }),
+        ]}"
+      >
+      </enocean-tab-group>
       <div class="footer">
-        <div>${this.manufacturer}</div>
+        <div>${this.device.eeps[0].manufacturer}</div>
         <div>
-          ${this.com_type == "bidi"
-            ? html`<span class="outid">${this.output_id} · </span>`
+          ${this.device.eeps[0].com_type == "bidi"
+            ? html`<span class="outid"
+                >${this.device.eeps[0].output_id} ·
+              </span>`
             : ""}
-          ${this.direction == 1
-            ? html`<span class="inid">${this.id}</span> · ${this.eep}`
-            : html`<span class="outid">${this.output_id}</span> ·
-                ${this.output_eep}`}
+          ${this.device.direction == 1
+            ? html`<span class="inid">${this.device.eeps[0].input_id}</span> ·
+                ${this.eep}`
+            : html`<span class="outid">${this.device.eeps[0].output_id}</span> ·
+                ${this.device.eeps[0].output_eep}`}
         </div>
       </div>
     </div>`;
   }
 }
 customElements.define("enocean-device", EnoceanDevice);
+
+// ${regularDeviceEEPs.length <= 0
+//         ? ""
+//         : regularDeviceEEPs.map((eep) => {
+//             const channels = eep.channels || [];
+//             return html`
+//               <div class="data tab">
+//                 ${channels.map((ch, index) => {
+//                   return html`<div>
+//                     ${channels.length == 1
+//                       ? ""
+//                       : html`<div>Channel ${index + 1}</div>`}
+//                     ${ch.props.map(
+//                       (prop) => html`<enocean-prop
+//                         .prop="${prop}"
+//                         deviceId="${this.id}"
+//                         eep="${this.eep}"
+//                         output_id="${this.output_id}"
+//                         output_eep="${this.output_eep}"
+//                         channel="${index + 1}"
+//                       ></enocean-prop>`
+//                     )}
+//                   </div>`;
+//                 })}
+//               </div>
+//             `;
+//           })}

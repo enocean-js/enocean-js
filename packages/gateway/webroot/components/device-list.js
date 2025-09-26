@@ -193,31 +193,26 @@ class EnoceanDeviceList extends EnoceanJSElement {
     this.searchTerm = e.target.value;
   }
   render() {
+    let devices = Object.keys(this.devices).map((key) => {
+      const device = {};
+      device.eeps = this.devices[key];
+      device.id = key;
+      device.searchField = this.devices[key]
+        .map((item) => {
+          return `${item.name} ${item.input_id} ${item.output_id} ${item.input_eep} ${item.output_eep} ${item.manufacturer}`;
+        })
+        .join(" ");
+      device.direction = this.devices[key][0].direction;
+      return device;
+    });
+
     const search = (this.searchTerm || "").toLowerCase();
-    const devices = this.devices
+    devices = devices
       .filter((device) => {
-        return (
-          String(device.name || "")
-            .toLowerCase()
-            .includes(search) ||
-          String(device.input_id || "")
-            .toLowerCase()
-            .includes(search) ||
-          String(device.output_id || "")
-            .toLowerCase()
-            .includes(search) ||
-          String(device.input_eep || "")
-            .toLowerCase()
-            .includes(search) ||
-          String(device.output_eep || "")
-            .toLowerCase()
-            .includes(search) ||
-          String(device.manufacturer || "")
-            .toLowerCase()
-            .includes(search)
-        );
+        return device.searchField.includes(search);
       })
       .reverse();
+
     return html`<div id="container">
         <input
           id="search"
@@ -238,6 +233,7 @@ class EnoceanDeviceList extends EnoceanJSElement {
               html`<enocean-device
                 @click="${this.deviceClicked}"
                 @deleted="${this.deviceDeleted}"
+                .device="${device}"
                 name="${device.name}"
                 eep="${device.input_eep}"
                 output_eep="${device.output_eep}"

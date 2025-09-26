@@ -101,6 +101,7 @@ function updatePropValues(profile, decoded) {
   let channel = newProfile.props;
   //but if we do have channels, use the props of the correct channel
   if (newProfile.channels) {
+    console.log(newProfile, decoded);
     channel = newProfile.channels[decoded.channel].props;
   }
 
@@ -210,7 +211,7 @@ function handleA5TeachIn(packet) {
   return true;
 }
 
-function handleUTETeachIn(packet) {
+async function handleUTETeachIn(packet) {
   let teachInInfo = utils.decodeUTETeachIn(packet.payload);
   const eep = teachInInfo.eep;
   let profile = null;
@@ -229,7 +230,11 @@ function handleUTETeachIn(packet) {
       destinationId: utils.fromString(packet.input_id),
     });
     // EEP NOT SUPPORTED MESSAGE
-    this.send(tel);
+    await this.send(tel);
+    await this.send(tel);
+    await this.send(tel);
+    await this.send(tel);
+    await this.send(tel);
     // let the uptsream system know we failed to teach in the device.
     this.emit("teach-in-failed", {
       ...packet,
@@ -337,7 +342,7 @@ function handleD0(packet) {
         name: "New Device",
         profile: JSON.stringify(profile),
         direction: utils.DIRECTION_IN,
-        manufacturer: diverse,
+        manufacturer: "diverse",
       },
     });
   }
