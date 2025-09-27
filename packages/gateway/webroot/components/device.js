@@ -159,14 +159,13 @@ class EnoceanDevice extends EnoceanJSElement {
   }
 
   deleteDevice() {
-    const id = this.direction == 1 ? this.id : this.output_id;
-    const eep = this.direction == 1 ? this.eep : this.output_eep;
+    const id = this.device.id;
     return async () => {
-      if (confirm(`Are you sure to delete device ${id} (${eep})?`)) {
-        await apiClient.removeDevice(id, eep);
+      if (confirm(`Are you sure to delete device ${id}?`)) {
+        await apiClient.removeDevice(id);
         this.dispatchEvent(
           new CustomEvent("deleted", {
-            detail: { id: id, eep: eep, device: this },
+            detail: { id: id, device: this },
             bubbles: true,
             composed: true,
           })

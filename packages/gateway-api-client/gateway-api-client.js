@@ -150,10 +150,9 @@ export class GatewayApiClient {
 
     return await res.json();
   }
-  async removeDevice(id, eep) {
+  async removeDevice(id) {
     const resDeleteDevice = await fetch(`${this.url}/api/device/${id}`, {
       method: "DELETE",
-      body: JSON.stringify({ eep }),
       headers: { "Content-Type": "application/json" },
     });
     return await resDeleteDevice.json();

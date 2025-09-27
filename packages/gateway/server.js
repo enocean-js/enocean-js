@@ -265,9 +265,8 @@ export function startServer(app, enocean, ip, port) {
 
   // API: removeDevice
   app.delete("/api/device/:id", express.json(), (req, res) => {
-    const eep = req.body.eep || null;
     const id = req.params.id;
-    const result = enocean.memory.deleteDevice(id, eep);
+    const result = enocean.memory.deleteDevice(id);
     res.json({ success: true, result });
   });
 

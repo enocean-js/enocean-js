@@ -29,8 +29,9 @@ class EnoceanDeviceList extends EnoceanJSElement {
   connectedCallback() {
     super.connectedCallback();
     this.unsubscribe_new_device = apiClient.on("new-device-found", (event) => {
-      this.devices = [...this.devices, event];
+      this.devices[event.output_id] = [event];
       this.addDeviceVisible = false;
+      this.requestUpdate();
     });
     this.unsubscribe_deleted = apiClient.on("device-deleted", (event) => {});
     apiClient.getAllDevices().then((resp) => {

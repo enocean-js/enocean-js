@@ -128,12 +128,10 @@ export class Memory {
       .run(JSON.stringify(profile), id, eep);
   }
   deleteDevice(id, eep) {
-    console.log("delete device", id, eep);
+    console.log("delete device", id);
     return this.db
-      .prepare(
-        "DELETE FROM devices2 WHERE (input_id = ? and input_eep = ?) OR (output_id = ? and output_eep = ?)"
-      )
-      .run(id, eep, id, eep);
+      .prepare("DELETE FROM devices2 WHERE (input_id = ? ) OR (output_id = ? )")
+      .run(id, id);
   }
   deleteDeviceByName(name) {
     return this.db.prepare("DELETE FROM devices2 WHERE name = ?").run(name);
