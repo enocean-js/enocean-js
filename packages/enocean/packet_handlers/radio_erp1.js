@@ -25,7 +25,7 @@ export async function onPacket(telegram) {
     signalStrength: utils.erp1.getSignalStrength(telegram),
     raw: telegram,
   };
-
+  console.log(utils.toString(ret.raw));
   if (ret.input_rorg === 0xd0) {
     // D0 is a SIGNAL telegram, there are no eep profiles for it.
     // we can decode SIGNALS in any case, so we handle it here directly.
@@ -297,13 +297,20 @@ function handleD0(packet) {
   const mid = packet.payload[0];
   const midString = mid.toString(16).padStart(2, "0");
   const eep = "d0-00-" + midString;
-  const knownDevice = this.memory.getDeviceEntriesEEP(packet.input_id, eep);
+  const knownDevice = this.memory.getDeviceEntryEEP(packet.input_id, eep);
+  let spec;
+  try {
+    spec = EEP.getEEP(eep);
+  } catch (e) {
+    log(`[EEP MISSING] No EEP decoder for ${eep}`);
+    return;
+  }
 
   if (knownDevice) {
     this.memory.storeRSSI(packet.input_id, packet.signalStrength);
-    const decoded = utils.decodeD0(packet.raw);
+    const decoded = spec.decode(packet.payload);
     const profile = updatePropValues(
-      JSON.stringify(EEP.getEEP(eep).profile(utils.DIRECTION_IN)),
+      JSON.stringify(spec.profile(utils.DIRECTION_IN)),
       decoded
     );
     this.memory.setDeviceProfileEEP(packet.input_id, eep, profile);
@@ -312,7 +319,7 @@ function handleD0(packet) {
       ...packet,
       ...{
         name: knownDevice.name,
-        input_eep: "d0-00-" + eep,
+        input_eep: eep,
         data: decoded,
         raw: packet.raw,
         profile: profile,
@@ -320,8 +327,9 @@ function handleD0(packet) {
     });
   } else {
     log("New D0 SIGNAL device found", packet.input_id, eep);
-    let profile = EEP.getEEP(eep).profile(utils.DIRECTION_IN);
-    const decoded = utils.decodeD0(packet.raw);
+
+    let profile = spec.profile(utils.DIRECTION_IN);
+    const decoded = spec.decode(packet.payload);
 
     profile = updatePropValues(JSON.stringify(profile), decoded);
 
@@ -330,7 +338,7 @@ function handleD0(packet) {
       null,
       "uni",
       "New Device",
-      "d0-00-" + midString,
+      eep,
       null,
       profile,
       utils.DIRECTION_IN,
@@ -341,7 +349,7 @@ function handleD0(packet) {
       ...packet,
       ...{
         type: "uni",
-        eep: "d0-00-00",
+        eep: eep,
         name: "New Device",
         profile: JSON.stringify(profile),
         direction: utils.DIRECTION_IN,

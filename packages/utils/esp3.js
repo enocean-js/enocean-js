@@ -123,7 +123,7 @@ export function setOptionalData(telegram, optionalData) {
   newTelegram[newTelegram.length - 1] = crc8(
     subArray(newTelegram, 6, dataLength + optionalLength)
   ); // Body CRC8
-  console.log(newTelegram);
+  //console.log(newTelegram);
   return newTelegram;
 }
 

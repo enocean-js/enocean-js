@@ -1,4 +1,3 @@
-import { SIGNAL } from "@enocean-js/utils";
 import { mkdirSync, readdirSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -24,11 +23,7 @@ export class ProfileManager {
   static _instance = null;
 
   getEEP(eep) {
-    if (eep.split("-")[0] === "d0") {
-      return SIGNAL[eep];
-    } else {
-      return this.EEP[eep];
-    }
+    return this.EEP[eep];
   }
   async init() {
     await this.loadEEPFromDisc(join(__dirname, "eep"));

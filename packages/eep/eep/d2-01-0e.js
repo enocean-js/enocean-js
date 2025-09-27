@@ -2,13 +2,15 @@
  * EEP A5-10-03: Temperature Sensor, Set Point Control
  */
 import {
+  erp1,
   setValue,
   getValue,
   DIRECTION_IN,
   setSpreadedValue,
+  fromString,
 } from "@enocean-js/utils";
 export const meta = {
-  version: "1.0.3",
+  version: "1.0.11",
   eep: "d2-01-0e",
   rorg: "d2",
   func: "01",
@@ -96,6 +98,14 @@ export const SPEC = {
         write: true,
         read: false,
       },
+      {
+        name: "repeaterMode",
+        type: "boolean",
+        role: "button",
+        desc: "repeater mode",
+        write: true,
+        read: false,
+      },
     ];
     const IN = { meta };
     IN.channels = [];
@@ -146,55 +156,91 @@ export const SPEC = {
       }
     }
   },
-  encode: (options, channel = 0) => {
+  encode: (options) => {
+    const channel = options.channel || 0;
     const ret = [];
     let payload;
-    for (const action in options) {
-      switch (action) {
+    const tel = (payload) => {
+      return erp1.createERP1Telegram({
+        rorg: 0xd2,
+        senderId: fromString(options.id),
+        payload: payload,
+        status: options.status || 0,
+        destinationId: fromString("ffffffff"),
+      });
+    };
+    options.actions.forEach((action) => {
+      switch (action.name) {
         case "status":
           payload = new Uint8Array(3);
           payload = setValue(payload, 1, 4, 4); // cmd 0x01 command actuator set
           payload = setValue(payload, channel, 11, 5); // select channel
           payload = setValue(payload, 0, 8, 3); // set to value (Not supported: dim to value)
-          payload = setValue(payload, options[action] ? 100 : 0, 17, 7); // value true/false
-          ret.push(payload);
-          console.log("Payload status", payload);
+          payload = setValue(payload, action.value ? 100 : 0, 17, 7); // value true/false
+          ret.push(tel(payload));
+          //console.log("Payload status", payload);
           break;
         case "dimLevel":
           payload = new Uint8Array(3);
           payload = setValue(payload, 1, 4, 4); // cmd 0x01 command actuator set
           payload = setValue(payload, channel, 11, 5); // select channel
           payload = setValue(payload, 0, 8, 3); // set to value
-          payload = setValue(payload, options[action], 17, 7); // dim level
-          ret.push(payload);
+          payload = setValue(payload, action.value, 17, 7); // dim level
+          ret.push(tel(payload));
           break;
         case "getStatus":
           payload = new Uint8Array(2);
           payload = setValue(payload, 3, 4, 4); // cmd 0x03 status query
           payload = setValue(payload, channel, 11, 5);
-          ret.push(payload);
+          ret.push(tel(payload));
           break;
         case "getPower":
           payload = new Uint8Array(2);
           payload = setValue(payload, 6, 4, 4); // cmd 0x06 measurement query
           payload = setValue(payload, 1, 10, 1); // query power
           payload = setValue(payload, channel, 11, 5);
-          ret.push(payload);
+          ret.push(tel(payload));
           break;
         case "getEnergy":
           payload = new Uint8Array(2);
           payload = setValue(payload, 6, 4, 4); // cmd 0x06 measurement query
           payload = setValue(payload, 0, 10, 1); // query energy
           payload = setValue(payload, channel, 11, 5);
-          ret.push(payload);
+          ret.push(tel(payload));
           break;
         case "setMeasurement":
           payload = SPEC.setMeasurement(channel);
-          ret.push(payload);
+          ret.push(tel(payload));
+        case "repeaterMode":
+          /*
+           * Packet Structure Table
+           * Manufacturer ID: ID-RF
+           * --------------------------------------------------------------------------------------------------------
+           * | Field Name | RORG   | N/A    | MAN ID MSB | MAN ID LSB | CMD VALUE | DATA          | STATUS | CRC8   |
+           * --------------------------------------------------------------------------------------------------------
+           * | Value      | 0xD1   | 0x0    | 0x0        | 0x46       | -         | -             | -      | -      |
+           * --------------------------------------------------------------------------------------------------------
+           * | Size       | 1 byte | 4 bits | 4 bits     | 1 byte     | 1 byte    | 0 to 11 bytes | 1 byte | 1 byte |
+           * --------------------------------------------------------------------------------------------------------
+           */
+          //getReapeterLevel
+          payload = new Uint8Array(3);
+          payload = setValue(payload, 0x09, 16, 8); // Repeater mode on/off
+          payload = setValue(payload, 0x46, 4, 12); // set to value
+          console.log(options);
+          ret.push(
+            erp1.createERP1Telegram({
+              rorg: 0xd1,
+              payload: payload,
+              status: 0,
+              senderId: fromString(options.id),
+              destinationId: fromString("05969480"),
+            })
+          );
       }
-    }
+    });
 
-    return { payload };
+    return ret;
   },
   init: (NumChannels) => {
     // Initialize the measurement settings
@@ -228,7 +274,7 @@ export const SPEC = {
     ]);
     payload = setValue(payload, minInterval, 40, 8);
     payload = setValue(payload, Math.round(maxInterval / 10), 32, 8);
-    console.log(payload);
+    //console.log(payload);
     return payload;
   },
 };

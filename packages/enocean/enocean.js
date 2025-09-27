@@ -77,14 +77,20 @@ export class Enocean extends EventEmitter {
 
     this.memory.getAllDevices().forEach((dev) => {
       const profile = JSON.parse(dev.profile || "{}");
+      const numChannels = profile.channels?.length || 0;
       if (dev.direction === 1) {
-        const eeProfile = EEP.getEEP(dev.input_eep).profile(utils.DIRECTION_IN);
+        const eeProfile = EEP.getEEP(dev.input_eep).profile(
+          utils.DIRECTION_IN,
+          numChannels
+        );
         if (semver.gt(eeProfile.meta.version, profile.meta.version)) {
           this.memory.setDeviceProfileEEP(
             dev.input_id,
             dev.input_eep,
-            merge({}, profile, eeProfile)
+            merge(profile, eeProfile)
           );
+          const n = this.memory.getDeviceEntryEEP(dev.input_id, dev.input_eep);
+          //console.log(n.profile);
           console.log(
             `Updated profile for device ${dev.name} from ${profile.meta.version} to ${eeProfile.meta.version}`
           );
@@ -274,34 +280,49 @@ export class Enocean extends EventEmitter {
       data
     );
   }
-  async doAction(id, prop) {
-    // first get the divice from db, if it has only one eep, use that info. that makse prop.eep optional.
-    // if there are more than eep, rorg is enough.
-    // if rorg is d0 or eep starts with d0, dont check db, just send the signal!
-    if (prop.eep && prop.eep.startsWith("d0")) {
-      const encoder = EEP.getEEP(prop.eep);
-      const encoded = encoder.encode(prop);
-      const tel = utils.erp1.createERP1Telegram({
-        rorg: parseInt(prop.eep.split("-")[0], 16),
-        senderId: utils.fromString(id),
-        payload: encoded.payload,
-        status: encoded.status || 0,
-        destinationId: utils.fromString("ffffffff"),
-      });
-      return await this.send(tel);
+  async doAction(options) {
+    // {id:aabbccdd,eep: eep, destinationId:ffffffff,actions:[{name:"abc",value:123},{}]}
+    //console.log(options);
+    let spec;
+    try {
+      spec = EEP.getEEP(options.eep);
+    } catch (e) {
+      log(`EEP ${options.eep} not found! for device ${options.id}`);
+      return { success: false, reason: "EEP Not implemented: " + options.eep };
     }
-    const device = this.memory.getDeviceEntries(id)[0];
-    console.log(device.output_eep);
+    if (options.eep && options.eep.startsWith("d0")) {
+      const encoder = EEP.getEEP(options.eep);
+      const encoded = encoder.encode(options);
+      return await this.send(encoded);
+    }
+    const device = this.memory.getDeviceEntryEEP(options.id, options.eep);
+    if (!device) {
+      log(`Device ${options.id} not found!`);
+      return { success: false, reason: "Device not found" };
+    }
     const encoder = EEP.getEEP(device.output_eep);
-    const encoded = encoder.encode(prop);
-    const tel = utils.erp1.createERP1Telegram({
-      rorg: parseInt(device.output_eep.split("-")[0], 16),
-      senderId: utils.fromString(id),
-      payload: encoded.payload,
-      status: encoded.status || 0,
-      destinationId: utils.fromString("ffffffff"),
-    });
-    return await this.send(tel);
+    options.profile = JSON.parse(device.profile);
+    const encoded = encoder.encode(options);
+    if (encoded.constructor.name === "Uint8Array") {
+      try {
+        const res = await this.send(encoded);
+        return res;
+      } catch (error) {
+        log(`Error sending data: ${error}`);
+        return { success: false, reason: "Error sending data", error };
+      }
+    }
+    if (encoded.constructor.name === "Array") {
+      try {
+        for (let i = 0; i < encoded.length; i++) {
+          await this.send(encoded[i]);
+        }
+      } catch (error) {
+        log(`Error sending data: ${error}`);
+        return { success: false, reason: "Error sending data", error };
+      }
+      return { success: true };
+    }
   }
 
   async send(telegram) {
@@ -309,13 +330,13 @@ export class Enocean extends EventEmitter {
     if (typeof telegram === "string") {
       telegram = utils.fromString(telegram);
     }
-
+    log(utils.toString(telegram));
     return new Promise((resolve, reject) => {
       const onResponse = (data) => {
         this.removeListener("error", onError);
         if (data[6] != 0) {
           log("error sending data");
-          reject("data not sent");
+          reject({ success: false, reason: "error sending data", data: data });
         } else {
           log("sent successfuly");
           resolve({ success: true, data: data });

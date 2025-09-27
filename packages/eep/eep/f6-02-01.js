@@ -8,7 +8,7 @@
 /**
  * EEP F6-02-01: Light and Blind Control - Application Style 1
  */
-import { getValue, setValue, DIRECTION_IN } from "@enocean-js/utils";
+import * as utils from "@enocean-js/utils";
 
 export const meta = {
   version: "1.0.3",
@@ -92,7 +92,7 @@ export const SPEC = {
         },
       ],
     };
-    return direction === DIRECTION_IN ? IN : OUT;
+    return direction === utils.DIRECTION_IN ? IN : OUT;
   },
   decode: (payload, status) => {
     if (typeof status === "number") {
@@ -105,12 +105,12 @@ export const SPEC = {
     // T21=1 and NU=1/0 identify a PTM switch telegram
     // const t21 = getValue(status, 2, 1) === 1;
 
-    const nu = getValue(status, 3, 1) === 1;
-    const action = getValue(payload, 3, 1) === 1;
+    const nu = utils.getValue(status, 3, 1) === 1;
+    const action = utils.getValue(payload, 3, 1) === 1;
     if (nu) {
-      const r1 = getValue(payload, 0, 3);
-      const r2 = getValue(payload, 4, 3);
-      const sa = getValue(payload, 7, 1) === 1;
+      const r1 = utils.getValue(payload, 0, 3);
+      const r2 = utils.getValue(payload, 4, 3);
+      const sa = utils.getValue(payload, 7, 1) === 1;
       if (action) {
         return {
           props: [
@@ -133,7 +133,7 @@ export const SPEC = {
         };
       }
     } else {
-      const r1 = getValue(payload, 0, 3);
+      const r1 = utils.getValue(payload, 0, 3);
       return {
         props: [
           { name: "Button1", value: false },
@@ -145,53 +145,50 @@ export const SPEC = {
       };
     }
   },
-  encode: (data) => {
+  encode: (options) => {
     let payload = new Uint8Array(1);
     let numberOfButtonsPressed = 0;
     let status = new Uint8Array(1);
-    status = setValue(status, 1, 4, 4); // RC=1
-    status = setValue(status, 1, 2, 1); // T21=1
-    status = setValue(status, 1, 3, 1); // NU=1
+    status = utils.setValue(status, 0, 4, 4); // RC=1
+    status = utils.setValue(status, 1, 2, 1); // T21=1
+    status = utils.setValue(status, 1, 3, 1); // NU=1
     let encodeMutiple = (n, id) => {
       if (n > 1) {
-        payload = setValue(payload, id, 4, 3);
+        payload = utils.setValue(payload, id, 4, 3);
       } else {
-        payload = setValue(payload, id, 0, 3);
+        payload = utils.setValue(payload, id, 0, 3);
       }
       if (n > 2) {
         throw new Error("Only up to two buttons can be encoded");
       }
     };
-    if (data.Button1 === true) {
-      numberOfButtonsPressed++;
-      encodeMutiple(numberOfButtonsPressed, 0);
-    }
-    if (data.Button2 === true) {
-      numberOfButtonsPressed++;
-      encodeMutiple(numberOfButtonsPressed, 1);
-    }
-    if (data.Button3 === true) {
-      numberOfButtonsPressed++;
-      encodeMutiple(numberOfButtonsPressed, 2);
-    }
-    if (data.Button4 === true) {
-      numberOfButtonsPressed++;
-      encodeMutiple(numberOfButtonsPressed, 3);
+    for (let i = 0; i < 4; i++) {
+      let button = options.actions.find(
+        (action) => action.name === `Button${i + 1}`
+      );
+      if (button && button.value === true) {
+        numberOfButtonsPressed++;
+        encodeMutiple(numberOfButtonsPressed, i);
+      }
     }
 
-    payload = setValue(payload, 1, 3, 1);
+    payload = utils.setValue(payload, 1, 3, 1);
 
     if (numberOfButtonsPressed === 0) {
-      status = setValue(status, 0, 3, 1); // NU=0
-      payload = setValue(payload, 0, 3, 1);
+      status = utils.setValue(status, 0, 3, 1); // NU=0
+      payload = utils.setValue(payload, 0, 3, 1);
     }
     if (numberOfButtonsPressed == 2) {
-      // releases
-      payload = setValue(payload, 1, 7, 1);
+      payload = utils.setValue(payload, 1, 7, 1);
     }
 
-    // For simplicity, we only encode a single action.
-    // R2 and SA bits remain 0.
-    return { payload, status: status[0] };
+    const tel = utils.erp1.createERP1Telegram({
+      rorg: 0xf6,
+      senderId: utils.fromString(options.id),
+      payload: payload,
+      status: status,
+      destinationId: utils.fromString("ffffffff"),
+    });
+    return tel;
   },
 };

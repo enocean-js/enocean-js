@@ -86,7 +86,7 @@ export class Memory {
       .get(id, rorg);
   }
 
-  getDeviceEntriesEEP(id, eep) {
+  getDeviceEntryEEP(id, eep) {
     return this.db
       .prepare(
         "SELECT * FROM devices2 WHERE (input_id = ? and input_eep = ?) OR (output_id = ? and output_eep = ?)"

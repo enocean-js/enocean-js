@@ -85,7 +85,49 @@ export const SIGNAL = {
   },
   "d0-00-07": {
     name: "Revision of device",
-    decode: (payload) => {},
+    meta: {
+      version: "1.0.0",
+      eep: "d0-00-07",
+      rorg: "d0",
+      func: "00",
+      type: "07",
+      title: "Revision of device",
+    },
+    profile: (direction) => {
+      const IN = {
+        meta: {
+          version: "1.0.0",
+          eep: "d0-00-07",
+          rorg: "d0",
+          func: "00",
+          type: "07",
+          title: "Revision of device",
+        },
+        type: "sensor",
+        props: [
+          {
+            name: "SoftwareVersion",
+            type: "string",
+            unit: "",
+            read: true,
+            write: false,
+          },
+          {
+            name: "HardwareVersion",
+            type: "string",
+            unit: "",
+            read: true,
+            write: false,
+          },
+        ],
+      };
+      return IN;
+    },
+    decode: (payload) => {
+      return {
+        props: [{ name: "SoftwareVersion", value: payload[1] }],
+      };
+    },
     encode: () => {},
   },
   "d0-00-08": { name: "Heartbeat", decode: (payload) => {}, encode: () => {} },

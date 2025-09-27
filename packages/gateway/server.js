@@ -317,10 +317,9 @@ export function startServer(app, enocean, ip, port) {
     enocean.emit("data", packet);
   });
 
-  app.post("/api/action/:id", async (req, res) => {
-    const id = req.params.id;
-    const prop = req.body;
-    res.json(await enocean.doAction(id, prop));
+  app.post("/api/action", async (req, res) => {
+    const option = req.body;
+    res.json(await enocean.doAction(option));
   });
 
   return new Promise((resolve, reject) => {

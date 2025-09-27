@@ -176,6 +176,7 @@ class EnoceanDevice extends EnoceanJSElement {
   }
 
   render() {
+    console.log(this.device);
     const regularDeviceEEPs = this.device.eeps.filter(
       (eep) => eep.input_rorg !== "d0"
     );

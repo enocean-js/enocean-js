@@ -158,12 +158,11 @@ export class GatewayApiClient {
     });
     return await resDeleteDevice.json();
   }
-  async doAction(id, prop) {
-    console.log("Action", id, prop);
-    const resDoAction = await fetch(`${this.url}/api/action/${id}`, {
+  async doAction(options) {
+    const resDoAction = await fetch(`${this.url}/api/action/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(prop),
+      body: JSON.stringify(options),
     });
     return await resDoAction.json();
   }
