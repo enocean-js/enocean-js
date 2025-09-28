@@ -234,7 +234,7 @@ export const SPEC = {
               payload: payload,
               status: 0,
               senderId: fromString(options.id),
-              destinationId: fromString("05969480"),
+              destinationId: fromString("ffffffff"),
             })
           );
       }

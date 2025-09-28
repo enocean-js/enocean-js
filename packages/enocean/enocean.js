@@ -282,7 +282,7 @@ export class Enocean extends EventEmitter {
   }
   async doAction(options) {
     // {id:aabbccdd,eep: eep, destinationId:ffffffff,actions:[{name:"abc",value:123},{}]}
-    //console.log(options);
+    console.log(options);
     let spec;
     try {
       spec = EEP.getEEP(options.eep);
@@ -302,7 +302,9 @@ export class Enocean extends EventEmitter {
     }
     const encoder = EEP.getEEP(device.output_eep);
     options.profile = JSON.parse(device.profile);
+    console.log(options);
     const encoded = encoder.encode(options);
+    console.log(encoded);
     if (encoded.constructor.name === "Uint8Array") {
       try {
         const res = await this.send(encoded);
@@ -330,7 +332,7 @@ export class Enocean extends EventEmitter {
     if (typeof telegram === "string") {
       telegram = utils.fromString(telegram);
     }
-    log(utils.toString(telegram));
+    console.log("Sending telegram:", utils.toString(telegram));
     return new Promise((resolve, reject) => {
       const onResponse = (data) => {
         this.removeListener("error", onError);

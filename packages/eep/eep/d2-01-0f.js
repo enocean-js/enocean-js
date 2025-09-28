@@ -1,7 +1,13 @@
 /**
  * EEP A5-10-03: Temperature Sensor, Set Point Control
  */
-import { setValue, getValue, DIRECTION_IN } from "@enocean-js/utils";
+import {
+  setValue,
+  getValue,
+  DIRECTION_IN,
+  erp1,
+  fromString,
+} from "@enocean-js/utils";
 export const meta = {
   version: "1.0.0",
   eep: "d2-01-0f",
@@ -74,36 +80,48 @@ export const SPEC = {
       };
     }
   },
-  encode: (options, channel = 0) => {
+  encode: (options) => {
+    const channel = options.channel || 0;
     const ret = [];
     let payload;
-    for (const action in options) {
-      switch (action) {
+    const tel = (payload) => {
+      return erp1.createERP1Telegram({
+        rorg: 0xd2,
+        senderId: fromString(options.id),
+        payload: payload,
+        status: options.status || 0,
+        destinationId: fromString("ffffffff"),
+      });
+    };
+    options.actions.forEach((action) => {
+      switch (action.name) {
         case "status":
           payload = new Uint8Array(3);
           payload = setValue(payload, 1, 4, 4); // cmd 0x01 command actuator set
           payload = setValue(payload, channel, 11, 5); // select channel
           payload = setValue(payload, 0, 8, 3); // set to value (Not supported: dim to value)
-          payload = setValue(payload, options[action] ? 100 : 0, 17, 7); // value true/false
-          ret.push(payload);
+          payload = setValue(payload, action.value ? 100 : 0, 17, 7); // value true/false
+          ret.push(tel(payload));
           break;
         case "dimLevel":
           payload = new Uint8Array(3);
           payload = setValue(payload, 1, 4, 4); // cmd 0x01 command actuator set
           payload = setValue(payload, channel, 11, 5); // select channel
           payload = setValue(payload, 0, 8, 3); // set to value
-          payload = setValue(payload, options[action], 17, 7); // dim level
-          ret.push(payload);
+          payload = setValue(payload, action.value, 17, 7); // dim level
+          ret.push(tel(payload));
           break;
         case "getStatus":
           payload = new Uint8Array(2);
           payload = setValue(payload, 3, 4, 4); // cmd 0x03 status query
           payload = setValue(payload, channel, 11, 5);
-          ret.push(payload);
+          ret.push(tel(payload));
           break;
       }
-    }
-
-    return { payload };
+    });
+    return ret;
   },
 };
+//550009070156d2010164ffe1ca830003ffffffffff0050
+//550009070156d2010000ffe1ca810003ffffffffff001c
+//550009070156d2010100ffe1ca830003ffffffffff000b

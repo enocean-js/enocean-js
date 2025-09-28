@@ -8,48 +8,15 @@ import "./material-icon.js";
 
 const apiClient = EnoceanJSElement.apiClient;
 const utils = EnoceanJSElement.utils;
-class EnoceanMonitor extends EnoceanJSElement {
+class EnoceanTelegram extends EnoceanJSElement {
   constructor() {
     super();
-    this.lines = [];
-    this.filter = "";
+    this.telegram = {};
   }
   static properties = {
-    lines: { type: Array },
-    filter: { type: String },
+    telegram: { type: Object },
   };
-  connectedCallback() {
-    super.connectedCallback();
-    this.unsubscribe_unknown = apiClient.on("unknown-device", (event) => {
-      if (this.filter && event.input_rorg.toString(16) == this.filter) {
-        this.printLine(html`${toHTML(event.raw)}`, "known-device");
-      }
-    });
-    this.unsubscribe_known = apiClient.on("device-data", (event) => {
-      //console.log(this.utils.erp1.toHTML(event.raw));
-      const channel =
-        event.profile.channel !== undefined
-          ? event.profile.channels
-          : [event.profile];
 
-      if (this.filter && event.profile.meta.rorg == this.filter) {
-        this.printLine(html`${toHTML(event.raw)}`, "known-device");
-      }
-    });
-  }
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this.unsubscribe_unknown(); // unsubscribe
-    this.unsubscribe_known(); // unsubscribe
-  }
-  printLine(text, type = "info") {
-    const new_lines = [...this.lines];
-    new_lines.push({ text, type });
-    if (new_lines.length > 100) {
-      new_lines.shift();
-    }
-    this.lines = new_lines;
-  }
   static styles = css`
     :host {
       display: block;
@@ -131,7 +98,7 @@ class EnoceanMonitor extends EnoceanJSElement {
     </div>`;
   }
 }
-customElements.define("enocean-monitor", EnoceanMonitor);
+customElements.define("enocean-telegram", EnoceanTelegram);
 function toHTML(tel) {
   const telegram = utils.erp1.parse(tel);
   return html`

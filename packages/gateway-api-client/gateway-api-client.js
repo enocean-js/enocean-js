@@ -165,6 +165,13 @@ export class GatewayApiClient {
     });
     return await resDoAction.json();
   }
+  async send(telegram) {
+    const resSend = await fetch(`${this.url}/api/send/${telegram}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    return await resSend.json();
+  }
   async editDevice(id, params) {
     const resUpdateDevice = await fetch(`${this.url}/api/device/${id}`, {
       method: "PUT",

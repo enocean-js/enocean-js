@@ -25,14 +25,16 @@ export async function onPacket(telegram) {
     signalStrength: utils.erp1.getSignalStrength(telegram),
     raw: telegram,
   };
-  console.log(utils.toString(ret.raw));
+
   if (ret.input_rorg === 0xd0) {
     // D0 is a SIGNAL telegram, there are no eep profiles for it.
     // we can decode SIGNALS in any case, so we handle it here directly.
     handleD0.call(this, ret);
     return;
   }
-
+  if (ret.input_rorg === 0xd1) {
+    console.log(utils.toString(ret.raw));
+  }
   // Check if there is a device with the senderId and rorg know
   // Each device may support several unique RORGs, but only one type of RORG is assigned per device instance.
   const knownDevice = this.memory.getDeviceEntriesRORG(

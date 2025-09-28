@@ -45,6 +45,7 @@ class EnoceanProp extends EnoceanJSElement {
   };
   action(outputId, prop, val) {
     return async () => {
+      console.log("Action", outputId, prop, val);
       await apiClient.doAction({
         id: this.output_id,
         eep: this.output_eep,

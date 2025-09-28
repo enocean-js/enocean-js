@@ -320,7 +320,15 @@ export function startServer(app, enocean, ip, port) {
     const option = req.body;
     res.json(await enocean.doAction(option));
   });
-
+  app.get("/api/send/:telegram", async (req, res) => {
+    try {
+      const response = await enocean.send(req.params.telegram);
+      res.json(response);
+    } catch (error) {
+      console.error("Error sending telegram:", error);
+      res.status(500).json({ success: false, error: error });
+    }
+  });
   return new Promise((resolve, reject) => {
     app.listen(port, ip, (err) => {
       if (err) {
