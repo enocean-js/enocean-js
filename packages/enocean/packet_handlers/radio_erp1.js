@@ -103,6 +103,7 @@ function updatePropValues(profile, decoded) {
   let channel = newProfile.props;
   //but if we do have channels, use the props of the correct channel
   if (newProfile.channels) {
+    console.log(decoded);
     if (!decoded.hasOwnProperty("channel")) {
       channel = newProfile.channels[decoded.channel].props;
     } else {

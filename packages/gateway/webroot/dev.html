@@ -23,6 +23,39 @@
         flex: 1;
         padding: 20px;
       }
+      .tele {
+        color: grey;
+        font-size: 1.1em;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 10px;
+        font-family: monospace;
+      }
+      span[contenteditable="true"] {
+        border-bottom: 1px dashed #ccc;
+        padding: 2px 4px;
+        box-sizing: border-box;
+        font-size: 1.5em;
+        color: black;
+      }
+      span[contenteditable="true"]:focus {
+        outline: none;
+      }
+      span[contenteditable="true"].err {
+        border-bottom-color: red;
+      }
+      #packetType {
+        width: 2em;
+        text-align: center;
+        padding: 2px 4px;
+        box-sizing: border-box;
+      }
+      #sendButton {
+        font-family: "Material Symbols Rounded";
+        font-size: 1.5em;
+        margin-left: 20px;
+      }
     </style>
   </head>
   <body>
@@ -38,55 +71,53 @@
 
         <br />
         <br />
-        <label for="packetType">Packet Type:</label>
-        <input
-          id="packetType"
-          type="text"
-          placeholder="Packet Type"
-          value="1"
-        />
-        <br />
-        <br />
-        <label for="data">Data:</label>
-        <input id="data" type="text" placeholder="Data" />
-        <span>d1004609ffe1ca8100</span>
-        <br />
-        <br />
-        <label for="optionalData">Optional Data:</label>
-        <input
-          id="optionalData"
-          type="text"
-          placeholder="Optional Data"
-          value="03ffffffffff00"
-        /><br />
-        <br />
-        <div id="telegramStringOutput"></div>
-        <button id="sendButton">Send Packet</button>
+
+        <div class="tele">
+          <span>55</span>. <span id="dataLength">0001</span>.
+          <span id="optionalLength">00</span>.
+          <span id="packetType" contenteditable="true" spellcheck="false"
+            >01</span
+          >. <span id="headerCRC">00</span>.
+          <span id="data" contenteditable="true" spellcheck="false"></span>.
+          <span id="optionalData" contenteditable="true" spellcheck="false"
+            >03ffffffffff00</span
+          >.
+          <span id="dataCRC">00</span>
+          <button id="sendButton">send</button>
+        </div>
+
         <div id="result"></div>
-        <enocean-monitor filter="d1"></enocean-monitor>
+        <enocean-monitor></enocean-monitor>
         <script type="module">
           import "./components/header.js";
           import "./components/monitor.js";
           import "./components/ed-prop-list.js";
           import { GatewayApiClient, utils } from "./gateway-api-client.js";
           const apiClient = new GatewayApiClient();
-
           let telegram = null;
-          const sendButton = document.getElementById("sendButton");
           const telegramStringOutput = document.getElementById(
             "telegramStringOutput"
           );
+
+          const sendButton = document.getElementById("sendButton");
+          const packetType = document.getElementById("packetType");
           const optionalData = document.getElementById("optionalData");
+          const data = document.getElementById("data");
+
+          const baseId = (await apiClient.getBaseId()).baseId;
+          data.innerText = `f600${baseId}00`;
+          makePacket();
+
           optionalData.oninput = (event) => {
             makePacket();
             console.log("Optional Data changed:", event.target.value);
           };
-          const data = document.getElementById("data");
+
           data.oninput = (event) => {
             makePacket();
             console.log("Data changed:", event.target.value);
           };
-          const packetType = document.getElementById("packetType");
+
           packetType.oninput = (event) => {
             makePacket();
             console.log("Packet Type changed:", event.target.value);
@@ -94,22 +125,58 @@
 
           sendButton.addEventListener("click", () => {
             apiClient.send(telegram).then((response) => {
-              result.innerHTML = JSON.stringify(response, null, 2);
+              if (response.success === true) {
+                console.log("Packet sent successfully");
+              } else {
+                console.error("Error sending packet:", response.error);
+              }
             });
           });
-          function makePacket() {
-            const packetType = document.getElementById("packetType").value;
-            const data = document.getElementById("data").value;
-            const optionalData = document.getElementById("optionalData").value;
 
-            let packet = utils.createESP3Telegram(packetType);
-            packet = utils.setData(packet, utils.fromString(data));
+          function makePacket() {
+            const packetTypeValue = packetType.innerText;
+            const dataValue = data.innerText;
+            const optionalDataValue = optionalData.innerText;
+            let packet = utils.createESP3Telegram(packetTypeValue);
+            packet = utils.setData(packet, utils.fromString(dataValue));
             packet = utils.setOptionalData(
               packet,
-              utils.fromString(optionalData)
+              utils.fromString(optionalDataValue)
             );
+            if (dataValue.length % 2 !== 0) {
+              data.classList.add("err");
+            } else {
+              data.classList.remove("err");
+            }
+            if (optionalDataValue.length % 2 !== 0) {
+              optionalData.classList.add("err");
+            } else {
+              optionalData.classList.remove("err");
+            }
+            if (packetTypeValue.length % 2 !== 0) {
+              packetType.classList.add("err");
+            } else {
+              packetType.classList.remove("err");
+            }
             telegram = utils.toString(packet);
-            telegramStringOutput.innerHTML = telegram;
+            document.getElementById("headerCRC").innerText = utils
+              .getHeaderCRC8(packet)
+              .toString(16)
+              .padStart(2, "0");
+            document.getElementById("dataCRC").innerText = utils
+              .getBodyCRC8(packet)
+              .toString(16)
+              .padStart(2, "0");
+            document.getElementById("dataLength").innerText = utils
+              .getDataLength(packet)
+              .toString(16)
+              .padStart(4, "0");
+            document.getElementById("optionalLength").innerText = utils
+              .getOptionalDataLength(packet)
+              .toString(16)
+              .padStart(2, "0");
+            //console.log("Telegram:", utils.getHeaderCRC8(packet));
+            //telegramStringOutput.innerHTML = telegram;
           }
         </script>
       </div>

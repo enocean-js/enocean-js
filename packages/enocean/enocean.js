@@ -274,11 +274,15 @@ export class Enocean extends EventEmitter {
   }
 
   async handleData(data) {
+    const type = utils.getPacketType(data);
     this.emit("data", data);
     this.emit(
-      utils.PacketTypeNameMap[utils.getPacketType(data)].eventName, // radio-erp1, response, ...
+      utils.PacketTypeNameMap[type].eventName, // radio-erp1, response, ...
       data
     );
+    if (!this.packetHandlers[type]) {
+      this.emit("other-data", data);
+    }
   }
   async doAction(options) {
     // {id:aabbccdd,eep: eep, destinationId:ffffffff,actions:[{name:"abc",value:123},{}]}

@@ -6,6 +6,7 @@ export const EventNames = [
   "serialport-open",
   "radio-erp1",
   "device-data",
+  "other-data",
   "unknown-device",
   "new-device-found",
   "teach-in-started",
