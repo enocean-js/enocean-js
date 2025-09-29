@@ -21,7 +21,7 @@ class EnoceanMonitor extends EnoceanJSElement {
   connectedCallback() {
     super.connectedCallback();
     this.unsubscribe_unknown = apiClient.on("unknown-device", (event) => {
-      if (this.filter && event.input_rorg.toString(16) == this.filter) {
+      if (this.filter === "" || event.input_rorg.toString(16) == this.filter) {
         this.printLine(html`${toHTML(event.raw)}`, "unknown-device");
       }
     });
@@ -32,7 +32,7 @@ class EnoceanMonitor extends EnoceanJSElement {
       }
     });
     this.unsubscribe_other = apiClient.on("other-data", (event) => {
-      console.log(event);
+      console.log("other:", event);
       this.printLine(html`${utils.toString(event)}`, "other-data");
     });
   }
